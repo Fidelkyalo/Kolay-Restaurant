@@ -26,20 +26,39 @@ const POS = () => {
         setNewTableNumber('');
     };
 
+    const [products, setProducts] = useState(() => {
+        const saved = localStorage.getItem('kolay_dishes');
+        return saved ? JSON.parse(saved) : [
+            { id: 1, name: 'Beef Burger', price: 850, category: 'Main Dish', image: '🍔' },
+            { id: 2, name: 'Margherita Pizza', price: 1100, category: 'Main Dish', image: '🍕' },
+            { id: 3, name: 'Grilled Salmon', price: 1850, category: 'Main Dish', image: '🐟' },
+            { id: 4, name: 'Cappuccino', price: 350, category: 'Beverages', image: '☕' },
+            { id: 5, name: 'Iced Tea', price: 250, category: 'Beverages', image: '🍹' },
+            { id: 6, name: 'French Fries', price: 300, category: 'Side Dish', image: '🍟' },
+            { id: 7, name: 'Fruit Salad', price: 450, category: 'Desserts', image: '🥗' },
+            { id: 8, name: 'Pancakes', price: 550, category: 'BreakFast', image: '🥞' },
+        ];
+    });
+    const [showDishModal, setShowDishModal] = useState(false);
+    const [newDish, setNewDish] = useState({ name: '', price: '', category: 'Main Dish', image: '🍱' });
+
+    const addDish = () => {
+        if (!newDish.name.trim() || !newDish.price) return;
+        const dishToAdd = {
+            id: Date.now(),
+            ...newDish,
+            price: parseFloat(newDish.price)
+        };
+        const updated = [...products, dishToAdd];
+        setProducts(updated);
+        localStorage.setItem('kolay_dishes', JSON.stringify(updated));
+        setNewDish({ name: '', price: '', category: 'Main Dish', image: '🍱' });
+        setShowDishModal(false);
+    };
+
     const categories = ['All', 'BreakFast', 'Main Dish', 'Beverages', 'Desserts', 'Side Dish'];
 
-    const demoProducts = [
-        { id: 1, name: 'Beef Burger', price: 850, category: 'Main Dish', image: '🍔' },
-        { id: 2, name: 'Margherita Pizza', price: 1100, category: 'Main Dish', image: '🍕' },
-        { id: 3, name: 'Grilled Salmon', price: 1850, category: 'Main Dish', image: '🐟' },
-        { id: 4, name: 'Cappuccino', price: 350, category: 'Beverages', image: '☕' },
-        { id: 5, name: 'Iced Tea', price: 250, category: 'Beverages', image: '🍹' },
-        { id: 6, name: 'French Fries', price: 300, category: 'Side Dish', image: '🍟' },
-        { id: 7, name: 'Fruit Salad', price: 450, category: 'Desserts', image: '🥗' },
-        { id: 8, name: 'Pancakes', price: 550, category: 'BreakFast', image: '🥞' },
-    ];
-
-    const filteredProducts = demoProducts.filter(p =>
+    const filteredProducts = products.filter(p =>
         (activeCategory === 'All' || p.category === activeCategory) &&
         p.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -180,7 +199,7 @@ const POS = () => {
                 </div>
 
                 {/* Categories */}
-                <div className="flex gap-4 mb-8 overflow-x-auto pb-2 scrollbar-hide">
+                <div className="flex gap-4 mb-8 overflow-x-auto pb-2 scrollbar-hide items-center">
                     {categories.map(cat => (
                         <button
                             key={cat}
@@ -193,6 +212,12 @@ const POS = () => {
                             {cat}
                         </button>
                     ))}
+                    <button
+                        onClick={() => setShowDishModal(true)}
+                        className="bg-primary/5 hover:bg-primary text-primary hover:text-white px-6 py-2.5 rounded-full font-bold border border-primary/20 transition-all flex items-center gap-2"
+                    >
+                        <Plus className="w-4 h-4" /> Manage Menu
+                    </button>
                 </div>
 
                 {/* Product Grid */}
@@ -300,6 +325,59 @@ const POS = () => {
                     </button>
                 </div>
             </div>
+            {/* Manage Dish Modal */}
+            {showDishModal && (
+                <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[120] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl p-8 animate-in zoom-in duration-200">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-2xl font-bold text-primary">Add New Dish</h3>
+                            <button onClick={() => setShowDishModal(false)} className="text-charcoal/40 hover:text-primary text-2xl">&times;</button>
+                        </div>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Dish Name</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Chicken Wings"
+                                    className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold"
+                                    value={newDish.name}
+                                    onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Price (KES)</label>
+                                    <input
+                                        type="number"
+                                        placeholder="850"
+                                        className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold"
+                                        value={newDish.price}
+                                        onChange={(e) => setNewDish({ ...newDish, price: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Category</label>
+                                    <select
+                                        className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold appearance-none"
+                                        value={newDish.category}
+                                        onChange={(e) => setNewDish({ ...newDish, category: e.target.value })}
+                                    >
+                                        {categories.filter(c => c !== 'All').map(c => (
+                                            <option key={c} value={c}>{c}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            <button
+                                onClick={addDish}
+                                className="w-full bg-secondary text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-all shadow-xl mt-4 active:scale-95"
+                            >
+                                Add to Menu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
