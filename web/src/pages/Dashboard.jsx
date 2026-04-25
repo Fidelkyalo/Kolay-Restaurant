@@ -3,6 +3,23 @@ import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar } from 'lucide
 import { Link, useNavigate } from 'react-router-dom';
 
 function Dashboard() {
+    const [viewMode, setViewMode] = useState('Weekly');
+
+    const chartData = {
+        Weekly: {
+            label: 'Last 7 days performance',
+            data: [35, 45, 30, 60, 85, 45, 95],
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        Monthly: {
+            label: 'Last 6 months performance',
+            data: [45, 65, 55, 80, 90, 95],
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+        }
+    };
+
+    const currentData = chartData[viewMode];
+
     return (
         <div className="min-h-screen bg-bg-cream text-charcoal font-body">
             {/* Navigation */}
@@ -104,15 +121,25 @@ function Dashboard() {
                             <div className="flex justify-between items-center mb-8">
                                 <div>
                                     <h2 className="text-xl font-bold text-primary">Revenue Trends</h2>
-                                    <p className="text-charcoal/50 text-sm">Last 7 days performance</p>
+                                    <p className="text-charcoal/50 text-sm">{currentData.label}</p>
                                 </div>
                                 <div className="flex bg-bg-cream p-1 rounded-xl">
-                                    <button className="px-4 py-1.5 rounded-lg bg-white shadow-sm text-xs font-bold text-primary">Weekly</button>
-                                    <button className="px-4 py-1.5 rounded-lg text-xs font-bold text-charcoal/40 hover:text-primary transition-colors">Monthly</button>
+                                    <button
+                                        onClick={() => setViewMode('Weekly')}
+                                        className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'Weekly' ? 'bg-white shadow-sm text-primary' : 'text-charcoal/40 hover:text-primary'}`}
+                                    >
+                                        Weekly
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode('Monthly')}
+                                        className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'Monthly' ? 'bg-white shadow-sm text-primary' : 'text-charcoal/40 hover:text-primary'}`}
+                                    >
+                                        Monthly
+                                    </button>
                                 </div>
                             </div>
-                            <div className="h-64 flex items-end gap-4 px-2">
-                                {[35, 45, 30, 60, 85, 45, 95].map((val, i) => (
+                            <div className="h-64 flex items-end gap-4 px-2 translate-y-1">
+                                {currentData.data.map((val, i) => (
                                     <div key={i} className="flex-1 flex flex-col items-center group">
                                         <div
                                             className="w-full bg-secondary/10 rounded-t-xl group-hover:bg-secondary transition-all relative"
@@ -122,7 +149,7 @@ function Dashboard() {
                                                 KES {(val * 1000).toLocaleString()}
                                             </div>
                                         </div>
-                                        <span className="text-[10px] font-bold text-charcoal/30 mt-3 uppercase">{['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}</span>
+                                        <span className="text-[10px] font-bold text-charcoal/30 mt-3 uppercase">{currentData.labels[i]}</span>
                                     </div>
                                 ))}
                             </div>
