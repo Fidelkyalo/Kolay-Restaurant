@@ -75,12 +75,13 @@ const POS = () => {
                     <div class="header">
                         <h1 class="restaurant-name">KOLAY RESTAURANT</h1>
                         <p class="tagline">"Where Every Meal Feels Right"</p>
-                        <p style="font-size: 12px;">123 Gourmet Street, Nairobi<br>Tel: +254 700 000 000</p>
+                        <p style="font-size: 11px;">123 Thome Street, Nairobi<br>Tel: +254 102 039 121<br>Email: kolayrestaurant@gmail.com</p>
                     </div>
                     <div class="order-info">
                         <div class="total-row"><span>ID:</span> <strong>#${lastPlacedOrder.id}</strong></div>
                         <div class="total-row"><span>Date:</span> <span>${new Date().toLocaleDateString()}</span></div>
-                        <div class="total-row"><span>Table:</span> <span>${lastPlacedOrder.table}</span></div>
+                        <div class="total-row"><span>Time:</span> <span>${new Date().toLocaleTimeString('en-GB')}</span></div>
+                        <div class="total-row"><span>Channel:</span> <strong>${lastPlacedOrder.table} ${lastPlacedOrder.table === 'Online Order' ? '(ONLINE)' : ''}</strong></div>
                     </div>
                     <table class="items">
                         <thead>
@@ -91,7 +92,7 @@ const POS = () => {
                                 <tr>
                                     <td class="qty">${item.quantity}</td>
                                     <td>${item.name}</td>
-                                    <td class="price">${(item.price * item.quantity).toLocaleString()}</td>
+                                    <td class="price">${((item.price || 0) * item.quantity).toLocaleString()}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -197,7 +198,7 @@ const POS = () => {
         const newOrder = {
             id: `#${Math.floor(1000 + Math.random() * 9000)}`,
             table: selectedTable,
-            items: cart.map(item => ({ name: item.name, quantity: item.quantity, notes: '' })),
+            items: cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price, notes: '' })),
             total: `KES ${(subtotal + tax).toLocaleString()}`,
             status: 'PENDING',
             statusColor: 'bg-gray-100 text-gray-700'
