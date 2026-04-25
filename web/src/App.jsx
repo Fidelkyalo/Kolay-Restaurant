@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard';
 import POS from './pages/POS';
 import KDS from './pages/KDS';
 import Inventory from './pages/Inventory';
+import AdminPanel from './pages/AdminPanel';
 
 function App() {
   return (

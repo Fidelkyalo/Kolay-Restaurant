@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Package, AlertTriangle, Plus, Search, ArrowLeft, RefreshCw, Filter } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Package, AlertTriangle, Plus, Search, RefreshCw, Filter } from 'lucide-react';
+import Navbar from '../components/Navbar';
 
 const INITIAL_INVENTORY = [
     { id: 1, name: 'Beef Burger Patties', stock: 12, unit: 'units', status: 'LOW', category: 'Meat' },
@@ -164,9 +164,7 @@ const Inventory = () => {
                 </div>
             )}
 
-            <Link to="/dashboard" className="flex items-center gap-2 text-charcoal/40 hover:text-secondary transition-colors mb-8 font-bold text-sm">
-                <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-            </Link>
+            <Navbar />
 
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
                 <div>
