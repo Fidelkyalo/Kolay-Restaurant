@@ -55,9 +55,9 @@ const POS = () => {
         const newOrder = {
             id: `#${Math.floor(1000 + Math.random() * 9000)}`,
             table: 'T-01',
-            items: cart.map(item => `${item.quantity}x ${item.name}`).join(', '),
+            items: cart.map(item => ({ name: item.name, quantity: item.quantity, notes: '' })),
             total: `KES ${(subtotal + tax).toLocaleString()}`,
-            status: 'Pending',
+            status: 'PENDING',
             statusColor: 'bg-gray-100 text-gray-700'
         };
 

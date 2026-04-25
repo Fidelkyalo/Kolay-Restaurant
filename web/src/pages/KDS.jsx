@@ -3,42 +3,32 @@ import { Clock, CheckCircle2, AlertCircle, ChefHat, Timer, ArrowRight, History, 
 import { Link } from 'react-router-dom';
 
 const KDS = () => {
-    const [activeOrders, setActiveOrders] = useState([
-        {
-            id: '#8902',
-            table: 'T-04',
-            time: '12 mins ago',
-            status: 'PENDING',
-            items: [
-                { name: 'Beef Burger', quantity: 2, notes: 'No onions' },
-                { name: 'French Fries', quantity: 1, notes: 'Extra crispy' }
-            ]
-        },
-        {
-            id: '#8901',
-            table: 'T-12',
-            time: '8 mins ago',
-            status: 'PREPARING',
-            items: [
-                { name: 'Grilled Salmon', quantity: 1, notes: 'Lemon on side' }
-            ]
-        },
-        {
-            id: '#8903',
-            table: 'T-02',
-            time: '2 mins ago',
-            status: 'PENDING',
-            items: [
-                { name: 'Margherita Pizza', quantity: 1, notes: '' },
-                { name: 'Iced Tea', quantity: 2, notes: '' }
-            ]
-        }
-    ]);
+    const [activeOrders, setActiveOrders] = useState([]);
+
+    useEffect(() => {
+        const loadOrders = () => {
+            const saved = localStorage.getItem('kolay_orders');
+            if (saved) {
+                const allOrders = JSON.parse(saved);
+                // Filter for PENDING or PREPARING (Uppercase as standardized)
+                setActiveOrders(allOrders.filter(o => o.status === 'PENDING' || o.status === 'PREPARING'));
+            }
+        };
+        loadOrders();
+        window.addEventListener('storage', loadOrders);
+        return () => window.removeEventListener('storage', loadOrders);
+    }, []);
 
     const updateStatus = (id, newStatus) => {
-        setActiveOrders(activeOrders.map(order =>
-            order.id === id ? { ...order, status: newStatus } : order
-        ));
+        const saved = localStorage.getItem('kolay_orders');
+        if (saved) {
+            const allOrders = JSON.parse(saved);
+            const updated = allOrders.map(order =>
+                order.id === id ? { ...order, status: newStatus } : order
+            );
+            localStorage.setItem('kolay_orders', JSON.stringify(updated));
+            setActiveOrders(updated.filter(o => o.status === 'PENDING' || o.status === 'PREPARING'));
+        }
     };
 
     return (
@@ -73,7 +63,7 @@ const KDS = () => {
 
             {/* Orders Grid */}
             <div className="flex-1 overflow-x-auto pb-4 flex gap-6 custom-scrollbar scroll-smooth">
-                {activeOrders.map((order, idx) => (
+                {activeOrders.map((order) => (
                     <div
                         key={order.id}
                         className={`w-[380px] shrink-0 flex flex-col rounded-[2.5rem] overflow-hidden shadow-2xl transition-all border-2 ${order.status === 'PREPARING' ? 'border-secondary/50 bg-[#2a2a2a]' : 'border-white/5 bg-[#252525]'
@@ -87,13 +77,13 @@ const KDS = () => {
                             </div>
                             <div className="text-right text-xs font-bold opacity-60">
                                 <p>{order.id}</p>
-                                <p className="flex items-center gap-1 justify-end mt-1"><Clock className="w-3 h-3 text-secondary" /> {order.time}</p>
+                                <p className="flex items-center gap-1 justify-end mt-1"><Clock className="w-3 h-3 text-secondary" /> {order.time || 'Just now'}</p>
                             </div>
                         </div>
 
                         {/* Ticket Body */}
                         <div className="p-8 flex-1 space-y-6 overflow-y-auto">
-                            {order.items.map((item, i) => (
+                            {Array.isArray(order.items) ? order.items.map((item, i) => (
                                 <div key={i} className="flex gap-4 group">
                                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center font-bold text-secondary text-lg border border-white/5 group-hover:bg-secondary group-hover:text-white transition-all">
                                         {item.quantity}
@@ -103,7 +93,14 @@ const KDS = () => {
                                         {item.notes && <p className="text-sm text-secondary italic font-medium mt-1">Note: {item.notes}</p>}
                                     </div>
                                 </div>
-                            ))}
+                            )) : (
+                                <div className="flex gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center font-bold text-secondary text-lg border border-white/5 transition-all">
+                                        1
+                                    </div>
+                                    <p className="text-lg font-bold tracking-tight">{order.items}</p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Ticket Actions */}
@@ -127,11 +124,12 @@ const KDS = () => {
                     </div>
                 ))}
 
-                {/* Empty placeholder to encourage horizontal layout */}
-                <div className="w-[380px] shrink-0 bg-white/5 border-2 border-dashed border-white/10 rounded-[2.5rem] flex flex-col items-center justify-center opacity-20">
-                    <AlertCircle className="w-16 h-16 mb-4" />
-                    <p className="font-bold text-center px-10 italic">Waiting for incoming tickets...</p>
-                </div>
+                {activeOrders.length === 0 && (
+                    <div className="w-full h-full flex flex-col items-center justify-center opacity-20">
+                        <AlertCircle className="w-16 h-16 mb-4" />
+                        <p className="font-bold text-center px-10 italic">Waiting for incoming tickets...</p>
+                    </div>
+                )}
             </div>
 
             {/* KDS Stats Footer */}
@@ -142,7 +140,7 @@ const KDS = () => {
                 </div>
                 <div className="bg-[#252525] p-6 rounded-3xl border border-white/5 flex-1 flex items-center justify-between shadow-lg">
                     <span className="text-sm font-bold opacity-40 uppercase tracking-widest">Urgent Tickets (10m+)</span>
-                    <span className="text-3xl font-display font-bold text-red-500">1</span>
+                    <span className="text-3xl font-display font-bold text-red-500">0</span>
                 </div>
                 <div className="bg-primary p-6 rounded-3xl border border-accent/20 flex-1 flex items-center justify-between shadow-xl">
                     <span className="text-sm font-bold text-white/50 uppercase tracking-widest">Completed Today</span>
