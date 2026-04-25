@@ -58,18 +58,25 @@ const Inventory = () => {
 
     const handleAddItem = (e) => {
         e.preventDefault();
-        if (!newItem.name || !newItem.stock) return;
+
+        // Robust validation
+        if (!newItem.name.trim() || newItem.stock === '') {
+            return;
+        }
 
         const itemToAdd = {
-            id: Date.now(), // Truly unique ID
-            name: newItem.name,
-            stock: parseInt(newItem.stock),
+            id: Date.now(),
+            name: newItem.name.trim(),
+            stock: parseInt(newItem.stock) || 0,
             unit: newItem.unit,
-            status: parseInt(newItem.stock) < 20 ? 'LOW' : 'OK',
+            status: (parseInt(newItem.stock) || 0) < 20 ? 'LOW' : 'OK',
             category: newItem.category
         };
 
-        setInventory([itemToAdd, ...inventory]);
+        // Functional update to ensure state consistency
+        setInventory(prev => [itemToAdd, ...prev]);
+
+        // Reset and Close
         setNewItem({ name: '', category: 'Produce', stock: '', unit: 'units' });
         setShowAddModal(false);
     };
@@ -80,11 +87,15 @@ const Inventory = () => {
             {showAddModal && (
                 <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                     <div className="bg-white rounded-[2rem] w-full max-w-md shadow-2xl p-8 animate-in fade-in zoom-in duration-200">
-                        <h3 className="text-2xl font-bold text-primary mb-6">Onboard New Stock</h3>
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-2xl font-bold text-primary">Onboard New Stock</h3>
+                            <button onClick={() => setShowAddModal(false)} className="text-charcoal/40 hover:text-primary">&times;</button>
+                        </div>
                         <form onSubmit={handleAddItem} className="space-y-5">
                             <div>
                                 <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Item Name</label>
                                 <input
+                                    required
                                     autoFocus
                                     placeholder="e.g. Tomato Sauce"
                                     className="w-full bg-bg-cream border border-cream px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20"
@@ -96,9 +107,11 @@ const Inventory = () => {
                                 <div>
                                     <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Initial Stock</label>
                                     <input
+                                        required
                                         type="number"
                                         placeholder="0"
-                                        className="w-full bg-bg-cream border border-cream px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20"
+                                        min="0"
+                                        className="w-full bg-bg-cream border border-cream px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20 font-bold text-primary"
                                         value={newItem.stock}
                                         onChange={e => setNewItem({ ...newItem, stock: e.target.value })}
                                     />
