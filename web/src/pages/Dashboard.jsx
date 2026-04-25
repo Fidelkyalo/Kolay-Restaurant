@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar } from 'lucide-react';
+import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar, MessageSquare, Clock, RefreshCw } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 function Dashboard() {
     const [viewMode, setViewMode] = useState('Weekly');
@@ -11,13 +11,37 @@ function Dashboard() {
 
     const [orders] = useState(() => {
         const saved = localStorage.getItem('kolay_orders');
-        const initial = [];
-        if (!saved) {
-            localStorage.setItem('kolay_orders', JSON.stringify(initial));
-            return initial;
-        }
-        return JSON.parse(saved);
+        return saved ? JSON.parse(saved) : [];
     });
+
+    const [archive] = useState(() => {
+        const saved = localStorage.getItem('kolay_archive');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    const [notes, setNotes] = useState(() => {
+        const saved = localStorage.getItem('kolay_dashboard_notes');
+        return saved ? JSON.parse(saved) : "Great sales today! Need to restock on Beef Burger patties soon.";
+    });
+
+    // Auto-Reset Logic (24h)
+    React.useEffect(() => {
+        const lastReset = localStorage.getItem('kolay_last_reset');
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+
+        if (!lastReset || (now - parseInt(lastReset)) > oneDay) {
+            // Self-cleaning: Archive current orders and clear active pool
+            const activePool = JSON.parse(localStorage.getItem('kolay_orders') || '[]');
+            if (activePool.length > 0) {
+                const currentArchive = JSON.parse(localStorage.getItem('kolay_archive') || '[]');
+                localStorage.setItem('kolay_archive', JSON.stringify([...activePool, ...currentArchive]));
+            }
+            localStorage.setItem('kolay_orders', JSON.stringify([]));
+            localStorage.setItem('kolay_last_reset', now.toString());
+            console.log('Daily system reset completed.');
+        }
+    }, []);
 
     const alerts = inventory.filter(item => item.status === 'LOW' || item.status === 'OUT');
     const activeOrders = orders.filter(o => o.status === 'In Progress' || o.status === 'Pending');
@@ -41,20 +65,30 @@ function Dashboard() {
         return str.toLowerCase().includes('pizza');
     }).length * 40);
 
-    const chartData = {
-        Weekly: {
-            label: 'Last 7 days performance',
-            data: [35, 45, 30, 60, 85, 45, 95],
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        Monthly: {
-            label: 'Last 6 months performance',
-            data: [45, 65, 55, 80, 90, 95],
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
-        }
+    // Dynamic Chart Data from Archive
+    const getChartData = () => {
+        const last7Days = [...Array(7)].map((_, i) => {
+            const d = new Date();
+            d.setDate(d.getDate() - (6 - i));
+            return {
+                label: d.toLocaleDateString('en-US', { weekday: 'short' }),
+                dateStr: d.toLocaleDateString('en-CA') // YYYY-MM-DD
+            };
+        });
+
+        return last7Days.map(day => {
+            const dayOrders = archive.filter(o => o.timestamp && o.timestamp.startsWith(day.dateStr));
+            const revenue = dayOrders.reduce((sum, o) => sum + (parseInt(o.total.replace(/[^0-9]/g, '')) || 0), 0);
+
+            return {
+                name: day.label,
+                revenue: revenue || 0,
+                orders: dayOrders.length
+            };
+        });
     };
 
-    const currentData = chartData[viewMode];
+    const realChartData = getChartData();
 
     return (
         <div className="min-h-screen bg-bg-cream text-charcoal font-body">
@@ -169,42 +203,82 @@ function Dashboard() {
                             </div>
                         </div>
 
-                        {/* Revenue Visualization Mock */}
-                        <div className="bg-white p-8 rounded-3xl border border-cream shadow-sm">
+                        {/* Statistics Graph Section */}
+                        <div className="bg-white p-8 rounded-3xl border border-cream shadow-sm relative overflow-hidden">
                             <div className="flex justify-between items-center mb-8">
                                 <div>
-                                    <h2 className="text-xl font-bold text-primary">Revenue Trends</h2>
-                                    <p className="text-charcoal/50 text-sm">{currentData.label}</p>
+                                    <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+                                        <TrendingUp className="w-5 h-5 text-secondary" />
+                                        System Statistics
+                                    </h2>
+                                    <p className="text-charcoal/50 text-sm">Real-time revenue & order trends from archive</p>
                                 </div>
-                                <div className="flex bg-bg-cream p-1 rounded-xl">
-                                    <button
-                                        onClick={() => setViewMode('Weekly')}
-                                        className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'Weekly' ? 'bg-white shadow-sm text-primary' : 'text-charcoal/40 hover:text-primary'}`}
-                                    >
-                                        Weekly
-                                    </button>
-                                    <button
-                                        onClick={() => setViewMode('Monthly')}
-                                        className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'Monthly' ? 'bg-white shadow-sm text-primary' : 'text-charcoal/40 hover:text-primary'}`}
-                                    >
-                                        Monthly
-                                    </button>
+                                <div className="flex gap-2">
+                                    <div className="bg-green-50 text-green-600 px-3 py-1 rounded-lg text-xs font-bold border border-green-100 flex items-center gap-1">
+                                        <Clock className="w-3 h-3" /> Auto-Reset: 24h
+                                    </div>
                                 </div>
                             </div>
-                            <div className="h-64 flex items-end gap-4 px-2 translate-y-1">
-                                {currentData.data.map((val, i) => (
-                                    <div key={i} className="flex-1 flex flex-col items-center group">
-                                        <div
-                                            className="w-full bg-secondary/10 rounded-t-xl group-hover:bg-secondary transition-all relative"
-                                            style={{ height: `${val}%` }}
-                                        >
-                                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                                KES {(val * 1000).toLocaleString()}
-                                            </div>
-                                        </div>
-                                        <span className="text-[10px] font-bold text-charcoal/30 mt-3 uppercase">{currentData.labels[i]}</span>
+
+                            <div className="h-80 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={realChartData}>
+                                        <defs>
+                                            <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#d35400" stopOpacity={0.1} />
+                                                <stop offset="95%" stopColor="#d35400" stopOpacity={0} />
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                                        <XAxis
+                                            dataKey="name"
+                                            axisLine={false}
+                                            tickLine={false}
+                                            tick={{ fill: '#888', fontSize: 10, fontWeight: 'bold' }}
+                                            dy={10}
+                                        />
+                                        <YAxis hide />
+                                        <Tooltip
+                                            contentStyle={{ borderRadius: '1rem', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', fontSize: '12px' }}
+                                        />
+                                        <Area
+                                            type="monotone"
+                                            dataKey="revenue"
+                                            stroke="#d35400"
+                                            strokeWidth={3}
+                                            fillOpacity={1}
+                                            fill="url(#colorRev)"
+                                        />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+
+                            {/* Comments/Notes Section within Graph Area */}
+                            <div className="mt-8 pt-8 border-t border-cream grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                                <div className="bg-bg-cream/50 p-6 rounded-2xl border border-cream/50">
+                                    <h4 className="text-xs font-black uppercase text-charcoal/40 mb-3 flex items-center gap-2">
+                                        <MessageSquare className="w-3 h-3" /> Management Notes
+                                    </h4>
+                                    <textarea
+                                        className="w-full bg-transparent border-none outline-none text-sm text-primary font-medium resize-none h-20"
+                                        value={notes}
+                                        onChange={(e) => {
+                                            setNotes(e.target.value);
+                                            localStorage.setItem('kolay_dashboard_notes', JSON.stringify(e.target.value));
+                                        }}
+                                        placeholder="Add performance notes here..."
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="p-4 bg-primary text-white rounded-2xl shadow-lg">
+                                        <p className="text-[10px] font-bold opacity-60 uppercase mb-1">Peak Day</p>
+                                        <p className="text-xl font-black">Friday</p>
                                     </div>
-                                ))}
+                                    <div className="p-4 bg-secondary text-white rounded-2xl shadow-lg">
+                                        <p className="text-[10px] font-bold opacity-60 uppercase mb-1">Avg Ticket</p>
+                                        <p className="text-xl font-black">KES 1,250</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

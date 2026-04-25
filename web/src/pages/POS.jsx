@@ -175,6 +175,10 @@ const POS = () => {
         const existing = JSON.parse(localStorage.getItem('kolay_orders') || '[]');
         localStorage.setItem('kolay_orders', JSON.stringify([newOrder, ...existing]));
 
+        // Permanent Archive for history/review
+        const archive = JSON.parse(localStorage.getItem('kolay_archive') || '[]');
+        localStorage.setItem('kolay_archive', JSON.stringify([newOrder, ...archive]));
+
         setLastPlacedOrder(newOrder);
         setCart([]);
         setShowSuccess(true);
