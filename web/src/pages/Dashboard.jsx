@@ -9,12 +9,14 @@ function Dashboard() {
     const [reportScope, setReportScope] = useState('Day');
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [showReportPreview, setShowReportPreview] = useState(false);
+    const [previewData, setPreviewData] = useState(null);
     const [inventory] = useState(() => {
         const saved = localStorage.getItem('kolay_inventory');
         return saved ? JSON.parse(saved) : [];
     });
 
-    const [orders] = useState(() => {
+    const [orders, setOrders] = useState(() => {
         const saved = localStorage.getItem('kolay_orders');
         return saved ? JSON.parse(saved) : [];
     });
@@ -29,19 +31,35 @@ function Dashboard() {
         return saved ? JSON.parse(saved) : "Great sales today! Need to restock on Beef Burger patties soon.";
     });
 
-    const updateStatus = (id, newStatus) => {
-        const saved = JSON.parse(localStorage.getItem('kolay_orders') || '[]');
-        const updated = saved.map(order =>
-            order.id === id ? { ...order, status: newStatus } : order
+    const [filterStatus, setFilterStatus] = useState('ALL');
+
+    const handleStatusUpdate = (orderId, newStatus) => {
+        const updatedOrders = orders.map(order =>
+            order.id === orderId ? { ...order, status: newStatus } : order
         );
-        localStorage.setItem('kolay_orders', JSON.stringify(updated));
+
+        // Automated Archiving on Delivery
+        if (newStatus === 'DELIVERED') {
+            const deliveredOrder = orders.find(o => o.id === orderId);
+            if (deliveredOrder) {
+                const archiveEntry = {
+                    id: deliveredOrder.id,
+                    timestamp: deliveredOrder.timestamp,
+                    total: deliveredOrder.total,
+                    items: deliveredOrder.items,
+                    table: deliveredOrder.table
+                };
+                const currentArchive = JSON.parse(localStorage.getItem('kolay_archive') || '[]');
+                if (!currentArchive.find(a => a.id === deliveredOrder.id)) {
+                    const newArchive = [...currentArchive, archiveEntry];
+                    localStorage.setItem('kolay_archive', JSON.stringify(newArchive));
+                }
+            }
+        }
+
+        setOrders(updatedOrders);
+        localStorage.setItem('kolay_orders', JSON.stringify(updatedOrders));
         window.dispatchEvent(new Event('storage')); // Trigger refresh
-        // Also update archive for consistency
-        const arch = JSON.parse(localStorage.getItem('kolay_archive') || '[]');
-        const updatedArch = arch.map(order =>
-            order.id === id ? { ...order, status: newStatus } : order
-        );
-        localStorage.setItem('kolay_archive', JSON.stringify(updatedArch));
     };
 
     // Auto-Reset Logic (24h)
@@ -120,16 +138,14 @@ function Dashboard() {
     };
 
     const getPeakStats = () => {
-        const days = {};
-        const months = {};
-        const hours = {};
+        const moments = (archive || []).map(o => new Date(o.timestamp));
+        const days = {}, months = {}, hours = {};
 
-        archive.forEach(o => {
-            const d = new Date(o.timestamp);
-            const dayKey = d.toLocaleString('default', { weekday: 'long' });
-            const monthKey = d.toLocaleString('default', { month: 'long' });
+        moments.forEach(d => {
+            if (isNaN(d.getTime())) return;
+            const dayKey = d.toLocaleDateString('en-US', { weekday: 'long' });
+            const monthKey = d.toLocaleDateString('en-US', { month: 'long' });
             const hourKey = `${d.getHours()}:00`;
-
             days[dayKey] = (days[dayKey] || 0) + 1;
             months[monthKey] = (months[monthKey] || 0) + 1;
             hours[hourKey] = (hours[hourKey] || 0) + 1;
@@ -147,20 +163,12 @@ function Dashboard() {
     const { peakDay, peakMonth, peakHour } = getPeakStats();
     const realChartData = getChartData();
 
-    const handlePrintReport = () => {
-        const printWindow = window.open('', '_blank', 'width=1000,height=900');
-        if (!printWindow) {
-            alert('Popup blocked! Please allow popups to print reports.');
-            return;
-        }
-
-        // Advanced Filtering with Safety Checks
+    const handleGenerateReport = () => {
         const filteredArchive = (archive || []).filter(o => {
             if (!o || !o.timestamp) return false;
             try {
                 const d = new Date(o.timestamp);
                 if (isNaN(d.getTime())) return false;
-
                 if (reportScope === 'Day') {
                     return d.toISOString().split('T')[0] === (selectedDate || '');
                 } else if (reportScope === 'Month') {
@@ -173,7 +181,6 @@ function Dashboard() {
             }
         });
 
-        // Safe Total Calculation
         const totalRevenue = filteredArchive.reduce((sum, d) => {
             try {
                 const totalStr = String(d.total || '0').replace('KES ', '').replace(/,/g, '');
@@ -183,13 +190,28 @@ function Dashboard() {
             }
         }, 0);
 
-        const totalOrders = filteredArchive.length;
+        setPreviewData({
+            records: filteredArchive,
+            totalRevenue,
+            totalOrders: filteredArchive.length,
+            scope: reportScope,
+            date: selectedDate
+        });
+        setShowReportPreview(true);
+    };
 
+    const handleActualPrint = () => {
+        const printWindow = window.open('', '_blank', 'width=1000,height=900');
+        if (!printWindow) {
+            alert('Popup blocked! Please allow popups to print reports.');
+            return;
+        }
+        const { records, totalRevenue, totalOrders, scope, date } = previewData;
         const reportHtml = `
             <!DOCTYPE html>
             <html>
                 <head>
-                    <title>Management Report - ${selectedDate || 'Snapshot'}</title>
+                    <title>Management Report - ${date || 'Snapshot'}</title>
                     <style>
                         body { font-family: 'Inter', sans-serif; padding: 50px; color: #1a1a1a; line-height: 1.6; }
                         .header { border-bottom: 4px solid #4E2C1E; padding-bottom: 30px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
@@ -205,7 +227,6 @@ function Dashboard() {
                         td { padding: 18px; border-bottom: 1px solid #eee; font-size: 13px; }
                         tr:nth-child(even) { background: #fafafa; }
                         .footer { margin-top: 80px; text-align: center; font-size: 12px; color: #bbb; border-top: 1px solid #eee; padding-top: 30px; font-style: italic; }
-                        @media print { .no-print { display: none; } }
                     </style>
                 </head>
                 <body>
@@ -215,12 +236,11 @@ function Dashboard() {
                             <p class="tagline">"Where Every Meal Feels Right"</p>
                         </div>
                         <div class="report-meta">
-                            <strong style="color: #4E2C1E; font-size: 18px;">${(reportScope || 'Day').toUpperCase()} REPORT</strong><br>
-                            Period: <strong>${selectedDate || 'Current'}</strong><br>
+                            <strong style="color: #4E2C1E; font-size: 18px;">${(scope || 'Day').toUpperCase()} REPORT</strong><br>
+                            Period: <strong>${date || 'Current'}</strong><br>
                             Printed: ${new Date().toLocaleString('en-GB')}
                         </div>
                     </div>
-
                     <div class="summary-grid">
                         <div class="summary-card">
                             <span class="summary-label">Total Revenue</span>
@@ -235,8 +255,6 @@ function Dashboard() {
                             <div class="summary-value">KES ${totalOrders > 0 ? (totalRevenue / totalOrders).toLocaleString(undefined, { maximumFractionDigits: 0 }) : 0}</div>
                         </div>
                     </div>
-
-                    <h2 style="font-size: 20px; color: #4E2C1E; margin-bottom: 20px; border-left: 5px solid #E67E22; padding-left: 15px;">Transaction Log</h2>
                     <table>
                         <thead>
                             <tr>
@@ -248,7 +266,7 @@ function Dashboard() {
                             </tr>
                         </thead>
                         <tbody>
-                            ${filteredArchive.map(o => {
+                            ${records.map(o => {
             try {
                 const timeStr = o.timestamp ? new Date(o.timestamp).toLocaleTimeString('en-GB') : 'N/A';
                 const itemsStr = (o.items || []).map(i => `${i.quantity || 1}x ${i.name || 'Unknown'}`).join(', ') || 'No Items';
@@ -261,14 +279,10 @@ function Dashboard() {
                                             <td style="text-align: right; font-weight: bold;">${o.total || 'KES 0'}</td>
                                         </tr>
                                     `;
-            } catch (e) {
-                return '';
-            }
+            } catch (e) { return ''; }
         }).join('')}
-                            ${filteredArchive.length === 0 ? `<tr><td colspan="5" style="text-align: center; padding: 100px; color: #ccc;">No data found for the selected period</td></tr>` : ''}
                         </tbody>
                     </table>
-
                     <div class="footer">
                         KOLAY RESTAURANT MANAGEMENT SYSTEM - SECURE OPERATIONAL REPORTING<br>
                         123 Thome Street, Nairobi | Tel: +254 102 039 121 | Email: kolayrestaurant@gmail.com
@@ -276,28 +290,21 @@ function Dashboard() {
                 </body>
             </html>
         `;
-
         printWindow.document.write(reportHtml);
         printWindow.document.close();
         printWindow.focus();
-        setTimeout(() => {
-            printWindow.print();
-        }, 500);
+        setTimeout(() => { printWindow.print(); }, 500);
     };
 
     return (
         <div className="min-h-screen bg-bg-cream text-charcoal font-body">
             <Navbar />
-
-            {/* Hero Section */}
             <main className="max-w-7xl mx-auto px-8 py-12">
                 <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
                         <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">Welcome back, Fidel</h1>
                         <p className="text-charcoal/70 text-lg">Here's what's happening at Kolay Restaurant today.</p>
                     </div>
-
-                    {/* Moved Reporting Controls */}
                     <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-primary/5 shadow-premium">
                         <div className="flex bg-bg-cream p-1 rounded-xl">
                             {['Day', 'Month', 'Year'].map((s) => (
@@ -317,7 +324,7 @@ function Dashboard() {
                             className="bg-white border border-primary/10 text-primary rounded-xl px-4 py-1.5 text-xs font-bold outline-none focus:ring-2 focus:ring-secondary/50 transition-all w-48"
                         />
                         <button
-                            onClick={handlePrintReport}
+                            onClick={handleGenerateReport}
                             className="flex items-center gap-2 bg-secondary text-white px-5 py-1.5 rounded-xl text-xs font-black shadow-lg hover:brightness-110 transition-all active:scale-95"
                         >
                             <Printer className="w-4 h-4" /> GENERATE REPORT
@@ -325,8 +332,7 @@ function Dashboard() {
                     </div>
                 </header>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                     {[
                         { label: 'Total Revenue', value: `KES ${totalRevenue.toLocaleString()}`, icon: '💰', trend: '0%', color: 'border-l-secondary', path: '/dashboard' },
                         { label: 'Active Orders', value: activeOrders.length.toString(), icon: '📝', trend: `${activeOrders.length} pending`, color: 'border-l-accent', path: '/pos' },
@@ -346,74 +352,90 @@ function Dashboard() {
                     ))}
                 </div>
 
-                {/* Content Area */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Recent Orders - Larger */}
-                    <div className="lg:col-span-2 space-y-8">
-                        <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-cream">
-                            <div className="p-6 border-b border-cream flex justify-between items-center bg-white">
-                                <h2 className="text-xl font-bold text-primary">Recent Orders</h2>
-                                <Link to="/pos" className="text-secondary font-bold text-sm hover:underline">View All</Link>
-                            </div>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left">
-                                    <thead>
-                                        <tr className="bg-bg-cream/50 text-charcoal/60 text-sm">
-                                            <th className="px-6 py-4 font-bold">Order ID</th>
-                                            <th className="px-6 py-4 font-bold">Table</th>
-                                            <th className="px-6 py-4 font-bold">Items</th>
-                                            <th className="px-6 py-4 font-bold">Total</th>
-                                            <th className="px-6 py-4 font-bold">Status</th>
-                                            <th className="px-6 py-4 font-bold text-right">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-cream">
-                                        {[...orders]
-                                            .slice(0, 10).map((order) => (
-                                                <tr key={order.id} className="hover:bg-cream/50 transition-colors cursor-pointer group" onClick={() => navigate('/pos')}>
-                                                    <td className="px-6 py-4 font-bold text-primary">{order.id}</td>
-                                                    <td className="px-6 py-4">
-                                                        <div className="flex flex-col">
-                                                            <span className="font-bold text-sm">{order.table}</span>
-                                                            <span className="text-[10px] text-gray-400 capitalize">{new Date(order.timestamp).toLocaleTimeString()}</span>
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-xs max-w-xs truncate">{order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td>
-                                                    <td className="px-6 py-4 font-bold">{order.total}</td>
-                                                    <td className="px-6 py-4">
-                                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${order.status === 'PENDING' ? 'bg-gray-100 text-gray-600' :
-                                                            order.status === 'PREPARING' ? 'bg-orange-100 text-secondary' :
-                                                                order.status === 'READY' ? 'bg-green-100 text-green-700 animate-pulse' :
-                                                                    'bg-blue-100 text-blue-700'
-                                                            }`}>
-                                                            {order.status}
-                                                        </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        {order.status === 'READY' ? (
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    updateStatus(order.id, 'SERVED');
-                                                                }}
-                                                                className="bg-primary hover:bg-secondary text-white text-[10px] font-black px-4 py-2 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 ml-auto"
-                                                            >
-                                                                <CheckCircle2 className="w-3 h-3" /> MARK DELIVERED
-                                                            </button>
-                                                        ) : order.status === 'SERVED' ? (
-                                                            <div className="flex items-center justify-end gap-2 text-green-600 text-[10px] font-black uppercase tracking-widest">
-                                                                <CheckCircle2 className="w-3 h-3" /> DELIVERED
-                                                            </div>
-                                                        ) : null}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                <section className="bg-white rounded-3xl border border-primary/5 shadow-premium overflow-hidden mb-12">
+                    <div className="p-4 md:p-8 border-b border-primary/5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div>
+                            <h2 className="text-xl md:text-2xl font-bold text-primary">Live Orders</h2>
+                            <p className="text-sm text-charcoal/50 font-medium">Manage and track active customer tickets</p>
                         </div>
+                        <div className="flex bg-bg-cream p-1 rounded-xl w-full md:w-auto overflow-x-auto">
+                            {['ALL', 'PENDING', 'READY', 'DELIVERED'].map((s) => (
+                                <button
+                                    key={s}
+                                    onClick={() => setFilterStatus(s)}
+                                    className={`px-4 py-2 rounded-lg text-[10px] whitespace-nowrap font-black transition-all ${filterStatus === s ? 'bg-primary text-white shadow-md' : 'text-primary/40 hover:text-primary'}`}
+                                >
+                                    {s}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left min-w-[800px]">
+                            <thead>
+                                <tr className="border-b border-primary/5">
+                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Time</th>
+                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Order Details</th>
+                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Table/Mode</th>
+                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Total</th>
+                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Status</th>
+                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-primary/5">
+                                {orders.filter(o => filterStatus === 'ALL' || o.status === filterStatus).map((order) => (
+                                    <tr key={order.id} className="group hover:bg-bg-cream/50 transition-colors">
+                                        <td className="px-8 py-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-primary/5 rounded-lg">
+                                                    <Clock className="w-4 h-4 text-primary" />
+                                                </div>
+                                                <span className="font-bold text-sm text-primary">{new Date(order.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="text-secondary font-black text-xs">#{order.id}</span>
+                                                <span className="text-sm font-bold text-primary truncate max-w-[200px]">
+                                                    {order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-6">
+                                            <span className="px-3 py-1 bg-bg-cream border border-primary/5 rounded-lg text-xs font-bold text-primary">
+                                                {order.table}
+                                            </span>
+                                        </td>
+                                        <td className="px-8 py-6 font-black text-primary">{order.total}</td>
+                                        <td className="px-8 py-6">
+                                            <span className={`px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm ${order.status === 'READY' ? 'bg-green-500 text-white shadow-green-500/20' :
+                                                order.status === 'PENDING' ? 'bg-amber-500 text-white shadow-amber-500/20' :
+                                                    'bg-primary/20 text-primary'
+                                                }`}>
+                                                {order.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-8 py-6 text-right">
+                                            <button
+                                                onClick={() => handleStatusUpdate(order.id, order.status === 'READY' ? 'DELIVERED' : 'READY')}
+                                                className={`px-6 py-2 rounded-xl text-[10px] font-black transition-all active:scale-95 ${order.status === 'READY' ? 'bg-primary text-white hover:bg-secondary shadow-lg' :
+                                                    order.status === 'DELIVERED' ? 'bg-green-100 text-green-600 border border-green-200 cursor-default' :
+                                                        'bg-secondary/10 text-secondary border border-secondary/20 hover:bg-secondary hover:text-white'
+                                                    }`}
+                                                disabled={order.status === 'DELIVERED'}
+                                            >
+                                                {order.status === 'DELIVERED' ? 'DELIVERED ✓' : order.status === 'READY' ? 'MARK DELIVERED' : 'MARK READY'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
 
-                        {/* Statistics Graph Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2 space-y-8">
                         <div className="bg-white p-8 rounded-3xl border border-cream shadow-sm relative overflow-hidden">
                             <div className="flex justify-between items-center mb-8">
                                 <div>
@@ -482,11 +504,11 @@ function Dashboard() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="p-4 bg-primary text-white rounded-2xl shadow-lg">
                                         <p className="text-[10px] font-bold opacity-60 uppercase mb-1">Peak Day</p>
-                                        <p className="text-xl font-black">Friday</p>
+                                        <p className="text-xl font-black">{peakDay}</p>
                                     </div>
                                     <div className="p-4 bg-secondary text-white rounded-2xl shadow-lg">
-                                        <p className="text-[10px] font-bold opacity-60 uppercase mb-1">Avg Ticket</p>
-                                        <p className="text-xl font-black">KES 1,250</p>
+                                        <p className="text-[10px] font-bold opacity-60 uppercase mb-1">Peak Hour</p>
+                                        <p className="text-xl font-black">{peakHour}</p>
                                     </div>
                                 </div>
                             </div>
@@ -570,6 +592,99 @@ function Dashboard() {
                     <a href="#" className="hover:text-primary">User Guide</a>
                 </div>
             </footer>
+
+            {/* Report Preview Modal */}
+            {showReportPreview && previewData && (
+                <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-[2.5rem] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border border-primary/10">
+                        <div className="p-8 border-b border-primary/5 flex justify-between items-center bg-bg-cream/30">
+                            <div>
+                                <h2 className="text-2xl font-black text-primary flex items-center gap-3">
+                                    <Printer className="text-secondary" /> REPORT PREVIEW
+                                </h2>
+                                <p className="text-sm text-charcoal/50 font-bold uppercase tracking-wider mt-1">
+                                    {previewData.scope} Summary for {previewData.date}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setShowReportPreview(false)}
+                                className="p-3 hover:bg-red-50 text-charcoal/30 hover:text-red-500 rounded-2xl transition-all"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-10 space-y-10">
+                            <div className="grid grid-cols-3 gap-6">
+                                <div className="bg-primary p-6 rounded-3xl text-white shadow-lg">
+                                    <span className="text-[10px] font-black opacity-60 uppercase mb-2 block">Total Revenue</span>
+                                    <span className="text-2xl font-black">KES {previewData.totalRevenue.toLocaleString()}</span>
+                                </div>
+                                <div className="bg-secondary p-6 rounded-3xl text-white shadow-lg">
+                                    <span className="text-[10px] font-black opacity-60 uppercase mb-2 block">Total Orders</span>
+                                    <span className="text-2xl font-black">{previewData.totalOrders}</span>
+                                </div>
+                                <div className="bg-accent p-6 rounded-3xl text-white shadow-lg">
+                                    <span className="text-[10px] font-black opacity-60 uppercase mb-2 block">Avg Ticket</span>
+                                    <span className="text-2xl font-black">
+                                        KES {previewData.totalOrders > 0 ? (previewData.totalRevenue / previewData.totalOrders).toLocaleString(undefined, { maximumFractionDigits: 0 }) : 0}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-black text-primary border-l-4 border-secondary pl-4">Transaction Log</h3>
+                                <div className="border border-primary/5 rounded-3xl overflow-hidden bg-bg-cream/20">
+                                    <table className="w-full text-left">
+                                        <thead className="bg-primary/5">
+                                            <tr>
+                                                <th className="px-6 py-4 text-[10px] font-black text-charcoal/40 uppercase">Time</th>
+                                                <th className="px-6 py-4 text-[10px] font-black text-charcoal/40 uppercase">Details</th>
+                                                <th className="px-6 py-4 text-[10px] font-black text-charcoal/40 uppercase text-right">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-primary/5">
+                                            {previewData.records.map((o, idx) => (
+                                                <tr key={idx} className="text-sm">
+                                                    <td className="px-6 py-4 font-bold text-primary">
+                                                        {new Date(o.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex flex-col">
+                                                            <span className="font-black text-xs text-secondary">#{o.id}</span>
+                                                            <span className="text-primary/60 text-xs">
+                                                                {o.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right font-black text-primary">
+                                                        {o.total}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-8 border-t border-primary/5 bg-bg-cream/30 flex gap-4">
+                            <button
+                                onClick={() => setShowReportPreview(false)}
+                                className="flex-1 py-4 rounded-2xl font-black text-charcoal/40 hover:text-primary transition-all uppercase tracking-widest text-xs"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleActualPrint}
+                                className="flex-[2] bg-primary text-white py-4 rounded-2xl font-black shadow-premium hover:brightness-110 transition-all flex items-center justify-center gap-3 uppercase tracking-widest text-xs"
+                            >
+                                <Printer className="w-4 h-4" /> Finalize and Print
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

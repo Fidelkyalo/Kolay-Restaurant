@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Search, ShoppingCart, Plus, Minus, X, CreditCard, User, ClipboardList, UtensilsCrossed, ArrowLeft, CheckCircle, Printer } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 const POS = () => {
     const [activeCategory, setActiveCategory] = useState('All');
@@ -225,289 +226,288 @@ const POS = () => {
     const total = subtotal + tax;
 
     return (
-        <div className="flex h-screen bg-bg-cream font-body overflow-hidden relative">
-            {/* Table Selection Modal */}
-            {showTableModal && (
-                <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
-                    <div className="bg-white rounded-[2rem] w-full max-w-lg shadow-2xl p-8 animate-in zoom-in duration-200">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-2xl font-bold text-primary">Assign Table</h3>
-                            <button onClick={() => setShowTableModal(false)} className="text-charcoal/40 hover:text-primary text-2xl">&times;</button>
-                        </div>
-                        <div className="grid grid-cols-4 gap-4 mb-8">
-                            {tables.map(t => (
+        <div className="flex flex-col h-screen bg-bg-cream font-body overflow-hidden relative">
+            <Navbar />
+            <div className="flex flex-1 overflow-hidden">
+                {/* Table Selection Modal */}
+                {showTableModal && (
+                    <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+                        <div className="bg-white rounded-[2rem] w-full max-w-lg shadow-2xl p-8 animate-in zoom-in duration-200">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-2xl font-bold text-primary">Assign Table</h3>
+                                <button onClick={() => setShowTableModal(false)} className="text-charcoal/40 hover:text-primary text-2xl">&times;</button>
+                            </div>
+                            <div className="grid grid-cols-4 gap-4 mb-8">
+                                {tables.map(t => (
+                                    <button
+                                        key={t}
+                                        onClick={() => { setSelectedTable(t); setShowTableModal(false); }}
+                                        className={`py-4 rounded-2xl font-bold text-sm transition-all border-2 ${selectedTable === t
+                                            ? 'bg-primary text-white border-primary shadow-lg scale-105'
+                                            : 'bg-bg-cream border-cream text-charcoal/60 hover:border-secondary/50'
+                                            }`}
+                                    >
+                                        {t}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="flex gap-4 border-t border-cream pt-6 mt-4">
+                                <input
+                                    type="text"
+                                    placeholder="New table # (e.g. 16)"
+                                    className="flex-1 px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold"
+                                    value={newTableNumber}
+                                    onChange={(e) => setNewTableNumber(e.target.value)}
+                                />
                                 <button
-                                    key={t}
-                                    onClick={() => { setSelectedTable(t); setShowTableModal(false); }}
-                                    className={`py-4 rounded-2xl font-bold text-sm transition-all border-2 ${selectedTable === t
-                                        ? 'bg-primary text-white border-primary shadow-lg scale-105'
-                                        : 'bg-bg-cream border-cream text-charcoal/60 hover:border-secondary/50'
-                                        }`}
+                                    onClick={addTable}
+                                    className="bg-secondary text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg active:scale-95"
                                 >
-                                    {t}
+                                    Add Table
                                 </button>
-                            ))}
+                            </div>
+                            <button
+                                onClick={() => setShowTableModal(false)}
+                                className="w-full py-4 mt-4 bg-bg-cream text-charcoal font-bold rounded-2xl hover:bg-cream transition-colors text-sm uppercase tracking-widest"
+                            >
+                                Close
+                            </button>
                         </div>
-                        <div className="flex gap-4 border-t border-cream pt-6 mt-4">
+                    </div>
+                )}
+
+                {/* Success Overlay */}
+                {showSuccess && (
+                    <div className="absolute inset-0 z-[100] flex items-center justify-center bg-primary/20 backdrop-blur-sm animate-in fade-in duration-300">
+                        <div className="bg-white rounded-[3rem] p-12 text-center shadow-2xl animate-in zoom-in duration-300 max-w-sm w-full mx-4">
+                            <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
+                                <CheckCircle className="w-12 h-12" />
+                            </div>
+                            <h3 className="text-3xl font-black text-primary mb-4">Order Placed!</h3>
+                            <p className="text-charcoal/60 font-medium mb-10 leading-relaxed">
+                                Order <strong>#{lastPlacedOrder?.id}</strong> has been sent to the kitchen.
+                            </p>
+                            <div className="space-y-4">
+                                <button
+                                    onClick={handlePrintReceipt}
+                                    className="w-full bg-secondary text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-orange-600 transition-all shadow-xl active:scale-95 text-lg"
+                                >
+                                    <Printer className="w-6 h-6" /> Print Receipt
+                                </button>
+                                <button
+                                    onClick={() => setShowSuccess(false)}
+                                    className="w-full bg-bg-cream text-charcoal/40 py-4 rounded-xl font-bold hover:bg-cream transition-colors text-sm uppercase tracking-widest"
+                                >
+                                    Continue Shopping
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Left Menu Side */}
+                <div className="flex-1 flex flex-col p-6 overflow-hidden">
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 className="text-3xl font-display font-bold text-primary flex items-center gap-2">
+                                <UtensilsCrossed className="text-secondary" /> POS System
+                            </h1>
+                            <p className="text-charcoal/50 text-sm">Select items to build a new order</p>
+                        </div>
+                        <div className="relative w-80">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/30 w-5 h-5" />
                             <input
                                 type="text"
-                                placeholder="New table # (e.g. 16)"
-                                className="flex-1 px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold"
-                                value={newTableNumber}
-                                onChange={(e) => setNewTableNumber(e.target.value)}
+                                placeholder="Search dishes..."
+                                className="w-full pl-10 pr-4 py-3 bg-white rounded-2xl border border-cream shadow-sm focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                             />
-                            <button
-                                onClick={addTable}
-                                className="bg-secondary text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg active:scale-95"
-                            >
-                                Add Table
-                            </button>
                         </div>
+                    </div>
+
+                    {/* Categories */}
+                    <div className="flex gap-4 mb-8 overflow-x-auto pb-2 scrollbar-hide items-center">
+                        {categories.map(cat => (
+                            <button
+                                key={cat}
+                                onClick={() => setActiveCategory(cat)}
+                                className={`px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-all ${activeCategory === cat
+                                    ? 'bg-secondary text-white shadow-lg scale-105'
+                                    : 'bg-white text-charcoal/60 hover:bg-cream border border-cream'
+                                    }`}
+                            >
+                                {cat}
+                            </button>
+                        ))}
                         <button
-                            onClick={() => setShowTableModal(false)}
-                            className="w-full py-4 mt-4 bg-bg-cream text-charcoal font-bold rounded-2xl hover:bg-cream transition-colors text-sm uppercase tracking-widest"
+                            onClick={() => setShowDishModal(true)}
+                            className="bg-primary/5 hover:bg-primary text-primary hover:text-white px-6 py-2.5 rounded-full font-bold border border-primary/20 transition-all flex items-center gap-2"
                         >
-                            Close
+                            <Plus className="w-4 h-4" /> Manage Menu
                         </button>
                     </div>
-                </div>
-            )}
 
-            {/* Success Overlay */}
-            {showSuccess && (
-                <div className="absolute inset-0 z-[100] flex items-center justify-center bg-primary/20 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white rounded-[3rem] p-12 text-center shadow-2xl animate-in zoom-in duration-300 max-w-sm w-full mx-4">
-                        <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
-                            <CheckCircle className="w-12 h-12" />
-                        </div>
-                        <h3 className="text-3xl font-black text-primary mb-4">Order Placed!</h3>
-                        <p className="text-charcoal/60 font-medium mb-10 leading-relaxed">
-                            Order <strong>#{lastPlacedOrder?.id}</strong> has been sent to the kitchen.
-                        </p>
-                        <div className="space-y-4">
-                            <button
-                                onClick={handlePrintReceipt}
-                                className="w-full bg-secondary text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-orange-600 transition-all shadow-xl active:scale-95 text-lg"
+                    {/* Product Grid */}
+                    <div className="flex-1 overflow-y-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pr-2 custom-scrollbar">
+                        {filteredProducts.map(product => (
+                            <div
+                                key={product.id}
+                                onClick={() => addToCart(product)}
+                                className="bg-white p-5 rounded-3xl border border-cream hover:border-secondary/30 hover:shadow-xl transition-all cursor-pointer group active:scale-95"
                             >
-                                <Printer className="w-6 h-6" /> Print Receipt
-                            </button>
-                            <button
-                                onClick={() => setShowSuccess(false)}
-                                className="w-full bg-bg-cream text-charcoal/40 py-4 rounded-xl font-bold hover:bg-cream transition-colors text-sm uppercase tracking-widest"
-                            >
-                                Continue Shopping
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Left Menu Side */}
-            <div className="flex-1 flex flex-col p-6 overflow-hidden">
-                {/* Back Button */}
-                <Link to="/dashboard" className="flex items-center gap-2 text-charcoal/40 hover:text-secondary transition-colors mb-4 font-bold text-sm">
-                    <ArrowLeft className="w-4 h-4" /> Back to Dashboard
-                </Link>
-                {/* Header */}
-                <div className="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 className="text-3xl font-display font-bold text-primary flex items-center gap-2">
-                            <UtensilsCrossed className="text-secondary" /> POS System
-                        </h1>
-                        <p className="text-charcoal/50 text-sm">Select items to build a new order</p>
-                    </div>
-                    <div className="relative w-80">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/30 w-5 h-5" />
-                        <input
-                            type="text"
-                            placeholder="Search dishes..."
-                            className="w-full pl-10 pr-4 py-3 bg-white rounded-2xl border border-cream shadow-sm focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-                </div>
-
-                {/* Categories */}
-                <div className="flex gap-4 mb-8 overflow-x-auto pb-2 scrollbar-hide items-center">
-                    {categories.map(cat => (
-                        <button
-                            key={cat}
-                            onClick={() => setActiveCategory(cat)}
-                            className={`px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-all ${activeCategory === cat
-                                ? 'bg-secondary text-white shadow-lg scale-105'
-                                : 'bg-white text-charcoal/60 hover:bg-cream border border-cream'
-                                }`}
-                        >
-                            {cat}
-                        </button>
-                    ))}
-                    <button
-                        onClick={() => setShowDishModal(true)}
-                        className="bg-primary/5 hover:bg-primary text-primary hover:text-white px-6 py-2.5 rounded-full font-bold border border-primary/20 transition-all flex items-center gap-2"
-                    >
-                        <Plus className="w-4 h-4" /> Manage Menu
-                    </button>
-                </div>
-
-                {/* Product Grid */}
-                <div className="flex-1 overflow-y-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pr-2 custom-scrollbar">
-                    {filteredProducts.map(product => (
-                        <div
-                            key={product.id}
-                            onClick={() => addToCart(product)}
-                            className="bg-white p-5 rounded-3xl border border-cream hover:border-secondary/30 hover:shadow-xl transition-all cursor-pointer group active:scale-95"
-                        >
-                            <div className="h-32 bg-bg-cream rounded-2xl mb-4 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform">
-                                {product.image}
-                            </div>
-                            <h3 className="font-bold text-primary mb-1">{product.name}</h3>
-                            <p className="text-secondary font-bold">KES {product.price.toLocaleString()}</p>
-                            <div className="mt-4 flex justify-between items-center text-[10px] text-charcoal/40 uppercase tracking-widest font-bold">
-                                <span>{product.category}</span>
-                                <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded">In Stock</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* Right Cart Side */}
-            <div className="w-[400px] bg-white border-l border-cream flex flex-col shadow-2xl">
-                <div className="p-6 border-b border-cream flex justify-between items-center bg-white/80 backdrop-blur-md sticky top-0 z-10">
-                    <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-                        <ShoppingCart className="w-5 h-5 text-secondary" /> Current Order
-                    </h2>
-                    <span className="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold">
-                        {cart.reduce((acc, item) => acc + item.quantity, 0)} Items
-                    </span>
-                </div>
-
-                {/* Cart Items */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-                    {cart.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
-                            <ClipboardList className="w-20 h-20 mb-4" />
-                            <p className="font-bold">No items selected</p>
-                        </div>
-                    ) : (
-                        cart.map(item => (
-                            <div key={item.id} className="flex gap-4 p-3 rounded-2xl hover:bg-bg-cream transition-colors group">
-                                <div className="w-16 h-16 bg-bg-cream rounded-xl flex items-center justify-center text-2xl shrink-0">
-                                    {item.image}
+                                <div className="h-32 bg-bg-cream rounded-2xl mb-4 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform">
+                                    {product.image}
                                 </div>
-                                <div className="flex-1">
-                                    <div className="flex justify-between items-start mb-2">
-                                        <h4 className="font-bold text-primary text-sm line-clamp-1">{item.name}</h4>
-                                        <button onClick={(e) => { e.stopPropagation(); removeFromCart(item.id); }} className="text-red-300 hover:text-red-500 transition-colors">
-                                            <X className="w-4 h-4" />
-                                        </button>
+                                <h3 className="font-bold text-primary mb-1">{product.name}</h3>
+                                <p className="text-secondary font-bold">KES {product.price.toLocaleString()}</p>
+                                <div className="mt-4 flex justify-between items-center text-[10px] text-charcoal/40 uppercase tracking-widest font-bold">
+                                    <span>{product.category}</span>
+                                    <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded">In Stock</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Right Cart Side */}
+                <div className="w-[400px] bg-white border-l border-cream flex flex-col shadow-2xl">
+                    <div className="p-6 border-b border-cream flex justify-between items-center bg-white/80 backdrop-blur-md sticky top-0 z-10">
+                        <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+                            <ShoppingCart className="w-5 h-5 text-secondary" /> Current Order
+                        </h2>
+                        <span className="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold">
+                            {cart.reduce((acc, item) => acc + item.quantity, 0)} Items
+                        </span>
+                    </div>
+
+                    {/* Cart Items */}
+                    <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                        {cart.length === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
+                                <ClipboardList className="w-20 h-20 mb-4" />
+                                <p className="font-bold">No items selected</p>
+                            </div>
+                        ) : (
+                            cart.map(item => (
+                                <div key={item.id} className="flex gap-4 p-3 rounded-2xl hover:bg-bg-cream transition-colors group">
+                                    <div className="w-16 h-16 bg-bg-cream rounded-xl flex items-center justify-center text-2xl shrink-0">
+                                        {item.image}
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                        <p className="text-secondary font-bold text-xs">KES {(item.price * item.quantity).toLocaleString()}</p>
-                                        <div className="flex items-center gap-3 bg-white border border-cream rounded-lg px-2 py-1 shadow-sm">
-                                            <button onClick={() => updateQuantity(item.id, -1)} className="hover:text-secondary transition-colors"><Minus className="w-3 h-3" /></button>
-                                            <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
-                                            <button onClick={() => updateQuantity(item.id, 1)} className="hover:text-secondary transition-colors"><Plus className="w-3 h-3" /></button>
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-start mb-2">
+                                            <h4 className="font-bold text-primary text-sm line-clamp-1">{item.name}</h4>
+                                            <button onClick={(e) => { e.stopPropagation(); removeFromCart(item.id); }} className="text-red-300 hover:text-red-500 transition-colors">
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <p className="text-secondary font-bold text-xs">KES {(item.price * item.quantity).toLocaleString()}</p>
+                                            <div className="flex items-center gap-3 bg-white border border-cream rounded-lg px-2 py-1 shadow-sm">
+                                                <button onClick={() => updateQuantity(item.id, -1)} className="hover:text-secondary transition-colors"><Minus className="w-3 h-3" /></button>
+                                                <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
+                                                <button onClick={() => updateQuantity(item.id, 1)} className="hover:text-secondary transition-colors"><Plus className="w-3 h-3" /></button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))
-                    )}
-                </div>
-
-                {/* Summary & Checkout */}
-                <div className="p-6 bg-white border-t border-cream space-y-4 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)]">
-                    <div className="space-y-2 text-sm text-charcoal/60">
-                        <div className="flex justify-between">
-                            <span>Subtotal</span>
-                            <span className="font-bold text-primary">KES {subtotal.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between">
-                            <span>Taxes (16% VAT)</span>
-                            <span className="font-bold text-primary">KES {tax.toLocaleString()}</span>
-                        </div>
-                        <div className="flex justify-between text-lg pt-2 border-t border-cream">
-                            <span className="font-bold text-primary">Total</span>
-                            <span className="font-bold text-secondary text-2xl">KES {total.toLocaleString()}</span>
-                        </div>
+                            ))
+                        )}
                     </div>
 
-                    <div className="pt-4 grid grid-cols-2 gap-4">
-                        <button className="flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-cream font-bold text-charcoal/40 hover:bg-bg-cream transition-all">
-                            <User className="w-5 h-5" /> Customer
-                        </button>
-                        <button
-                            onClick={() => setShowTableModal(true)}
-                            className="flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-secondary/50 text-secondary font-bold hover:bg-bg-cream transition-all group"
-                        >
-                            Table: {selectedTable}
-                        </button>
-                    </div>
-
-                    <button
-                        onClick={handlePlaceOrder}
-                        disabled={cart.length === 0}
-                        className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-5 rounded-2xl shadow-xl transition-all active:transform active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg mt-2"
-                    >
-                        <CreditCard className="w-6 h-6" /> Place Order
-                    </button>
-                </div>
-            </div>
-            {/* Manage Dish Modal */}
-            {showDishModal && (
-                <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[120] flex items-center justify-center p-4">
-                    <div className="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl p-8 animate-in zoom-in duration-200">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-2xl font-bold text-primary">Add New Dish</h3>
-                            <button onClick={() => setShowDishModal(false)} className="text-charcoal/40 hover:text-primary text-2xl">&times;</button>
+                    {/* Summary & Checkout */}
+                    <div className="p-6 bg-white border-t border-cream space-y-4 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)]">
+                        <div className="space-y-2 text-sm text-charcoal/60">
+                            <div className="flex justify-between">
+                                <span>Subtotal</span>
+                                <span className="font-bold text-primary">KES {subtotal.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Taxes (16% VAT)</span>
+                                <span className="font-bold text-primary">KES {tax.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between text-lg pt-2 border-t border-cream">
+                                <span className="font-bold text-primary">Total</span>
+                                <span className="font-bold text-secondary text-2xl">KES {total.toLocaleString()}</span>
+                            </div>
                         </div>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Dish Name</label>
-                                <input
-                                    type="text"
-                                    placeholder="e.g. Chicken Wings"
-                                    className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold"
-                                    value={newDish.name}
-                                    onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Price (KES)</label>
-                                    <input
-                                        type="number"
-                                        placeholder="850"
-                                        className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold"
-                                        value={newDish.price}
-                                        onChange={(e) => setNewDish({ ...newDish, price: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Category</label>
-                                    <select
-                                        className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold appearance-none"
-                                        value={newDish.category}
-                                        onChange={(e) => setNewDish({ ...newDish, category: e.target.value })}
-                                    >
-                                        {categories.filter(c => c !== 'All').map(c => (
-                                            <option key={c} value={c}>{c}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                            </div>
+
+                        <div className="pt-4 grid grid-cols-2 gap-4">
+                            <button className="flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-cream font-bold text-charcoal/40 hover:bg-bg-cream transition-all">
+                                <User className="w-5 h-5" /> Customer
+                            </button>
                             <button
-                                onClick={addDish}
-                                className="w-full bg-secondary text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-all shadow-xl mt-4 active:scale-95"
+                                onClick={() => setShowTableModal(true)}
+                                className="flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-secondary/50 text-secondary font-bold hover:bg-bg-cream transition-all group"
                             >
-                                Add to Menu
+                                Table: {selectedTable}
                             </button>
                         </div>
+
+                        <button
+                            onClick={handlePlaceOrder}
+                            disabled={cart.length === 0}
+                            className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-5 rounded-2xl shadow-xl transition-all active:transform active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg mt-2"
+                        >
+                            <CreditCard className="w-6 h-6" /> Place Order
+                        </button>
                     </div>
                 </div>
-            )}
+                {/* Manage Dish Modal */}
+                {showDishModal && (
+                    <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[120] flex items-center justify-center p-4">
+                        <div className="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl p-8 animate-in zoom-in duration-200">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-2xl font-bold text-primary">Add New Dish</h3>
+                                <button onClick={() => setShowDishModal(false)} className="text-charcoal/40 hover:text-primary text-2xl">&times;</button>
+                            </div>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Dish Name</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. Chicken Wings"
+                                        className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold"
+                                        value={newDish.name}
+                                        onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Price (KES)</label>
+                                        <input
+                                            type="number"
+                                            placeholder="850"
+                                            className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold"
+                                            value={newDish.price}
+                                            onChange={(e) => setNewDish({ ...newDish, price: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Category</label>
+                                        <select
+                                            className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold appearance-none"
+                                            value={newDish.category}
+                                            onChange={(e) => setNewDish({ ...newDish, category: e.target.value })}
+                                        >
+                                            {categories.filter(c => c !== 'All').map(c => (
+                                                <option key={c} value={c}>{c}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={addDish}
+                                    className="w-full bg-secondary text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-all shadow-xl mt-4 active:scale-95"
+                                >
+                                    Add to Menu
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

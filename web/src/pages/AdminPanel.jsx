@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Settings, Users, Shield, Database, Trash2, Home } from 'lucide-react';
+import Navbar from '../components/Navbar';
 
 function AdminPanel() {
     const navigate = useNavigate();
@@ -15,15 +16,7 @@ function AdminPanel() {
     return (
         <div className="min-h-screen bg-bg-cream text-charcoal font-body">
             {/* nav */}
-            <nav className="bg-primary text-white py-4 px-8 flex justify-between items-center shadow-lg">
-                <div className="flex items-center gap-3">
-                    <img src="/Logo.png" alt="Kolay Logo" className="h-10 w-auto rounded" />
-                    <span className="text-2xl font-display font-bold">ADMIN CONSOLE</span>
-                </div>
-                <Link to="/dashboard" className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-xl transition-all">
-                    <Home className="w-4 h-4" /> Back to Dashboard
-                </Link>
-            </nav>
+            <Navbar />
 
             <main className="max-w-6xl mx-auto px-8 py-12">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -58,14 +51,14 @@ function AdminPanel() {
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left">
                                     <thead>
-                                        <tr className="border-bottom border-primary/5">
+                                        <tr className="border-b border-primary/5">
                                             <th className="py-4 text-xs uppercase text-charcoal/40">User</th>
                                             <th className="py-4 text-xs uppercase text-charcoal/40">Role</th>
                                             <th className="py-4 text-xs uppercase text-charcoal/40">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr className="border-bottom border-primary/5">
+                                        <tr className="border-b border-primary/5">
                                             <td className="py-4 font-bold">Fidel Kyalo</td>
                                             <td className="py-4"><span className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-[10px] font-black">SUPER ADMIN</span></td>
                                             <td className="py-4 text-secondary text-sm font-bold cursor-pointer">Edit</td>
