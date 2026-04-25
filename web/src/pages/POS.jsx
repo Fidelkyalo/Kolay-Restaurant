@@ -8,7 +8,7 @@ const POS = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [tables, setTables] = useState(() => {
         const saved = localStorage.getItem('kolay_tables');
-        return saved ? JSON.parse(saved) : ['T-01', 'T-02', 'T-03', 'T-04', 'T-05', 'T-08', 'T-10', 'T-12', 'T-15', 'Takeaway'];
+        return saved ? JSON.parse(saved) : ['T-01', 'T-02', 'T-03', 'T-04', 'T-05', 'T-08', 'T-10', 'T-12', 'T-15', 'Takeaway', 'Online Order'];
     });
     const [newTableNumber, setNewTableNumber] = useState('');
     const [selectedTable, setSelectedTable] = useState('T-01');
