@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar, MessageSquare, Clock, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar, MessageSquare, Clock, RefreshCw, CheckCircle2, Printer } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -143,6 +143,106 @@ function Dashboard() {
     const { peakDay, peakMonth, peakHour } = getPeakStats();
     const realChartData = getChartData();
 
+    const handlePrintReport = () => {
+        const printWindow = window.open('', '_blank', 'width=800,height=900');
+        if (!printWindow) {
+            alert('Popup blocked! Please allow popups to print reports.');
+            return;
+        }
+
+        const reportHtml = `
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Management Report - ${viewMode}</title>
+                    <style>
+                        body { font-family: 'Inter', sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; }
+                        .header { border-bottom: 4px solid #4E2C1E; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
+                        .restaurant-name { font-size: 32px; font-weight: 800; color: #4E2C1E; margin: 0; }
+                        .tagline { font-size: 14px; color: #E67E22; font-style: italic; }
+                        .report-meta { text-align: right; font-size: 12px; color: #888; }
+                        .stats-grid { display: grid; grid-template-columns: repeat(3, 1)fr; gap: 20px; margin-bottom: 40px; }
+                        .stat-card { border: 1px solid #eee; padding: 20px; rounded: 15px; }
+                        .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 5px; }
+                        .stat-value { font-size: 20px; font-weight: 700; color: #1a1a1a; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th { text-align: left; background: #f9f9f9; padding: 15px; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #eee; }
+                        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+                        .footer { margin-top: 60px; text-align: center; font-size: 11px; color: #aaa; border-top: 1px solid #eee; padding-top: 20px; }
+                        @media print { .no-print { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <div>
+                            <h1 class="restaurant-name">KOLAY RESTAURANT</h1>
+                            <p class="tagline">"Where Every Meal Feels Right"</p>
+                        </div>
+                        <div class="report-meta">
+                            <strong>BUSINESS REPORT: ${viewMode.toUpperCase()}</strong><br>
+                            Generated: ${new Date().toLocaleString('en-GB')}<br>
+                            location: 123 Thome Street, Nairobi
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 20px; margin-bottom: 30px;">
+                        <div style="flex: 1; border: 1px solid #eee; padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase;">Peak Hour</div>
+                            <div style="font-size: 18px; font-weight: bold;">${peakHour}</div>
+                        </div>
+                        <div style="flex: 1; border: 1px solid #eee; padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase;">Peak Day</div>
+                            <div style="font-size: 18px; font-weight: bold;">${peakDay}</div>
+                        </div>
+                        <div style="flex: 1; border: 1px solid #eee; padding: 15px; border-radius: 10px;">
+                            <div style="font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase;">Peak Month</div>
+                            <div style="font-size: 18px; font-weight: bold;">${peakMonth}</div>
+                        </div>
+                    </div>
+
+                    <h3>Performance Breakdown</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Period/Segment</th>
+                                <th>Orders</th>
+                                <th style="text-align: right;">Revenue (KES)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${realChartData.map(d => `
+                                <tr>
+                                    <td><strong>${d.name}</strong></td>
+                                    <td>${d.orders}</td>
+                                    <td style="text-align: right;">${d.revenue.toLocaleString()}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr style="background: #fdfdfd; font-weight: bold;">
+                                <td>TOTAL</td>
+                                <td>${realChartData.reduce((sum, d) => sum + d.orders, 0)}</td>
+                                <td style="text-align: right;">KES ${realChartData.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <div class="footer">
+                        CONFIDENTIAL MANAGEMENT REPORT - KOLAY RESTAURANT MANAGEMENT SYSTEM<br>
+                        © ${new Date().getFullYear()} KOLAY GLOBAL
+                    </div>
+                </body>
+            </html>
+        `;
+
+        printWindow.document.write(reportHtml);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+        }, 500);
+    };
+
     return (
         <div className="min-h-screen bg-bg-cream text-charcoal font-body">
             {/* Navigation */}
@@ -169,6 +269,12 @@ function Dashboard() {
                             </button>
                         ))}
                     </div>
+                    <button
+                        onClick={handlePrintReport}
+                        className="flex items-center gap-2 bg-white text-primary border border-primary/20 px-6 py-2 rounded-xl text-xs font-black shadow-sm hover:bg-cream transition-all active:scale-95"
+                    >
+                        <Printer className="w-4 h-4" /> PRINT REPORT
+                    </button>
                     <button
                         onClick={() => {
                             if (window.confirm('Are you sure you want to clear all orders and start over?')) {
