@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Package, AlertTriangle, Plus, Search, ArrowLeft, RefreshCw, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const INITIAL_INVENTORY = [];
+const INITIAL_INVENTORY = [
+    { id: 1, name: 'Beef Burger Patties', stock: 12, unit: 'units', status: 'LOW', category: 'Meat' },
+    { id: 2, name: 'Fresh Salmon', stock: 5, unit: 'kg', status: 'LOW', category: 'Fish' },
+    { id: 3, name: 'Cooking Oil', stock: 45, unit: 'L', status: 'OK', category: 'Supplies' },
+    { id: 4, name: 'Burger Buns', stock: 120, unit: 'units', status: 'OK', category: 'Bakery' },
+    { id: 5, name: 'French Fries', stock: 8, unit: 'kg', status: 'OUT', category: 'Produce' },
+];
 
 const Inventory = () => {
     const [searchTerm, setSearchTerm] = useState('');
