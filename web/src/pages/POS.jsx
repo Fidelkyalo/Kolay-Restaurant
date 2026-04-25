@@ -6,11 +6,25 @@ const POS = () => {
     const [activeCategory, setActiveCategory] = useState('All');
     const [cart, setCart] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [tables, setTables] = useState(() => {
+        const saved = localStorage.getItem('kolay_tables');
+        return saved ? JSON.parse(saved) : ['T-01', 'T-02', 'T-03', 'T-04', 'T-05', 'T-08', 'T-10', 'T-12', 'T-15', 'Takeaway'];
+    });
+    const [newTableNumber, setNewTableNumber] = useState('');
     const [selectedTable, setSelectedTable] = useState('T-01');
     const [showTableModal, setShowTableModal] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
 
-    const tables = ['T-01', 'T-02', 'T-03', 'T-04', 'T-05', 'T-08', 'T-10', 'T-12', 'T-15', 'Takeaway'];
+    const addTable = () => {
+        if (!newTableNumber.trim()) return;
+        const formatted = newTableNumber.startsWith('T-') ? newTableNumber : `T-${newTableNumber}`;
+        if (tables.includes(formatted)) return;
+
+        const updated = [...tables, formatted];
+        setTables(updated);
+        localStorage.setItem('kolay_tables', JSON.stringify(updated));
+        setNewTableNumber('');
+    };
 
     const categories = ['All', 'BreakFast', 'Main Dish', 'Beverages', 'Desserts', 'Side Dish'];
 
@@ -101,9 +115,24 @@ const POS = () => {
                                 </button>
                             ))}
                         </div>
+                        <div className="flex gap-4 border-t border-cream pt-6 mt-4">
+                            <input
+                                type="text"
+                                placeholder="New table # (e.g. 16)"
+                                className="flex-1 px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold"
+                                value={newTableNumber}
+                                onChange={(e) => setNewTableNumber(e.target.value)}
+                            />
+                            <button
+                                onClick={addTable}
+                                className="bg-secondary text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg active:scale-95"
+                            >
+                                Add Table
+                            </button>
+                        </div>
                         <button
                             onClick={() => setShowTableModal(false)}
-                            className="w-full py-4 bg-bg-cream text-charcoal font-bold rounded-2xl hover:bg-cream transition-colors"
+                            className="w-full py-4 mt-4 bg-bg-cream text-charcoal font-bold rounded-2xl hover:bg-cream transition-colors text-sm uppercase tracking-widest"
                         >
                             Close
                         </button>
