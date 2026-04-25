@@ -5,6 +5,8 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 
 function Dashboard() {
     const [viewMode, setViewMode] = useState('Weekly');
+    const [reportScope, setReportScope] = useState('Day');
+    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [inventory] = useState(() => {
         const saved = localStorage.getItem('kolay_inventory');
         return saved ? JSON.parse(saved) : [];
@@ -144,31 +146,48 @@ function Dashboard() {
     const realChartData = getChartData();
 
     const handlePrintReport = () => {
-        const printWindow = window.open('', '_blank', 'width=800,height=900');
+        const printWindow = window.open('', '_blank', 'width=1000,height=900');
         if (!printWindow) {
             alert('Popup blocked! Please allow popups to print reports.');
             return;
         }
 
+        // Advanced Filtering based on Selection
+        const filteredArchive = archive.filter(o => {
+            const d = new Date(o.timestamp);
+            if (reportScope === 'Day') {
+                return d.toISOString().split('T')[0] === selectedDate;
+            } else if (reportScope === 'Month') {
+                return d.toISOString().startsWith(selectedDate.substring(0, 7));
+            } else {
+                return d.getFullYear().toString() === selectedDate.substring(0, 4);
+            }
+        });
+
+        const totalRevenue = filteredArchive.reduce((sum, d) => sum + (parseFloat(d.total.replace('KES ', '').replace(',', '')) || 0), 0);
+        const totalOrders = filteredArchive.length;
+
         const reportHtml = `
             <!DOCTYPE html>
             <html>
                 <head>
-                    <title>Management Report - ${viewMode}</title>
+                    <title>Management Report - ${selectedDate}</title>
                     <style>
-                        body { font-family: 'Inter', sans-serif; padding: 40px; color: #1a1a1a; line-height: 1.6; }
-                        .header { border-bottom: 4px solid #4E2C1E; padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: flex-end; }
-                        .restaurant-name { font-size: 32px; font-weight: 800; color: #4E2C1E; margin: 0; }
-                        .tagline { font-size: 14px; color: #E67E22; font-style: italic; }
-                        .report-meta { text-align: right; font-size: 12px; color: #888; }
-                        .stats-grid { display: grid; grid-template-columns: repeat(3, 1)fr; gap: 20px; margin-bottom: 40px; }
-                        .stat-card { border: 1px solid #eee; padding: 20px; rounded: 15px; }
-                        .stat-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 5px; }
-                        .stat-value { font-size: 20px; font-weight: 700; color: #1a1a1a; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                        th { text-align: left; background: #f9f9f9; padding: 15px; font-size: 12px; text-transform: uppercase; border-bottom: 2px solid #eee; }
-                        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
-                        .footer { margin-top: 60px; text-align: center; font-size: 11px; color: #aaa; border-top: 1px solid #eee; padding-top: 20px; }
+                        body { font-family: 'Inter', sans-serif; padding: 50px; color: #1a1a1a; line-height: 1.6; }
+                        .header { border-bottom: 4px solid #4E2C1E; padding-bottom: 30px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
+                        .restaurant-name { font-size: 36px; font-weight: 800; color: #4E2C1E; margin: 0; letter-spacing: -1px; }
+                        .tagline { font-size: 16px; color: #E67E22; font-style: italic; margin-top: 5px; }
+                        .report-meta { text-align: right; font-size: 14px; color: #666; }
+                        .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 50px; }
+                        .summary-card { background: #fdfdfd; border: 1px solid #eee; padding: 25px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+                        .summary-label { font-size: 11px; text-transform: uppercase; font-weight: 800; color: #999; margin-bottom: 10px; display: block; }
+                        .summary-value { font-size: 24px; font-weight: 800; color: #4E2C1E; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 30px; background: white; }
+                        th { text-align: left; background: #4E2C1E; color: white; padding: 18px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+                        td { padding: 18px; border-bottom: 1px solid #eee; font-size: 13px; }
+                        tr:nth-child(even) { background: #fafafa; }
+                        .footer { margin-top: 80px; text-align: center; font-size: 12px; color: #bbb; border-top: 1px solid #eee; padding-top: 30px; font-style: italic; }
+                        .status-pill { padding: 4px 8px; rounded: 4px; font-size: 10px; font-weight: bold; background: #eee; }
                         @media print { .no-print { display: none; } }
                     </style>
                 </head>
@@ -179,57 +198,55 @@ function Dashboard() {
                             <p class="tagline">"Where Every Meal Feels Right"</p>
                         </div>
                         <div class="report-meta">
-                            <strong>BUSINESS REPORT: ${viewMode.toUpperCase()}</strong><br>
-                            Generated: ${new Date().toLocaleString('en-GB')}<br>
-                            location: 123 Thome Street, Nairobi
+                            <strong style="color: #4E2C1E; font-size: 18px;">${reportScope.toUpperCase()} REPORT</strong><br>
+                            Period: <strong>${selectedDate}</strong><br>
+                            Printed: ${new Date().toLocaleString('en-GB')}
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 20px; margin-bottom: 30px;">
-                        <div style="flex: 1; border: 1px solid #eee; padding: 15px; border-radius: 10px;">
-                            <div style="font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase;">Peak Hour</div>
-                            <div style="font-size: 18px; font-weight: bold;">${peakHour}</div>
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <span class="summary-label">Total Revenue</span>
+                            <div class="summary-value text-accent">KES ${totalRevenue.toLocaleString()}</div>
                         </div>
-                        <div style="flex: 1; border: 1px solid #eee; padding: 15px; border-radius: 10px;">
-                            <div style="font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase;">Peak Day</div>
-                            <div style="font-size: 18px; font-weight: bold;">${peakDay}</div>
+                        <div class="summary-card">
+                            <span class="summary-label">Total Orders</span>
+                            <div class="summary-value">${totalOrders}</div>
                         </div>
-                        <div style="flex: 1; border: 1px solid #eee; padding: 15px; border-radius: 10px;">
-                            <div style="font-size: 10px; color: #888; font-weight: bold; text-transform: uppercase;">Peak Month</div>
-                            <div style="font-size: 18px; font-weight: bold;">${peakMonth}</div>
+                        <div class="summary-card">
+                            <span class="summary-label">Avg Order Value</span>
+                            <div class="summary-value">KES ${totalOrders > 0 ? (totalRevenue / totalOrders).toLocaleString(undefined, { maximumFractionDigits: 0 }) : 0}</div>
                         </div>
                     </div>
 
-                    <h3>Performance Breakdown</h3>
+                    <h2 style="font-size: 20px; color: #4E2C1E; margin-bottom: 20px; border-left: 5px solid #E67E22; padding-left: 15px;">Transaction Log</h2>
                     <table>
                         <thead>
                             <tr>
-                                <th>Period/Segment</th>
-                                <th>Orders</th>
-                                <th style="text-align: right;">Revenue (KES)</th>
+                                <th>Time</th>
+                                <th>Order ID</th>
+                                <th>Table/Mode</th>
+                                <th>Items</th>
+                                <th style="text-align: right;">Amount</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${realChartData.map(d => `
+                            ${filteredArchive.map(o => `
                                 <tr>
-                                    <td><strong>${d.name}</strong></td>
-                                    <td>${d.orders}</td>
-                                    <td style="text-align: right;">${d.revenue.toLocaleString()}</td>
+                                    <td><strong>${new Date(o.timestamp).toLocaleTimeString('en-GB')}</strong></td>
+                                    <td><span style="color: #E67E22; font-weight: bold;">${o.id}</span></td>
+                                    <td>${o.table}</td>
+                                    <td style="color: #666; font-size: 11px;">${o.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td>
+                                    <td style="text-align: right; font-weight: bold;">${o.total}</td>
                                 </tr>
                             `).join('')}
+                            ${filteredArchive.length === 0 ? `<tr><td colspan="5" style="text-align: center; padding: 100px; color: #ccc;">No data found for the selected period</td></tr>` : ''}
                         </tbody>
-                        <tfoot>
-                            <tr style="background: #fdfdfd; font-weight: bold;">
-                                <td>TOTAL</td>
-                                <td>${realChartData.reduce((sum, d) => sum + d.orders, 0)}</td>
-                                <td style="text-align: right;">KES ${realChartData.reduce((sum, d) => sum + d.revenue, 0).toLocaleString()}</td>
-                            </tr>
-                        </tfoot>
                     </table>
 
                     <div class="footer">
-                        CONFIDENTIAL MANAGEMENT REPORT - KOLAY RESTAURANT MANAGEMENT SYSTEM<br>
-                        © ${new Date().getFullYear()} KOLAY GLOBAL
+                        KOLAY RESTAURANT MANAGEMENT SYSTEM - SECURE OPERATIONAL REPORTING<br>
+                        123 Thome Street, Nairobi | Tel: +254 102 039 121 | Email: kolayrestaurant@gmail.com
                     </div>
                 </body>
             </html>
@@ -259,21 +276,28 @@ function Dashboard() {
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="flex bg-cream p-1 rounded-2xl border border-primary/10 shadow-inner">
-                        {['Weekly', 'Monthly', 'Hourly'].map((mode) => (
+                        {['Day', 'Month', 'Year'].map((s) => (
                             <button
-                                key={mode}
-                                onClick={() => setViewMode(mode)}
-                                className={`px-6 py-2 rounded-xl text-xs font-black transition-all ${viewMode === mode ? 'bg-primary text-white shadow-lg' : 'text-primary/40 hover:text-primary'}`}
+                                key={s}
+                                onClick={() => setReportScope(s)}
+                                className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all ${reportScope === s ? 'bg-primary text-white shadow-lg' : 'text-primary/40'}`}
                             >
-                                {mode.toUpperCase()}
+                                {s.toUpperCase()}
                             </button>
                         ))}
                     </div>
+                    <input
+                        type={reportScope === 'Day' ? 'date' : reportScope === 'Month' ? 'month' : 'number'}
+                        value={reportScope === 'Year' ? selectedDate.substring(0, 4) : selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        className="bg-white border border-primary/10 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20"
+                        placeholder="Year"
+                    />
                     <button
                         onClick={handlePrintReport}
-                        className="flex items-center gap-2 bg-white text-primary border border-primary/20 px-6 py-2 rounded-xl text-xs font-black shadow-sm hover:bg-cream transition-all active:scale-95"
+                        className="flex items-center gap-2 bg-primary text-white px-6 py-2 rounded-xl text-xs font-black shadow-lg hover:bg-secondary transition-all active:scale-95"
                     >
-                        <Printer className="w-4 h-4" /> PRINT REPORT
+                        <Printer className="w-4 h-4" /> GENERATE REPORT
                     </button>
                     <button
                         onClick={() => {
