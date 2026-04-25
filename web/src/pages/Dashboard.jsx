@@ -152,26 +152,42 @@ function Dashboard() {
             return;
         }
 
-        // Advanced Filtering based on Selection
-        const filteredArchive = archive.filter(o => {
-            const d = new Date(o.timestamp);
-            if (reportScope === 'Day') {
-                return d.toISOString().split('T')[0] === selectedDate;
-            } else if (reportScope === 'Month') {
-                return d.toISOString().startsWith(selectedDate.substring(0, 7));
-            } else {
-                return d.getFullYear().toString() === selectedDate.substring(0, 4);
+        // Advanced Filtering with Safety Checks
+        const filteredArchive = (archive || []).filter(o => {
+            if (!o || !o.timestamp) return false;
+            try {
+                const d = new Date(o.timestamp);
+                if (isNaN(d.getTime())) return false;
+
+                if (reportScope === 'Day') {
+                    return d.toISOString().split('T')[0] === (selectedDate || '');
+                } else if (reportScope === 'Month') {
+                    return d.toISOString().startsWith((selectedDate || '').substring(0, 7));
+                } else {
+                    return d.getFullYear().toString() === (selectedDate || '').substring(0, 4);
+                }
+            } catch (e) {
+                return false;
             }
         });
 
-        const totalRevenue = filteredArchive.reduce((sum, d) => sum + (parseFloat(d.total.replace('KES ', '').replace(',', '')) || 0), 0);
+        // Safe Total Calculation
+        const totalRevenue = filteredArchive.reduce((sum, d) => {
+            try {
+                const totalStr = String(d.total || '0').replace('KES ', '').replace(/,/g, '');
+                return sum + (parseFloat(totalStr) || 0);
+            } catch (e) {
+                return sum;
+            }
+        }, 0);
+
         const totalOrders = filteredArchive.length;
 
         const reportHtml = `
             <!DOCTYPE html>
             <html>
                 <head>
-                    <title>Management Report - ${selectedDate}</title>
+                    <title>Management Report - ${selectedDate || 'Snapshot'}</title>
                     <style>
                         body { font-family: 'Inter', sans-serif; padding: 50px; color: #1a1a1a; line-height: 1.6; }
                         .header { border-bottom: 4px solid #4E2C1E; padding-bottom: 30px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
@@ -187,7 +203,6 @@ function Dashboard() {
                         td { padding: 18px; border-bottom: 1px solid #eee; font-size: 13px; }
                         tr:nth-child(even) { background: #fafafa; }
                         .footer { margin-top: 80px; text-align: center; font-size: 12px; color: #bbb; border-top: 1px solid #eee; padding-top: 30px; font-style: italic; }
-                        .status-pill { padding: 4px 8px; rounded: 4px; font-size: 10px; font-weight: bold; background: #eee; }
                         @media print { .no-print { display: none; } }
                     </style>
                 </head>
@@ -198,8 +213,8 @@ function Dashboard() {
                             <p class="tagline">"Where Every Meal Feels Right"</p>
                         </div>
                         <div class="report-meta">
-                            <strong style="color: #4E2C1E; font-size: 18px;">${reportScope.toUpperCase()} REPORT</strong><br>
-                            Period: <strong>${selectedDate}</strong><br>
+                            <strong style="color: #4E2C1E; font-size: 18px;">${(reportScope || 'Day').toUpperCase()} REPORT</strong><br>
+                            Period: <strong>${selectedDate || 'Current'}</strong><br>
                             Printed: ${new Date().toLocaleString('en-GB')}
                         </div>
                     </div>
@@ -207,7 +222,7 @@ function Dashboard() {
                     <div class="summary-grid">
                         <div class="summary-card">
                             <span class="summary-label">Total Revenue</span>
-                            <div class="summary-value text-accent">KES ${totalRevenue.toLocaleString()}</div>
+                            <div class="summary-value">KES ${totalRevenue.toLocaleString()}</div>
                         </div>
                         <div class="summary-card">
                             <span class="summary-label">Total Orders</span>
@@ -231,15 +246,23 @@ function Dashboard() {
                             </tr>
                         </thead>
                         <tbody>
-                            ${filteredArchive.map(o => `
-                                <tr>
-                                    <td><strong>${new Date(o.timestamp).toLocaleTimeString('en-GB')}</strong></td>
-                                    <td><span style="color: #E67E22; font-weight: bold;">${o.id}</span></td>
-                                    <td>${o.table}</td>
-                                    <td style="color: #666; font-size: 11px;">${o.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td>
-                                    <td style="text-align: right; font-weight: bold;">${o.total}</td>
-                                </tr>
-                            `).join('')}
+                            ${filteredArchive.map(o => {
+            try {
+                const timeStr = o.timestamp ? new Date(o.timestamp).toLocaleTimeString('en-GB') : 'N/A';
+                const itemsStr = (o.items || []).map(i => `${i.quantity || 1}x ${i.name || 'Unknown'}`).join(', ') || 'No Items';
+                return `
+                                        <tr>
+                                            <td><strong>${timeStr}</strong></td>
+                                            <td><span style="color: #E67E22; font-weight: bold;">${o.id || 'N/A'}</span></td>
+                                            <td>${o.table || 'Take Away'}</td>
+                                            <td style="color: #666; font-size: 11px;">${itemsStr}</td>
+                                            <td style="text-align: right; font-weight: bold;">${o.total || 'KES 0'}</td>
+                                        </tr>
+                                    `;
+            } catch (e) {
+                return '';
+            }
+        }).join('')}
                             ${filteredArchive.length === 0 ? `<tr><td colspan="5" style="text-align: center; padding: 100px; color: #ccc;">No data found for the selected period</td></tr>` : ''}
                         </tbody>
                     </table>
