@@ -83,27 +83,64 @@ function Dashboard() {
 
     // Dynamic Chart Data from Archive
     const getChartData = () => {
-        const last7Days = [...Array(7)].map((_, i) => {
-            const d = new Date();
-            d.setDate(d.getDate() - (6 - i));
-            return {
-                label: d.toLocaleDateString('en-US', { weekday: 'short' }),
-                dateStr: d.toLocaleDateString('en-CA') // YYYY-MM-DD
-            };
+        const data = {};
+        const now = new Date();
+
+        archive.forEach(order => {
+            const date = new Date(order.timestamp);
+            let key;
+
+            if (viewMode === 'Monthly') {
+                key = date.toLocaleString('default', { month: 'short' });
+            } else if (viewMode === 'Hourly') {
+                key = `${date.getHours()}h`;
+            } else {
+                key = date.toLocaleDateString('default', { weekday: 'short' });
+            }
+
+            const amount = parseFloat(order.total.replace('KES ', '').replace(',', '')) || 0;
+            if (!data[key]) data[key] = { name: key, revenue: 0, orders: 0 };
+            data[key].revenue += amount;
+            data[key].orders += 1;
         });
 
-        return last7Days.map(day => {
-            const dayOrders = archive.filter(o => o.timestamp && o.timestamp.startsWith(day.dateStr));
-            const revenue = dayOrders.reduce((sum, o) => sum + (parseInt(o.total.replace(/[^0-9]/g, '')) || 0), 0);
+        // Sort data logically
+        const orderOfDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const orderOfMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-            return {
-                name: day.label,
-                revenue: revenue || 0,
-                orders: dayOrders.length
-            };
+        return Object.values(data).sort((a, b) => {
+            if (viewMode === 'Monthly') return orderOfMonths.indexOf(a.name) - orderOfMonths.indexOf(b.name);
+            if (viewMode === 'Hourly') return parseInt(a.name) - parseInt(b.name);
+            return orderOfDays.indexOf(a.name) - orderOfDays.indexOf(b.name);
         });
     };
 
+    const getPeakStats = () => {
+        const days = {};
+        const months = {};
+        const hours = {};
+
+        archive.forEach(o => {
+            const d = new Date(o.timestamp);
+            const dayKey = d.toLocaleString('default', { weekday: 'long' });
+            const monthKey = d.toLocaleString('default', { month: 'long' });
+            const hourKey = `${d.getHours()}:00`;
+
+            days[dayKey] = (days[dayKey] || 0) + 1;
+            months[monthKey] = (months[monthKey] || 0) + 1;
+            hours[hourKey] = (hours[hourKey] || 0) + 1;
+        });
+
+        const getTop = (obj) => Object.entries(obj).sort((a, b) => b[1] - a[1])[0] || ["N/A", 0];
+
+        return {
+            peakDay: getTop(days)[0],
+            peakMonth: getTop(months)[0],
+            peakHour: getTop(hours)[0]
+        };
+    };
+
+    const { peakDay, peakMonth, peakHour } = getPeakStats();
     const realChartData = getChartData();
 
     return (
@@ -121,6 +158,17 @@ function Dashboard() {
                     <Link to="/inventory" className="hover:text-secondary transition-colors">Inventory</Link>
                 </div>
                 <div className="flex items-center gap-4">
+                    <div className="flex bg-cream p-1 rounded-2xl border border-primary/10 shadow-inner">
+                        {['Weekly', 'Monthly', 'Hourly'].map((mode) => (
+                            <button
+                                key={mode}
+                                onClick={() => setViewMode(mode)}
+                                className={`px-6 py-2 rounded-xl text-xs font-black transition-all ${viewMode === mode ? 'bg-primary text-white shadow-lg' : 'text-primary/40 hover:text-primary'}`}
+                            >
+                                {mode.toUpperCase()}
+                            </button>
+                        ))}
+                    </div>
                     <button
                         onClick={() => {
                             if (window.confirm('Are you sure you want to clear all orders and start over?')) {
