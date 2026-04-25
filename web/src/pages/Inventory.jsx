@@ -1,6 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Package, AlertTriangle, Plus, Search, ArrowLeft, RefreshCw, Filter } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+const INITIAL_INVENTORY = [
+    { id: 1, name: 'Beef Patties', stock: 12, unit: 'units', status: 'LOW', category: 'Meat' },
+    { id: 2, name: 'Fresh Salmon', stock: 5, unit: 'kg', status: 'LOW', category: 'Fish' },
+    { id: 3, name: 'Cooking Oil', stock: 45, unit: 'L', status: 'OK', category: 'Supplies' },
+    { id: 4, name: 'Burger Buns', stock: 120, unit: 'units', status: 'OK', category: 'Bakery' },
+    { id: 5, name: 'French Fries', stock: 8, unit: 'kg', status: 'OUT', category: 'Produce' },
+];
 
 const Inventory = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -8,13 +16,16 @@ const Inventory = () => {
     const [isSyncing, setIsSyncing] = useState(false);
     const [showAddModal, setShowAddModal] = useState(false);
     const [newItem, setNewItem] = useState({ name: '', category: 'Produce', stock: '', unit: 'units' });
-    const [inventory, setInventory] = useState([
-        { id: 1, name: 'Beef Patties', stock: 12, unit: 'units', status: 'LOW', category: 'Meat' },
-        { id: 2, name: 'Fresh Salmon', stock: 5, unit: 'kg', status: 'LOW', category: 'Fish' },
-        { id: 3, name: 'Cooking Oil', stock: 45, unit: 'L', status: 'OK', category: 'Supplies' },
-        { id: 4, name: 'Burger Buns', stock: 120, unit: 'units', status: 'OK', category: 'Bakery' },
-        { id: 5, name: 'French Fries', stock: 8, unit: 'kg', status: 'OUT', category: 'Produce' },
-    ]);
+
+    // Persistence Logic
+    const [inventory, setInventory] = useState(() => {
+        const saved = localStorage.getItem('kolay_inventory');
+        return saved ? JSON.parse(saved) : INITIAL_INVENTORY;
+    });
+
+    useEffect(() => {
+        localStorage.setItem('kolay_inventory', JSON.stringify(inventory));
+    }, [inventory]);
 
     const filteredInventory = inventory.filter(item => {
         const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -27,7 +38,9 @@ const Inventory = () => {
 
     const handleSync = () => {
         setIsSyncing(true);
-        setTimeout(() => setIsSyncing(false), 2000);
+        // Reset to initial but keep what was there? 
+        // Ordinarily sync would fetch from DB, but for demo we simulate a "refresh"
+        setTimeout(() => setIsSyncing(false), 1500);
     };
 
     const handleUpdateStock = (id, amount) => {
@@ -48,7 +61,7 @@ const Inventory = () => {
         if (!newItem.name || !newItem.stock) return;
 
         const itemToAdd = {
-            id: inventory.length + 1,
+            id: Date.now(), // Truly unique ID
             name: newItem.name,
             stock: parseInt(newItem.stock),
             unit: newItem.unit,
@@ -221,7 +234,7 @@ const Inventory = () => {
                                     <tr key={item.id} className="hover:bg-bg-cream/30 transition-colors">
                                         <td className="px-8 py-6">
                                             <p className="font-bold text-primary">{item.name}</p>
-                                            <p className="text-[10px] text-charcoal/40 uppercase font-bold tracking-tight">SKU: KOL-{item.id}00X</p>
+                                            <p className="text-[10px] text-charcoal/40 uppercase font-bold tracking-tight">SKU: KOL-{item.id.toString().slice(-4)}</p>
                                         </td>
                                         <td className="px-8 py-6">
                                             <span className="text-[10px] font-black uppercase px-3 py-1 bg-bg-cream border border-cream rounded-full text-charcoal/60">{item.category}</span>
