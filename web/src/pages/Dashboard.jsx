@@ -274,47 +274,55 @@ function Dashboard() {
                     <Link to="/kds" className="hover:text-secondary transition-colors">KDS</Link>
                     <Link to="/inventory" className="hover:text-secondary transition-colors">Inventory</Link>
                 </div>
-                <div className="flex items-center gap-4">
-                    <div className="flex bg-cream p-1 rounded-2xl border border-primary/10 shadow-inner">
-                        {['Day', 'Month', 'Year'].map((s) => (
-                            <button
-                                key={s}
-                                onClick={() => setReportScope(s)}
-                                className={`px-4 py-2 rounded-xl text-[10px] font-black transition-all ${reportScope === s ? 'bg-primary text-white shadow-lg' : 'text-primary/40'}`}
-                            >
-                                {s.toUpperCase()}
-                            </button>
-                        ))}
+                <div className="flex items-center gap-4 ml-auto">
+                    {/* Report Controls */}
+                    <div className="flex items-center gap-3 bg-white/5 p-1.5 rounded-2xl border border-white/10">
+                        <div className="flex bg-white/10 p-1 rounded-xl">
+                            {['Day', 'Month', 'Year'].map((s) => (
+                                <button
+                                    key={s}
+                                    onClick={() => setReportScope(s)}
+                                    className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${reportScope === s ? 'bg-secondary text-white shadow-lg' : 'text-white/40 hover:text-white/70'}`}
+                                >
+                                    {s.toUpperCase()}
+                                </button>
+                            ))}
+                        </div>
+                        <input
+                            type={reportScope === 'Day' ? 'date' : reportScope === 'Month' ? 'month' : 'number'}
+                            value={reportScope === 'Year' ? selectedDate.substring(0, 4) : selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            className="bg-primary/40 border border-white/10 text-white rounded-xl px-4 py-1.5 text-xs font-bold outline-none focus:ring-2 focus:ring-secondary/50 transition-all w-40"
+                        />
+                        <button
+                            onClick={handlePrintReport}
+                            className="flex items-center gap-2 bg-secondary text-white px-5 py-1.5 rounded-xl text-xs font-black shadow-lg hover:brightness-110 transition-all active:scale-95 border border-white/10"
+                        >
+                            <Printer className="w-3.5 h-3.5" /> GENERATE REPORT
+                        </button>
                     </div>
-                    <input
-                        type={reportScope === 'Day' ? 'date' : reportScope === 'Month' ? 'month' : 'number'}
-                        value={reportScope === 'Year' ? selectedDate.substring(0, 4) : selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        className="bg-white border border-primary/10 rounded-xl px-4 py-2 text-xs font-bold outline-none focus:ring-2 focus:ring-primary/20"
-                        placeholder="Year"
-                    />
-                    <button
-                        onClick={handlePrintReport}
-                        className="flex items-center gap-2 bg-primary text-white px-6 py-2 rounded-xl text-xs font-black shadow-lg hover:bg-secondary transition-all active:scale-95"
-                    >
-                        <Printer className="w-4 h-4" /> GENERATE REPORT
-                    </button>
-                    <button
-                        onClick={() => {
-                            if (window.confirm('Are you sure you want to clear all orders and start over?')) {
-                                localStorage.removeItem('kolay_orders');
-                                window.location.reload();
-                            }
-                        }}
-                        className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-red-500/20"
-                    >
-                        Reset System
-                    </button>
-                    <div className="bg-accent text-primary px-4 py-1.5 rounded-full text-sm font-bold shadow-sm">
-                        Admin Panel
-                    </div>
-                    <div className="h-10 w-10 rounded-full bg-primary-dark border-2 border-accent flex items-center justify-center cursor-pointer shadow-md">
-                        <span className="font-bold text-accent">FK</span>
+
+                    {/* Secondary Actions */}
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => {
+                                if (window.confirm('Are you sure you want to clear all orders and start over?')) {
+                                    localStorage.removeItem('kolay_orders');
+                                    localStorage.removeItem('kolay_inventory');
+                                    localStorage.removeItem('kolay_archive');
+                                    window.location.reload();
+                                }
+                            }}
+                            className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 px-4 py-1.5 rounded-xl text-[10px] font-black transition-all"
+                        >
+                            Reset System
+                        </button>
+                        <div className="bg-accent text-primary px-4 py-1.5 rounded-full text-sm font-bold shadow-sm">
+                            Admin Panel
+                        </div>
+                        <div className="h-10 w-10 rounded-full bg-primary-dark border-2 border-accent flex items-center justify-center cursor-pointer shadow-md">
+                            <span className="font-bold text-accent">FK</span>
+                        </div>
                     </div>
                 </div>
             </nav>
