@@ -6,6 +6,7 @@ const POS = () => {
     const [activeCategory, setActiveCategory] = useState('All');
     const [cart, setCart] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [showSuccess, setShowSuccess] = useState(false);
 
     const categories = ['All', 'BreakFast', 'Main Dish', 'Beverages', 'Desserts', 'Side Dish'];
 
@@ -48,12 +49,45 @@ const POS = () => {
         }));
     };
 
+    const handlePlaceOrder = () => {
+        if (cart.length === 0) return;
+
+        const newOrder = {
+            id: `#${Math.floor(1000 + Math.random() * 9000)}`,
+            table: 'T-01',
+            items: cart.map(item => `${item.quantity}x ${item.name}`).join(', '),
+            total: `KES ${(subtotal + tax).toLocaleString()}`,
+            status: 'Pending',
+            statusColor: 'bg-gray-100 text-gray-700'
+        };
+
+        const existing = JSON.parse(localStorage.getItem('kolay_orders') || '[]');
+        localStorage.setItem('kolay_orders', JSON.stringify([newOrder, ...existing]));
+
+        setShowSuccess(true);
+        setCart([]);
+        setTimeout(() => setShowSuccess(false), 3000);
+    };
+
     const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     const tax = subtotal * 0.16; // 16% VAT
     const total = subtotal + tax;
 
     return (
-        <div className="flex h-screen bg-bg-cream font-body overflow-hidden">
+        <div className="flex h-screen bg-bg-cream font-body overflow-hidden relative">
+            {/* Success Overlay */}
+            {showSuccess && (
+                <div className="absolute inset-0 z-[100] flex items-center justify-center bg-primary/20 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white p-8 rounded-3xl shadow-2xl border border-cream text-center animate-in zoom-in duration-300">
+                        <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
+                            ✅
+                        </div>
+                        <h2 className="text-2xl font-bold text-primary mb-2">Order Placed!</h2>
+                        <p className="text-charcoal/50">Sent to kitchen for preparation.</p>
+                    </div>
+                </div>
+            )}
+
             {/* Left Menu Side */}
             <div className="flex-1 flex flex-col p-6 overflow-hidden">
                 {/* Back Button */}
@@ -184,12 +218,13 @@ const POS = () => {
                         <button className="flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-cream font-bold text-charcoal/40 hover:bg-bg-cream transition-all">
                             <User className="w-5 h-5" /> Customer
                         </button>
-                        <button className="flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-cream font-bold text-charcoal/40 hover:bg-bg-cream transition-all">
+                        <button className="flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-secondary/50 text-secondary font-bold hover:bg-bg-cream transition-all">
                             Table: T-01
                         </button>
                     </div>
 
                     <button
+                        onClick={handlePlaceOrder}
                         disabled={cart.length === 0}
                         className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-5 rounded-2xl shadow-xl transition-all active:transform active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg mt-2"
                     >
