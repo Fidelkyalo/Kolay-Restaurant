@@ -9,7 +9,41 @@ function Dashboard() {
         return saved ? JSON.parse(saved) : [];
     });
 
+    const [orders] = useState(() => {
+        const saved = localStorage.getItem('kolay_orders');
+        const initial = [
+            { id: '#8902', table: 'T-04', items: '2x Beef Burger, 1x Fries', total: 'KES 2,400', status: 'In Progress', statusColor: 'bg-orange-100 text-orange-700' },
+            { id: '#8901', table: 'T-12', items: '1x Grilled Salmon', total: 'KES 1,850', status: 'Ready', statusColor: 'bg-green-100 text-green-700' },
+            { id: '#8900', table: 'T-02', items: '3x Chicken Wings', total: 'KES 1,200', status: 'Served', statusColor: 'bg-blue-100 text-blue-700' },
+            { id: '#8899', table: 'T-08', items: '1x Margherita Pizza', total: 'KES 1,100', status: 'Pending', statusColor: 'bg-gray-100 text-gray-700' },
+        ];
+        if (!saved) {
+            localStorage.setItem('kolay_orders', JSON.stringify(initial));
+            return initial;
+        }
+        return JSON.parse(saved);
+    });
+
     const alerts = inventory.filter(item => item.status === 'LOW' || item.status === 'OUT');
+    const activeOrders = orders.filter(o => o.status === 'In Progress' || o.status === 'Pending');
+
+    const totalRevenue = orders.reduce((sum, order) => {
+        const val = parseInt(order.total.replace(/[^0-9]/g, '')) || 0;
+        return sum + val;
+    }, 0);
+
+    const totalCustomers = 1200 + new Set(orders.map(o => o.table)).size;
+
+    // Functional Load Calculation
+    const grillLoad = Math.min(100, activeOrders.filter(o =>
+        o.items.toLowerCase().includes('burger') ||
+        o.items.toLowerCase().includes('wings') ||
+        o.items.toLowerCase().includes('salmon')
+    ).length * 30);
+
+    const pizzaLoad = Math.min(100, activeOrders.filter(o =>
+        o.items.toLowerCase().includes('pizza')
+    ).length * 40);
 
     const chartData = {
         Weekly: {
@@ -60,9 +94,9 @@ function Dashboard() {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                     {[
-                        { label: 'Total Revenue', value: 'KES 45,280', icon: '💰', trend: '+12.5%', color: 'border-l-secondary', path: '/dashboard' },
-                        { label: 'Active Orders', value: '24', icon: '📝', trend: '8 pending', color: 'border-l-accent', path: '/pos' },
-                        { label: 'Total Customers', value: '1,204', icon: '👥', trend: '+48 today', color: 'border-l-primary', path: '/dashboard' },
+                        { label: 'Total Revenue', value: `KES ${totalRevenue.toLocaleString()}`, icon: '💰', trend: '+12.5%', color: 'border-l-secondary', path: '/dashboard' },
+                        { label: 'Active Orders', value: activeOrders.length.toString(), icon: '📝', trend: `${activeOrders.length} pending`, color: 'border-l-accent', path: '/pos' },
+                        { label: 'Total Customers', value: totalCustomers.toLocaleString(), icon: '👥', trend: `+${orders.length} orders`, color: 'border-l-primary', path: '/dashboard' },
                         { label: 'Stock Alerts', value: `${alerts.length} Items`, icon: '⚠️', trend: alerts.length > 0 ? 'Refill needed' : 'All good', color: 'border-l-red-500', path: '/inventory' },
                     ].map((stat, i) => (
                         <Link key={i} to={stat.path} className={`bg-white p-6 rounded-2xl shadow-sm border-l-4 ${stat.color} hover:shadow-md transition-shadow cursor-pointer block`}>
@@ -99,12 +133,7 @@ function Dashboard() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-cream">
-                                        {[
-                                            { id: '#8902', table: 'T-04', items: '2x Beef Burger, 1x Fries', total: 'KES 2,400', status: 'In Progress', statusColor: 'bg-orange-100 text-orange-700' },
-                                            { id: '#8901', table: 'T-12', items: '1x Grilled Salmon', total: 'KES 1,850', status: 'Ready', statusColor: 'bg-green-100 text-green-700' },
-                                            { id: '#8900', table: 'T-02', items: '3x Chicken Wings', total: 'KES 1,200', status: 'Served', statusColor: 'bg-blue-100 text-blue-700' },
-                                            { id: '#8899', table: 'T-08', items: '1x Margherita Pizza', total: 'KES 1,100', status: 'Pending', statusColor: 'bg-gray-100 text-gray-700' },
-                                        ].map((order, i) => (
+                                        {orders.slice(0, 5).map((order, i) => (
                                             <tr key={i} className="hover:bg-bg-cream/30 transition-colors cursor-pointer group">
                                                 <td className="px-6 py-4 font-bold text-primary group-hover:text-secondary">{order.id}</td>
                                                 <td className="px-6 py-4">{order.table}</td>
@@ -181,19 +210,19 @@ function Dashboard() {
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-sm">
                                         <span className="font-medium">Grill Station</span>
-                                        <span className="font-bold text-secondary">85%</span>
+                                        <span className={`font-bold ${grillLoad > 70 ? 'text-secondary' : 'text-primary'}`}>{grillLoad}%</span>
                                     </div>
                                     <div className="h-2 w-full bg-cream rounded-full overflow-hidden">
-                                        <div className="h-full bg-secondary rounded-full" style={{ width: '85%' }}></div>
+                                        <div className="h-full bg-secondary rounded-full transition-all duration-500" style={{ width: `${grillLoad}%` }}></div>
                                     </div>
                                 </div>
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-sm">
                                         <span className="font-medium">Pizza Oven</span>
-                                        <span className="font-bold text-accent">40%</span>
+                                        <span className={`font-bold ${pizzaLoad > 70 ? 'text-secondary' : 'text-primary'}`}>{pizzaLoad}%</span>
                                     </div>
                                     <div className="h-2 w-full bg-cream rounded-full overflow-hidden">
-                                        <div className="h-full bg-accent rounded-full" style={{ width: '40%' }}></div>
+                                        <div className="h-full bg-accent rounded-full transition-all duration-500" style={{ width: `${pizzaLoad}%` }}></div>
                                     </div>
                                 </div>
                             </div>
