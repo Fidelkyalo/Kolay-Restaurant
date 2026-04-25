@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar, MessageSquare, Clock, RefreshCw } from 'lucide-react';
+import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar, MessageSquare, Clock, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -24,6 +24,21 @@ function Dashboard() {
         const saved = localStorage.getItem('kolay_dashboard_notes');
         return saved ? JSON.parse(saved) : "Great sales today! Need to restock on Beef Burger patties soon.";
     });
+
+    const updateStatus = (id, newStatus) => {
+        const saved = JSON.parse(localStorage.getItem('kolay_orders') || '[]');
+        const updated = saved.map(order =>
+            order.id === id ? { ...order, status: newStatus } : order
+        );
+        localStorage.setItem('kolay_orders', JSON.stringify(updated));
+        window.dispatchEvent(new Event('storage')); // Trigger refresh
+        // Also update archive for consistency
+        const arch = JSON.parse(localStorage.getItem('kolay_archive') || '[]');
+        const updatedArch = arch.map(order =>
+            order.id === id ? { ...order, status: newStatus } : order
+        );
+        localStorage.setItem('kolay_archive', JSON.stringify(updatedArch));
+    };
 
     // Auto-Reset Logic (24h)
     React.useEffect(() => {
@@ -172,6 +187,7 @@ function Dashboard() {
                                             <th className="px-6 py-4 font-bold">Items</th>
                                             <th className="px-6 py-4 font-bold">Total</th>
                                             <th className="px-6 py-4 font-bold">Status</th>
+                                            <th className="px-6 py-4 font-bold text-right">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-cream">
@@ -192,10 +208,24 @@ function Dashboard() {
                                                     <td className="px-6 py-4">
                                                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${order.status === 'PENDING' ? 'bg-gray-100 text-gray-600' :
                                                             order.status === 'PREPARING' ? 'bg-orange-100 text-secondary' :
-                                                                'bg-green-100 text-green-700'
+                                                                order.status === 'READY' ? 'bg-green-100 text-green-700 animate-pulse' :
+                                                                    'bg-blue-100 text-blue-700'
                                                             }`}>
                                                             {order.status}
                                                         </span>
+                                                    </td>
+                                                    <td className="px-6 py-4 text-right">
+                                                        {order.status === 'READY' && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    updateStatus(order.id, 'SERVED');
+                                                                }}
+                                                                className="bg-primary hover:bg-secondary text-white text-[10px] font-black px-4 py-2 rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 ml-auto"
+                                                            >
+                                                                <CheckCircle2 className="w-3 h-3" /> MARK DELIVERED
+                                                            </button>
+                                                        )}
                                                     </td>
                                                 </tr>
                                             ))}
