@@ -1,6 +1,7 @@
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import POS from './pages/POS';
+import KDS from './pages/KDS';
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/pos" element={<POS />} />
+        <Route path="/kds" element={<KDS />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
