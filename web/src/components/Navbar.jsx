@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Settings, RefreshCw, Shield, Menu, X, Home, LayoutGrid, Monitor, Package, ChevronRight, LogOut } from 'lucide-react';
 
@@ -6,6 +6,23 @@ const Navbar = () => {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
+
+    const [restaurantName, setRestaurantName] = useState(() => {
+        const saved = localStorage.getItem('kolay_settings');
+        return saved ? JSON.parse(saved).restaurantName : 'KOLAY';
+    });
+
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const saved = localStorage.getItem('kolay_settings');
+            if (saved) {
+                setRestaurantName(JSON.parse(saved).restaurantName);
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
 
     const links = [
         { name: 'Dashboard', path: '/dashboard', icon: <Home className="w-4 h-4" /> },
@@ -29,7 +46,7 @@ const Navbar = () => {
             {/* Logo Section */}
             <div className="flex items-center gap-2 md:gap-3 md:w-1/4">
                 <img src="/Logo.png" alt="Kolay Logo" className="h-8 md:h-10 w-auto rounded shadow-sm" />
-                <span className="text-xl md:text-2xl font-display font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">KOLAY</span>
+                <span className="text-xl md:text-2xl font-display font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent uppercase">{restaurantName}</span>
             </div>
 
             {/* Nav Links - Centered (Desktop) */}
@@ -114,7 +131,7 @@ const Navbar = () => {
                         <div className="flex justify-between items-center mb-10">
                             <div className="flex items-center gap-3">
                                 <img src="/Logo.png" alt="Logo" className="h-8 w-auto rounded" />
-                                <span className="text-xl font-display font-bold">KOLAY</span>
+                                <span className="text-xl font-display font-bold uppercase">{restaurantName}</span>
                             </div>
                             <button onClick={() => setIsMenuOpen(false)} className="p-2 hover:bg-white/10 rounded-lg">
                                 <X className="w-6 h-6" />
