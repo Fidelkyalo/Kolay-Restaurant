@@ -6,6 +6,8 @@ const Inventory = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All Items');
     const [isSyncing, setIsSyncing] = useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [newItem, setNewItem] = useState({ name: '', category: 'Produce', stock: '', unit: 'units' });
     const [inventory, setInventory] = useState([
         { id: 1, name: 'Beef Patties', stock: 12, unit: 'units', status: 'LOW', category: 'Meat' },
         { id: 2, name: 'Fresh Salmon', stock: 5, unit: 'kg', status: 'LOW', category: 'Fish' },
@@ -41,20 +43,101 @@ const Inventory = () => {
         }));
     };
 
-    const handleAddItem = () => {
-        const newItem = {
+    const handleAddItem = (e) => {
+        e.preventDefault();
+        if (!newItem.name || !newItem.stock) return;
+
+        const itemToAdd = {
             id: inventory.length + 1,
-            name: 'New Resource ' + (inventory.length + 1),
-            stock: 50,
-            unit: 'units',
-            status: 'OK',
-            category: 'Miscellaneous'
+            name: newItem.name,
+            stock: parseInt(newItem.stock),
+            unit: newItem.unit,
+            status: parseInt(newItem.stock) < 20 ? 'LOW' : 'OK',
+            category: newItem.category
         };
-        setInventory([...inventory, newItem]);
+
+        setInventory([itemToAdd, ...inventory]);
+        setNewItem({ name: '', category: 'Produce', stock: '', unit: 'units' });
+        setShowAddModal(false);
     };
 
     return (
-        <div className="min-h-screen bg-bg-cream p-8 font-body">
+        <div className="min-h-screen bg-bg-cream p-8 font-body relative">
+            {/* Modal Overlay */}
+            {showAddModal && (
+                <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-[2rem] w-full max-w-md shadow-2xl p-8 animate-in fade-in zoom-in duration-200">
+                        <h3 className="text-2xl font-bold text-primary mb-6">Onboard New Stock</h3>
+                        <form onSubmit={handleAddItem} className="space-y-5">
+                            <div>
+                                <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Item Name</label>
+                                <input
+                                    autoFocus
+                                    placeholder="e.g. Tomato Sauce"
+                                    className="w-full bg-bg-cream border border-cream px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20"
+                                    value={newItem.name}
+                                    onChange={e => setNewItem({ ...newItem, name: e.target.value })}
+                                />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Initial Stock</label>
+                                    <input
+                                        type="number"
+                                        placeholder="0"
+                                        className="w-full bg-bg-cream border border-cream px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20"
+                                        value={newItem.stock}
+                                        onChange={e => setNewItem({ ...newItem, stock: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Unit</label>
+                                    <select
+                                        className="w-full bg-bg-cream border border-cream px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20 font-bold"
+                                        value={newItem.unit}
+                                        onChange={e => setNewItem({ ...newItem, unit: e.target.value })}
+                                    >
+                                        <option>units</option>
+                                        <option>kg</option>
+                                        <option>L</option>
+                                        <option>packs</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Category</label>
+                                <select
+                                    className="w-full bg-bg-cream border border-cream px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20 font-bold"
+                                    value={newItem.category}
+                                    onChange={e => setNewItem({ ...newItem, category: e.target.value })}
+                                >
+                                    <option>Produce</option>
+                                    <option>Meat</option>
+                                    <option>Fish</option>
+                                    <option>Bakery</option>
+                                    <option>Supplies</option>
+                                </select>
+                            </div>
+                            <div className="flex gap-3 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAddModal(false)}
+                                    className="flex-1 py-3 font-bold text-charcoal/40 hover:text-primary transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="flex-1 bg-secondary hover:bg-orange-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-secondary/20 transition-all active:scale-95"
+                                >
+                                    Confirm Add
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             <Link to="/dashboard" className="flex items-center gap-2 text-charcoal/40 hover:text-secondary transition-colors mb-8 font-bold text-sm">
                 <ArrowLeft className="w-4 h-4" /> Back to Dashboard
             </Link>
@@ -75,7 +158,7 @@ const Inventory = () => {
                         {isSyncing ? 'Syncing...' : 'Sync Stock'}
                     </button>
                     <button
-                        onClick={handleAddItem}
+                        onClick={() => setShowAddModal(true)}
                         className="flex-1 md:flex-none bg-primary text-white px-6 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold text-sm shadow-lg hover:bg-primary-dark transition-all active:scale-95"
                     >
                         <Plus className="w-4 h-4" /> Add Item
