@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Clock, CheckCircle2, AlertCircle, ChefHat, Timer, ArrowRight, History } from 'lucide-react';
+import { Clock, CheckCircle2, AlertCircle, ChefHat, Timer, ArrowRight, History, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const KDS = () => {
     const [activeOrders, setActiveOrders] = useState([
@@ -42,6 +42,9 @@ const KDS = () => {
 
     return (
         <div className="min-h-screen bg-[#1a1a1a] text-white p-6 font-body overflow-hidden flex flex-col">
+            <Link to="/dashboard" className="flex items-center gap-2 text-white/30 hover:text-secondary transition-colors mb-4 font-bold text-sm">
+                <ArrowLeft className="w-4 h-4" /> Exit KDS
+            </Link>
             {/* KDS Header */}
             <div className="flex justify-between items-center mb-8 bg-[#252525] p-6 rounded-3xl border border-white/5 shadow-2xl">
                 <div className="flex items-center gap-4">

@@ -1,5 +1,5 @@
-import React from 'react';
 import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Dashboard() {
     return (
@@ -11,10 +11,10 @@ function Dashboard() {
                     <span className="text-2xl font-display font-bold tracking-tight">KOLAY</span>
                 </div>
                 <div className="hidden md:flex gap-8 font-medium">
-                    <a href="#" className="hover:text-secondary transition-colors underline decoration-secondary decoration-2 underline-offset-8">Dashboard</a>
-                    <a href="#" className="hover:text-secondary transition-colors">Menu</a>
-                    <a href="#" className="hover:text-secondary transition-colors">Orders</a>
-                    <a href="#" className="hover:text-secondary transition-colors">Inventory</a>
+                    <Link to="/dashboard" className="hover:text-secondary transition-colors underline decoration-secondary decoration-2 underline-offset-8">Dashboard</Link>
+                    <Link to="/pos" className="hover:text-secondary transition-colors">Menu</Link>
+                    <Link to="/kds" className="hover:text-secondary transition-colors">KDS</Link>
+                    <Link to="/dashboard" className="hover:text-secondary transition-colors">Inventory</Link>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="bg-accent text-primary px-4 py-1.5 rounded-full text-sm font-bold shadow-sm">
@@ -136,9 +136,9 @@ function Dashboard() {
                             </div>
                             <h3 className="text-2xl font-bold mb-4 relative z-10">Quick Order</h3>
                             <p className="text-white/70 mb-6 text-sm relative z-10">Generate a new POS order quickly from here.</p>
-                            <button className="w-full bg-secondary hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg active:transform active:scale-95 relative z-10">
+                            <Link to="/pos" className="w-full bg-secondary hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg active:transform active:scale-95 relative z-10 flex items-center justify-center">
                                 + Create New Order
-                            </button>
+                            </Link>
                         </div>
 
                         <div className="bg-white p-6 rounded-3xl shadow-sm border border-cream">

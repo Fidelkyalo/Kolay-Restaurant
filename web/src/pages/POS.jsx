@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Search, ShoppingCart, Plus, Minus, X, CreditCard, User, ClipboardList, UtensilsCrossed } from 'lucide-react';
+import { Search, ShoppingCart, Plus, Minus, X, CreditCard, User, ClipboardList, UtensilsCrossed, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const POS = () => {
     const [activeCategory, setActiveCategory] = useState('All');
@@ -55,6 +55,10 @@ const POS = () => {
         <div className="flex h-screen bg-bg-cream font-body overflow-hidden">
             {/* Left Menu Side */}
             <div className="flex-1 flex flex-col p-6 overflow-hidden">
+                {/* Back Button */}
+                <Link to="/dashboard" className="flex items-center gap-2 text-charcoal/40 hover:text-secondary transition-colors mb-4 font-bold text-sm">
+                    <ArrowLeft className="w-4 h-4" /> Back to Dashboard
+                </Link>
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <div>
@@ -82,8 +86,8 @@ const POS = () => {
                             key={cat}
                             onClick={() => setActiveCategory(cat)}
                             className={`px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-all ${activeCategory === cat
-                                    ? 'bg-secondary text-white shadow-lg scale-105'
-                                    : 'bg-white text-charcoal/60 hover:bg-cream border border-cream'
+                                ? 'bg-secondary text-white shadow-lg scale-105'
+                                : 'bg-white text-charcoal/60 hover:bg-cream border border-cream'
                                 }`}
                         >
                             {cat}
