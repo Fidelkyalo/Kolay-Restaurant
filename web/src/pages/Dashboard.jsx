@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 

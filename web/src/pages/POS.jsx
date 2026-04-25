@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Search, ShoppingCart, Plus, Minus, X, CreditCard, User, ClipboardList, UtensilsCrossed, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
