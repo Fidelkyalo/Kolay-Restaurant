@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Utensils, Star, Clock, MapPin, Phone, Instagram, Facebook, Twitter, ArrowRight, Calendar, ChevronDown, Check } from 'lucide-react';
+import { Utensils, Star, Clock, MapPin, Phone, Camera, MessageCircle, Send, ArrowRight, Calendar, ChevronDown, Check } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
 import { Link } from 'react-router-dom';
 
@@ -272,9 +272,7 @@ const Home = () => {
                                 alt="Gallery"
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125"
                             />
-                            <div className="absolute inset-0 bg-secondary/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                <Instagram className="text-white w-12 h-12" />
-                            </div>
+                            <Camera className="text-white w-12 h-12" />
                         </div>
                     ))}
                 </div>
@@ -292,9 +290,9 @@ const Home = () => {
                             Bringing artisan culinary experiences to your soul. Join us for a feast of the senses.
                         </p>
                         <div className="flex gap-6">
-                            <button className="bg-white/5 hover:bg-accent hover:text-primary p-3 rounded-xl transition-all"><Instagram className="w-5 h-5" /></button>
-                            <button className="bg-white/5 hover:bg-accent hover:text-primary p-3 rounded-xl transition-all"><Facebook className="w-5 h-5" /></button>
-                            <button className="bg-white/5 hover:bg-accent hover:text-primary p-3 rounded-xl transition-all"><Twitter className="w-5 h-5" /></button>
+                            <button className="bg-white/5 hover:bg-accent hover:text-primary p-3 rounded-xl transition-all"><Camera className="w-5 h-5" /></button>
+                            <button className="bg-white/5 hover:bg-accent hover:text-primary p-3 rounded-xl transition-all"><MessageCircle className="w-5 h-5" /></button>
+                            <button className="bg-white/5 hover:bg-accent hover:text-primary p-3 rounded-xl transition-all"><Send className="w-5 h-5" /></button>
                         </div>
                     </div>
 

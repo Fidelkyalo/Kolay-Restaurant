@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Utensils, Calendar, MapPin, Phone, Instagram, Facebook } from 'lucide-react';
+import { Menu, X, Utensils, Calendar, MapPin, Phone, Camera, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const PublicNavbar = () => {
