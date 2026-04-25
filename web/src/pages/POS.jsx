@@ -34,9 +34,29 @@ const POS = () => {
                 <head>
                     <title>Receipt - ${lastPlacedOrder.id}</title>
                     <style>
-                        body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; color: #1a1a1a; padding: 20px; line-height: 1.4; }
+                        body { 
+                            font-family: 'Courier New', Courier, monospace; 
+                            width: 300px; 
+                            margin: 0 auto; 
+                            color: #1a1a1a; 
+                            padding: 20px; 
+                            line-height: 1.4;
+                            position: relative;
+                            overflow: hidden;
+                        }
+                        .watermark {
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%) rotate(-15deg);
+                            width: 250px;
+                            opacity: 0.05;
+                            z-index: -1;
+                            pointer-events: none;
+                        }
                         .header { text-align: center; border-bottom: 2px dashed #eee; padding-bottom: 20px; margin-bottom: 20px; }
                         .restaurant-name { font-size: 24px; font-weight: bold; margin: 0; color: #4E2C1E; }
+                        .tagline { font-size: 10px; font-style: italic; color: #888; margin-top: 4px; }
                         .order-info { margin-bottom: 20px; font-size: 14px; }
                         .items { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
                         .items th { text-align: left; border-bottom: 1px solid #eee; padding: 5px 0; font-size: 10px; text-transform: uppercase; color: #888; }
@@ -51,9 +71,11 @@ const POS = () => {
                     </style>
                 </head>
                 <body>
+                    <img src="${window.location.origin}/Logo.png" class="watermark" />
                     <div class="header">
                         <h1 class="restaurant-name">KOLAY RESTAURANT</h1>
-                        <p>123 Gourmet Street, Nairobi<br>Tel: +254 700 000 000</p>
+                        <p class="tagline">"Where Every Meal Feels Right"</p>
+                        <p style="font-size: 12px;">123 Gourmet Street, Nairobi<br>Tel: +254 700 000 000</p>
                     </div>
                     <div class="order-info">
                         <div class="total-row"><span>ID:</span> <strong>#${lastPlacedOrder.id}</strong></div>
