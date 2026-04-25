@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import POS from './pages/POS';
 import KDS from './pages/KDS';
+import Inventory from './pages/Inventory';
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/pos" element={<POS />} />
         <Route path="/kds" element={<KDS />} />
+        <Route path="/inventory" element={<Inventory />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

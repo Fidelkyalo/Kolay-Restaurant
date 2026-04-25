@@ -15,7 +15,7 @@ function Dashboard() {
                     <Link to="/dashboard" className="hover:text-secondary transition-colors underline decoration-secondary decoration-2 underline-offset-8">Dashboard</Link>
                     <Link to="/pos" className="hover:text-secondary transition-colors">Menu</Link>
                     <Link to="/kds" className="hover:text-secondary transition-colors">KDS</Link>
-                    <Link to="/dashboard" className="hover:text-secondary transition-colors">Inventory</Link>
+                    <Link to="/inventory" className="hover:text-secondary transition-colors">Inventory</Link>
                 </div>
                 <div className="flex items-center gap-4">
                     <div className="bg-accent text-primary px-4 py-1.5 rounded-full text-sm font-bold shadow-sm">
