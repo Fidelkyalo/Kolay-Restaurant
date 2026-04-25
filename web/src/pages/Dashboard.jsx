@@ -30,15 +30,16 @@ function Dashboard() {
     const totalCustomers = new Set(orders.map(o => o.table)).size;
 
     // Functional Load Calculation
-    const grillLoad = Math.min(100, activeOrders.filter(o =>
-        o.items.toLowerCase().includes('burger') ||
-        o.items.toLowerCase().includes('wings') ||
-        o.items.toLowerCase().includes('salmon')
-    ).length * 30);
+    const grillLoad = Math.min(100, activeOrders.filter(o => {
+        const str = Array.isArray(o.items) ? o.items.map(i => i.name).join(' ') : o.items;
+        const low = str.toLowerCase();
+        return low.includes('burger') || low.includes('wings') || low.includes('salmon');
+    }).length * 30);
 
-    const pizzaLoad = Math.min(100, activeOrders.filter(o =>
-        o.items.toLowerCase().includes('pizza')
-    ).length * 40);
+    const pizzaLoad = Math.min(100, activeOrders.filter(o => {
+        const str = Array.isArray(o.items) ? o.items.map(i => i.name).join(' ') : o.items;
+        return str.toLowerCase().includes('pizza');
+    }).length * 40);
 
     const chartData = {
         Weekly: {
@@ -128,19 +129,30 @@ function Dashboard() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-cream">
-                                        {orders.slice(0, 5).map((order, i) => (
-                                            <tr key={i} className="hover:bg-bg-cream/30 transition-colors cursor-pointer group">
-                                                <td className="px-6 py-4 font-bold text-primary group-hover:text-secondary">{order.id}</td>
-                                                <td className="px-6 py-4">{order.table}</td>
-                                                <td className="px-6 py-4 text-sm text-charcoal/70">{order.items}</td>
-                                                <td className="px-6 py-4 font-bold">{order.total}</td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${order.statusColor}`}>
-                                                        {order.status}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        ))}
+                                        {[...orders]
+                                            .filter(o => o.status !== 'SERVED')
+                                            .reverse()
+                                            .slice(0, 5)
+                                            .map((order, i) => (
+                                                <tr key={i} className="hover:bg-bg-cream/30 transition-colors cursor-pointer group">
+                                                    <td className="px-6 py-4 font-bold text-primary group-hover:text-secondary">{order.id}</td>
+                                                    <td className="px-6 py-4">{order.table}</td>
+                                                    <td className="px-6 py-4 text-sm text-charcoal/70">
+                                                        {Array.isArray(order.items)
+                                                            ? order.items.map(item => `${item.quantity}x ${item.name}`).join(', ')
+                                                            : order.items}
+                                                    </td>
+                                                    <td className="px-6 py-4 font-bold">{order.total}</td>
+                                                    <td className="px-6 py-4">
+                                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${order.status === 'PENDING' ? 'bg-gray-100 text-gray-600' :
+                                                            order.status === 'PREPARING' ? 'bg-orange-100 text-secondary' :
+                                                                'bg-green-100 text-green-700'
+                                                            }`}>
+                                                            {order.status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
                                     </tbody>
                                 </table>
                             </div>
