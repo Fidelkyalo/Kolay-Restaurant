@@ -14,6 +14,80 @@ const POS = () => {
     const [selectedTable, setSelectedTable] = useState('T-01');
     const [showTableModal, setShowTableModal] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [lastPlacedOrder, setLastPlacedOrder] = useState(null);
+
+    const handlePrintReceipt = () => {
+        if (!lastPlacedOrder) return;
+
+        const printWindow = window.open('', '_blank');
+        const receiptHtml = `
+            <html>
+                <head>
+                    <title>Receipt - ${lastPlacedOrder.id}</title>
+                    <style>
+                        body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; color: #1a1a1a; padding: 20px; }
+                        .header { text-align: center; border-bottom: 2px dashed #eee; padding-bottom: 20px; margin-bottom: 20px; }
+                        .restaurant-name { font-size: 24px; font-weight: bold; margin: 0; color: #d35400; }
+                        .order-info { margin-bottom: 20px; font-size: 14px; }
+                        .items { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        .items th { text-align: left; border-bottom: 1px solid #eee; padding: 5px 0; font-size: 10px; text-transform: uppercase; color: #888; }
+                        .items td { padding: 8px 0; font-size: 14px; }
+                        .items .qty { width: 30px; }
+                        .items .price { text-align: right; }
+                        .totals { border-top: 2px dashed #eee; padding-top: 15px; margin-top: 15px; }
+                        .total-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
+                        .total-row.grand { font-size: 20px; font-weight: bold; margin-top: 10px; color: #2c3e50; }
+                        .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #888; }
+                        .qr { margin-top: 20px; text-align: center; opacity: 0.5; }
+                        @media print { .no-print { display: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1 class="restaurant-name">KOLAY RESTAURANT</h1>
+                        <p>123 Gourmet Street, Nairobi<br>Tel: +254 700 000 000</p>
+                    </div>
+                    <div class="order-info">
+                        <div class="total-row"><span>Order ID:</span> <span>${lastPlacedOrder.id}</span></div>
+                        <div class="total-row"><span>Date:</span> <span>${new Date().toLocaleDateString()}</span></div>
+                        <div class="total-row"><span>Time:</span> <span>${new Date().toLocaleTimeString()}</span></div>
+                        <div class="total-row"><span>Table:</span> <span>${lastPlacedOrder.table}</span></div>
+                    </div>
+                    <table class="items">
+                        <thead>
+                            <tr><th class="qty">QTY</th><th>ITEM</th><th class="price">PRICE</th></tr>
+                        </thead>
+                        <tbody>
+                            ${lastPlacedOrder.items.map(item => `
+                                <tr>
+                                    <td class="qty">${item.quantity}</td>
+                                    <td>${item.name}</td>
+                                    <td class="price">${item.price.toLocaleString()}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="totals">
+                        <div class="total-row"><span>Subtotal</span> <span>KES ${lastPlacedOrder.total.replace('KES ', '')}</span></div>
+                        <div class="total-row"><span>VAT (16%)</span> <span>Included</span></div>
+                        <div class="total-row.grand"><span>TOTAL</span> <span>${lastPlacedOrder.total}</span></div>
+                    </div>
+                    <div class="footer">
+                        <p>Thank you for dining with us!<br>Visit again soon.</p>
+                        <div class="qr">● ● ● ● ●<br>GUEST COPY</div>
+                    </div>
+                    <script>
+                        window.onload = () => {
+                            window.print();
+                            // window.close(); // Optional: close the window after printing
+                        };
+                    </script>
+                </body>
+            </html>
+        `;
+        printWindow.document.write(receiptHtml);
+        printWindow.document.close();
+    };
 
     const addTable = () => {
         if (!newTableNumber.trim()) return;
@@ -101,9 +175,13 @@ const POS = () => {
         const existing = JSON.parse(localStorage.getItem('kolay_orders') || '[]');
         localStorage.setItem('kolay_orders', JSON.stringify([newOrder, ...existing]));
 
-        setShowSuccess(true);
+        setLastPlacedOrder(newOrder);
         setCart([]);
-        setTimeout(() => setShowSuccess(false), 3000);
+        setShowSuccess(true);
+        setTimeout(() => {
+            setShowSuccess(false);
+            setLastPlacedOrder(null);
+        }, 8000); // Increased time to allow for receipt printing
     };
 
     const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
@@ -162,12 +240,28 @@ const POS = () => {
             {/* Success Overlay */}
             {showSuccess && (
                 <div className="absolute inset-0 z-[100] flex items-center justify-center bg-primary/20 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white p-8 rounded-3xl shadow-2xl border border-cream text-center animate-in zoom-in duration-300">
-                        <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
-                            ✅
+                    <div className="bg-white rounded-[3rem] p-12 text-center shadow-2xl animate-in zoom-in duration-300 max-w-sm w-full mx-4">
+                        <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
+                            <CheckCircle className="w-12 h-12" />
                         </div>
-                        <h2 className="text-2xl font-bold text-primary mb-2">Order Placed!</h2>
-                        <p className="text-charcoal/50">Sent to kitchen for preparation.</p>
+                        <h3 className="text-3xl font-black text-primary mb-4">Order Placed!</h3>
+                        <p className="text-charcoal/60 font-medium mb-10 leading-relaxed">
+                            Order <strong>#{lastPlacedOrder?.id}</strong> has been sent to the kitchen.
+                        </p>
+                        <div className="space-y-4">
+                            <button
+                                onClick={handlePrintReceipt}
+                                className="w-full bg-secondary text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-orange-600 transition-all shadow-xl active:scale-95 text-lg"
+                            >
+                                <Printer className="w-6 h-6" /> Print Receipt
+                            </button>
+                            <button
+                                onClick={() => setShowSuccess(false)}
+                                className="w-full bg-bg-cream text-charcoal/40 py-4 rounded-xl font-bold hover:bg-cream transition-colors text-sm uppercase tracking-widest"
+                            >
+                                Continue Shopping
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
