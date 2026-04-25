@@ -71,6 +71,17 @@ function Dashboard() {
                     <Link to="/inventory" className="hover:text-secondary transition-colors">Inventory</Link>
                 </div>
                 <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => {
+                            if (window.confirm('Are you sure you want to clear all orders and start over?')) {
+                                localStorage.removeItem('kolay_orders');
+                                window.location.reload();
+                            }
+                        }}
+                        className="bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-4 py-1.5 rounded-full text-xs font-bold transition-all border border-red-500/20"
+                    >
+                        Reset System
+                    </button>
                     <div className="bg-accent text-primary px-4 py-1.5 rounded-full text-sm font-bold shadow-sm">
                         Admin Panel
                     </div>
@@ -90,9 +101,9 @@ function Dashboard() {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                     {[
-                        { label: 'Total Revenue', value: `KES ${totalRevenue.toLocaleString()}`, icon: '💰', trend: '+12.5%', color: 'border-l-secondary', path: '/dashboard' },
+                        { label: 'Total Revenue', value: `KES ${totalRevenue.toLocaleString()}`, icon: '💰', trend: '0%', color: 'border-l-secondary', path: '/dashboard' },
                         { label: 'Active Orders', value: activeOrders.length.toString(), icon: '📝', trend: `${activeOrders.length} pending`, color: 'border-l-accent', path: '/pos' },
-                        { label: 'Total Customers', value: totalCustomers.toLocaleString(), icon: '👥', trend: `+${orders.length} orders`, color: 'border-l-primary', path: '/dashboard' },
+                        { label: 'Total Customers', value: totalCustomers.toLocaleString(), icon: '👥', trend: `${orders.length} orders`, color: 'border-l-primary', path: '/dashboard' },
                         { label: 'Stock Alerts', value: `${alerts.length} Items`, icon: '⚠️', trend: alerts.length > 0 ? 'Refill needed' : 'All good', color: 'border-l-red-500', path: '/inventory' },
                     ].map((stat, i) => (
                         <Link key={i} to={stat.path} className={`bg-white p-6 rounded-2xl shadow-sm border-l-4 ${stat.color} hover:shadow-md transition-shadow cursor-pointer block`}>
