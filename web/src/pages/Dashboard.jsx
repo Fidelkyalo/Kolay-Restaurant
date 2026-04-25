@@ -334,20 +334,22 @@ function Dashboard() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                     {[
-                        { label: 'Total Revenue', value: `KES ${totalRevenue.toLocaleString()}`, icon: '💰', trend: '0%', color: 'border-l-secondary', path: '/dashboard' },
-                        { label: 'Active Orders', value: activeOrders.length.toString(), icon: '📝', trend: `${activeOrders.length} pending`, color: 'border-l-accent', path: '/pos' },
-                        { label: 'Total Customers', value: totalCustomers.toLocaleString(), icon: '👥', trend: `${orders.length} orders`, color: 'border-l-primary', path: '/dashboard' },
-                        { label: 'Stock Alerts', value: `${alerts.length} Items`, icon: '⚠️', trend: alerts.length > 0 ? 'Refill needed' : 'All good', color: 'border-l-red-500', path: '/inventory' },
+                        { label: 'Total Revenue', value: `KES ${totalRevenue.toLocaleString()}`, icon: <DollarSign className="w-6 h-6 text-secondary" />, trend: 'Live', color: 'border-l-secondary', path: '/dashboard', bg: 'bg-orange-50/50' },
+                        { label: 'Active Orders', value: activeOrders.length.toString(), icon: <Package className="w-6 h-6 text-accent" />, trend: `${activeOrders.length} pending`, color: 'border-l-accent', path: '/pos', bg: 'bg-amber-50/50' },
+                        { label: 'Total Customers', value: totalCustomers.toLocaleString(), icon: <TrendingUp className="w-6 h-6 text-primary" />, trend: `${orders.length} orders`, color: 'border-l-primary', path: '/dashboard', bg: 'bg-primary/5' },
+                        { label: 'Stock Alerts', value: `${alerts.length} Items`, icon: <AlertTriangle className="w-6 h-6 text-red-500" />, trend: alerts.length > 0 ? 'Refill needed' : 'Healthy', color: 'border-l-red-500', path: '/inventory', bg: 'bg-red-50/50' },
                     ].map((stat, i) => (
-                        <Link key={i} to={stat.path} className={`bg-white p-6 rounded-2xl shadow-sm border-l-4 ${stat.color} hover:shadow-md transition-shadow cursor-pointer block`}>
-                            <div className="flex justify-between items-start mb-4">
-                                <span className="text-3xl">{stat.icon}</span>
-                                <span className={`text-xs font-bold px-2 py-1 rounded bg-cream border transition-all ${stat.trend.includes('+') ? 'text-green-600 border-green-100' : 'text-secondary border-orange-100'}`}>
+                        <Link key={i} to={stat.path} className={`bg-white p-6 rounded-[2rem] shadow-premium border-l-4 ${stat.color} hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer block ${stat.bg}`}>
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="p-3 bg-white rounded-2xl shadow-sm border border-primary/5">
+                                    {stat.icon}
+                                </div>
+                                <span className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter transition-all ${stat.trend.includes('Refill') ? 'bg-red-500 text-white shadow-lg shadow-red-500/20' : 'bg-secondary/10 text-secondary border border-secondary/20'}`}>
                                     {stat.trend}
                                 </span>
                             </div>
-                            <h3 className="text-sm font-bold text-charcoal/50 uppercase tracking-wider">{stat.label}</h3>
-                            <p className="text-2xl font-bold text-primary">{stat.value}</p>
+                            <h3 className="text-[10px] font-black text-charcoal/40 uppercase tracking-widest mb-1">{stat.label}</h3>
+                            <p className="text-3xl font-black text-primary leading-none tracking-tight">{stat.value}</p>
                         </Link>
                     ))}
                 </div>
