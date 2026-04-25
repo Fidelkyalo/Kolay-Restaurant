@@ -382,68 +382,80 @@ const POS = () => {
                         </span>
                     </div>
 
-                    {/* Summary & Checkout - MOVED TO TOP */}
-                    <div className="p-6 bg-white border-b border-cream space-y-4 shadow-sm relative z-20">
-                        <div className="grid grid-cols-2 gap-3">
-                            <button className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-cream font-bold text-charcoal/40 hover:bg-bg-cream transition-all text-xs">
-                                <User className="w-4 h-4" /> Guest
-                            </button>
-                            <button
-                                onClick={() => setShowTableModal(true)}
-                                className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-secondary/50 text-secondary font-bold hover:bg-orange-50 transition-all group text-xs"
-                            >
-                                Table: {selectedTable}
-                            </button>
-                        </div>
-
-                        <button
-                            onClick={handlePlaceOrder}
-                            disabled={cart.length === 0}
-                            className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-4 rounded-xl shadow-xl transition-all active:transform active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-base"
-                        >
-                            <CreditCard className="w-5 h-5 text-accent" /> Place Order
-                            <span className="ml-auto bg-white/10 px-3 py-1 rounded-lg text-xs tracking-tighter">
-                                KES {total.toLocaleString()}
-                            </span>
-                        </button>
-                    </div>
-
                     {/* Cart Items */}
                     <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-bg-cream/20">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="text-[10px] font-black uppercase text-charcoal/40 tracking-widest">Order Details</h3>
-                            <button onClick={() => setCart([])} className="text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-tighter">Clear Cart</button>
+                            <button onClick={() => setCart([])} className="text-[10px] font-black text-red-500 hover:text-red-700 uppercase tracking-tighter hover:underline">Clear Cart</button>
                         </div>
                         {cart.length === 0 ? (
                             <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
-                                <ClipboardList className="w-20 h-20 mb-4" />
-                                <p className="font-bold">No items selected</p>
+                                <ShoppingCart className="w-20 h-20 mb-4" />
+                                <p className="font-bold">Your cart is empty</p>
                             </div>
                         ) : (
                             cart.map(item => (
-                                <div key={item.id} className="flex gap-4 p-3 rounded-2xl bg-white border border-cream/50 shadow-sm hover:shadow-md transition-all group">
-                                    <div className="w-14 h-14 bg-bg-cream rounded-xl flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
+                                <div key={item.id} className="flex gap-4 p-4 rounded-[2rem] bg-white border-2 border-cream shadow-sm hover:shadow-md transition-all group relative">
+                                    <div className="w-16 h-16 bg-bg-cream rounded-2xl flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
                                         {item.image}
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex justify-between items-start mb-1">
                                             <h4 className="font-bold text-primary text-sm line-clamp-1">{item.name}</h4>
                                             <button onClick={(e) => { e.stopPropagation(); removeFromCart(item.id); }} className="text-red-300 hover:text-red-500 transition-colors">
-                                                <X className="w-3 h-3" />
+                                                <X className="w-4 h-4" />
                                             </button>
                                         </div>
-                                        <div className="flex justify-between items-center">
-                                            <p className="text-secondary font-black text-[10px]">KES {(item.price * item.quantity).toLocaleString()}</p>
-                                            <div className="flex items-center gap-3 bg-bg-cream rounded-lg px-2 py-1">
-                                                <button onClick={() => updateQuantity(item.id, -1)} className="hover:text-secondary transition-colors"><Minus className="w-2.5 h-2.5" /></button>
-                                                <span className="text-[10px] font-black w-4 text-center">{item.quantity}</span>
-                                                <button onClick={() => updateQuantity(item.id, 1)} className="hover:text-secondary transition-colors"><Plus className="w-2.5 h-2.5" /></button>
+                                        <div className="flex justify-between items-center mt-2">
+                                            <p className="text-secondary font-black text-sm">KES {item.price.toLocaleString()}</p>
+                                            <div className="flex items-center gap-3 bg-bg-cream rounded-xl px-3 py-1.5 border border-cream">
+                                                <button onClick={() => updateQuantity(item.id, -1)} className="hover:text-secondary transition-colors"><Minus className="w-3 h-3" /></button>
+                                                <span className="text-sm font-black w-6 text-center">{item.quantity}</span>
+                                                <button onClick={() => updateQuantity(item.id, 1)} className="hover:text-secondary transition-colors"><Plus className="w-3 h-3" /></button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             ))
                         )}
+                    </div>
+
+                    {/* Summary & Checkout - REVERTED TO BOTTOM */}
+                    <div className="p-8 bg-white border-t border-cream space-y-6 shadow-[0_-20px_40px_-20px_rgba(0,0,0,0.1)] relative z-20">
+                        <div className="space-y-3">
+                            <div className="flex justify-between text-xs font-bold text-charcoal/40 uppercase tracking-widest">
+                                <span>Subtotal</span>
+                                <span>KES {subtotal.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between text-xs font-bold text-charcoal/40 uppercase tracking-widest">
+                                <span>Tax (16%)</span>
+                                <span>KES {tax.toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between items-end pt-4 border-t border-cream/50">
+                                <span className="font-black text-primary text-lg">Total</span>
+                                <span className="font-black text-secondary text-3xl tracking-tighter">KES {total.toLocaleString()}</span>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <button className="flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-cream font-black text-charcoal/40 hover:bg-bg-cream transition-all text-xs uppercase tracking-widest">
+                                <User className="w-5 h-5" /> Guest
+                            </button>
+                            <button
+                                onClick={() => setShowTableModal(true)}
+                                className="flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-secondary/30 text-secondary font-black hover:bg-orange-50 transition-all group text-xs uppercase tracking-widest"
+                            >
+                                <ShoppingCart className="w-5 h-5" /> {selectedTable}
+                            </button>
+                        </div>
+
+                        <button
+                            onClick={handlePlaceOrder}
+                            disabled={cart.length === 0}
+                            className="w-full bg-primary hover:bg-charcoal text-white font-black py-5 rounded-2xl shadow-2xl shadow-primary/20 transition-all active:transform active:scale-95 flex items-center justify-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed text-xl uppercase tracking-widest group"
+                        >
+                            <CreditCard className="w-6 h-6 text-accent group-hover:rotate-12 transition-transform" /> Place Order
+                        </button>
                     </div>
                 </div>
                 {/* Manage Dish Modal */}
