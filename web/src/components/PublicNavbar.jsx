@@ -27,12 +27,10 @@ const PublicNavbar = () => {
         <nav className={`fixed w-full z-[100] transition-all duration-500 ${isScrolled ? 'bg-primary/95 backdrop-blur-md py-4 shadow-2xl' : 'bg-transparent py-6'}`}>
             <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
                 {/* Logo */}
-                <div className="flex items-center gap-3 group cursor-pointer">
-                    <div className="bg-secondary p-2 rounded-xl group-hover:rotate-12 transition-transform duration-300 shadow-glow">
-                        <Utensils className="text-white w-6 h-6" />
-                    </div>
+                <Link to="/" className="flex items-center gap-3 group cursor-pointer">
+                    <img src="/Logo.png" alt="Kolay Logo" className="h-10 w-auto rounded group-hover:rotate-12 transition-transform duration-300 shadow-glow" />
                     <span className="text-white text-2xl font-display font-black tracking-tighter uppercase">Kolay</span>
-                </div>
+                </Link>
 
                 {/* Desktop Links */}
                 <div className="hidden md:flex items-center gap-10">

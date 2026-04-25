@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar, MessageSquare, Clock, RefreshCw, CheckCircle2, Printer, Settings, Shield } from 'lucide-react';
+import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar, MessageSquare, Clock, RefreshCw, CheckCircle2, Printer, Settings, Shield, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';

@@ -77,10 +77,15 @@ const GuestMenu = () => {
             {/* Header */}
             <header className="sticky top-0 z-[100] bg-white/80 backdrop-blur-md border-b border-cream p-6 shadow-sm">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <Link to="/" className="flex items-center gap-3 group">
-                        <ArrowLeft className="w-5 h-5 text-charcoal/40 group-hover:text-primary transition-colors" />
-                        <span className="text-2xl font-black text-primary uppercase tracking-tighter italic">Kolay<span className="text-secondary">Menu</span></span>
-                    </Link>
+                    <div className="flex items-center gap-3">
+                        <Link to="/" className="p-3 hover:bg-bg-cream rounded-2xl transition-colors">
+                            <ArrowLeft className="w-5 h-5 text-charcoal/40 hover:text-primary" />
+                        </Link>
+                        <div className="flex items-center gap-3">
+                            <img src="/Logo.png" alt="Logo" className="h-10 w-auto rounded" />
+                            <span className="text-2xl font-black text-primary uppercase tracking-tighter italic">Kolay<span className="text-secondary">Menu</span></span>
+                        </div>
+                    </div>
                     <button
                         onClick={() => setIsCartOpen(true)}
                         className="relative bg-primary text-white p-4 rounded-2xl shadow-glow hover:scale-105 active:scale-95 transition-all"
