@@ -11,12 +11,7 @@ function Dashboard() {
 
     const [orders] = useState(() => {
         const saved = localStorage.getItem('kolay_orders');
-        const initial = [
-            { id: '#8902', table: 'T-04', items: [{ name: 'Beef Burger', quantity: 2, notes: 'No onions' }, { name: 'French Fries', quantity: 1, notes: 'Extra crispy' }], total: 'KES 2,400', status: 'PREPARING', statusColor: 'bg-orange-100 text-orange-700' },
-            { id: '#8901', table: 'T-12', items: [{ name: 'Grilled Salmon', quantity: 1, notes: 'Lemon on side' }], total: 'KES 1,850', status: 'READY', statusColor: 'bg-green-100 text-green-700' },
-            { id: '#8900', table: 'T-02', items: [{ name: 'Chicken Wings', quantity: 3, notes: '' }], total: 'KES 1,200', status: 'SERVED', statusColor: 'bg-blue-100 text-blue-700' },
-            { id: '#8899', table: 'T-08', items: [{ name: 'Margherita Pizza', quantity: 1, notes: '' }], total: 'KES 1,100', status: 'PENDING', statusColor: 'bg-gray-100 text-gray-700' },
-        ];
+        const initial = [];
         if (!saved) {
             localStorage.setItem('kolay_orders', JSON.stringify(initial));
             return initial;
@@ -32,7 +27,7 @@ function Dashboard() {
         return sum + val;
     }, 0);
 
-    const totalCustomers = 1200 + new Set(orders.map(o => o.table)).size;
+    const totalCustomers = new Set(orders.map(o => o.table)).size;
 
     // Functional Load Calculation
     const grillLoad = Math.min(100, activeOrders.filter(o =>
