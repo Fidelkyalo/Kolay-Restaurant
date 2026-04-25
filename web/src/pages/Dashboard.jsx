@@ -4,6 +4,12 @@ import { Link, useNavigate } from 'react-router-dom';
 
 function Dashboard() {
     const [viewMode, setViewMode] = useState('Weekly');
+    const [inventory] = useState(() => {
+        const saved = localStorage.getItem('kolay_inventory');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    const alerts = inventory.filter(item => item.status === 'LOW' || item.status === 'OUT');
 
     const chartData = {
         Weekly: {
@@ -57,7 +63,7 @@ function Dashboard() {
                         { label: 'Total Revenue', value: 'KES 45,280', icon: '💰', trend: '+12.5%', color: 'border-l-secondary', path: '/dashboard' },
                         { label: 'Active Orders', value: '24', icon: '📝', trend: '8 pending', color: 'border-l-accent', path: '/pos' },
                         { label: 'Total Customers', value: '1,204', icon: '👥', trend: '+48 today', color: 'border-l-primary', path: '/dashboard' },
-                        { label: 'Stock Alerts', value: '3 Items', icon: '⚠️', trend: 'Refill needed', color: 'border-l-red-500', path: '/inventory' },
+                        { label: 'Stock Alerts', value: `${alerts.length} Items`, icon: '⚠️', trend: alerts.length > 0 ? 'Refill needed' : 'All good', color: 'border-l-red-500', path: '/inventory' },
                     ].map((stat, i) => (
                         <Link key={i} to={stat.path} className={`bg-white p-6 rounded-2xl shadow-sm border-l-4 ${stat.color} hover:shadow-md transition-shadow cursor-pointer block`}>
                             <div className="flex justify-between items-start mb-4">
@@ -200,19 +206,21 @@ function Dashboard() {
                                 <h3 className="text-lg font-bold text-primary">Inventory Alerts</h3>
                             </div>
                             <div className="space-y-4">
-                                {[
-                                    { name: 'Beef Patties', current: '12 units', threshold: '20 units', color: 'text-red-500' },
-                                    { name: 'Fresh Salmon', current: '5 kg', threshold: '8 kg', color: 'text-red-500' },
-                                    { name: 'Cooking Oil', current: '10 L', threshold: '15 L', color: 'text-orange-500' },
-                                ].map((item, i) => (
+                                {alerts.length > 0 ? alerts.map((item, i) => (
                                     <div key={i} className="flex justify-between items-center p-3 bg-bg-cream/50 rounded-xl border border-cream/30">
                                         <div>
                                             <p className="font-bold text-sm text-primary">{item.name}</p>
-                                            <p className="text-[10px] text-charcoal/40 uppercase font-bold">Min: {item.threshold}</p>
+                                            <p className="text-[10px] text-charcoal/40 uppercase font-bold">Current: {item.stock} {item.unit}</p>
                                         </div>
-                                        <span className={`font-bold text-sm ${item.color}`}>{item.current}</span>
+                                        <span className={`font-bold text-xs px-2 py-1 rounded-lg ${item.status === 'OUT' ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-600'}`}>
+                                            {item.status === 'OUT' ? 'OUT' : 'LOW'}
+                                        </span>
                                     </div>
-                                ))}
+                                )) : (
+                                    <div className="text-center py-6">
+                                        <p className="text-sm text-charcoal/40 font-bold italic">All items well stocked</p>
+                                    </div>
+                                )}
                             </div>
                             <Link to="/inventory" className="w-full mt-6 py-3 border-2 border-dashed border-cream rounded-2xl text-xs font-bold text-charcoal/40 hover:text-secondary hover:border-secondary/50 transition-all flex items-center justify-center">
                                 Manage Inventory
