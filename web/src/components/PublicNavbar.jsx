@@ -46,7 +46,7 @@ const PublicNavbar = () => {
                         </a>
                     ))}
                     <Link
-                        to="/login"
+                        to="/order"
                         className="bg-accent hover:bg-white text-primary px-6 py-2.5 rounded-full font-black text-[10px] uppercase tracking-widest transition-all shadow-glow hover:scale-105 active:scale-95"
                     >
                         Order Online
@@ -76,7 +76,7 @@ const PublicNavbar = () => {
                         </a>
                     ))}
                     <Link
-                        to="/login"
+                        to="/order"
                         onClick={() => setIsMobileMenuOpen(false)}
                         className="block bg-secondary text-white p-4 rounded-2xl font-black text-center text-xl shadow-lg"
                     >

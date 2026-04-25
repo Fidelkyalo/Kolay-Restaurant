@@ -38,7 +38,7 @@ const Home = () => {
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-primary/60 z-10" />
                     <img
-                        src="https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80&w=2000"
+                        src="/assets/hero.png"
                         alt="Hero Background"
                         className="w-full h-full object-cover scale-105 animate-[slowZoom_20s_infinite]"
                     />
@@ -58,7 +58,7 @@ const Home = () => {
                         </p>
                         <div className="flex flex-col sm:flex-row gap-6 justify-center">
                             <Link
-                                to="/login"
+                                to="/order"
                                 className="group bg-secondary hover:bg-white text-white hover:text-primary px-10 py-5 rounded-full font-black text-xs uppercase tracking-widest transition-all shadow-glow flex items-center justify-center gap-3"
                             >
                                 Order Now <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />

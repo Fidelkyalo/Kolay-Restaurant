@@ -448,6 +448,17 @@ function Dashboard() {
                                     <p className="text-charcoal/50 text-sm">Real-time revenue & order trends from archive</p>
                                 </div>
                                 <div className="flex gap-2">
+                                    <div className="flex bg-bg-cream p-1 rounded-xl mr-4 shadow-inner">
+                                        {['Hourly', 'Weekly', 'Monthly'].map((m) => (
+                                            <button
+                                                key={m}
+                                                onClick={() => setViewMode(m)}
+                                                className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all ${viewMode === m ? 'bg-primary text-white shadow-md' : 'text-primary/40 hover:text-primary'}`}
+                                            >
+                                                {m.toUpperCase()}
+                                            </button>
+                                        ))}
+                                    </div>
                                     <div className="bg-green-50 text-green-600 px-3 py-1 rounded-lg text-xs font-bold border border-green-100 flex items-center gap-1">
                                         <Clock className="w-3 h-3" /> Auto-Reset: 24h
                                     </div>
