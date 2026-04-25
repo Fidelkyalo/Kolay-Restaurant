@@ -17,28 +17,36 @@ const POS = () => {
     const [lastPlacedOrder, setLastPlacedOrder] = useState(null);
 
     const handlePrintReceipt = () => {
-        if (!lastPlacedOrder) return;
+        if (!lastPlacedOrder) {
+            console.error("No receipt data available");
+            return;
+        }
 
-        const printWindow = window.open('', '_blank');
+        const printWindow = window.open('', '_blank', 'width=400,height=600');
+        if (!printWindow) {
+            alert('Popup blocked! Please allow popups to print receipts.');
+            return;
+        }
+
         const receiptHtml = `
+            <!DOCTYPE html>
             <html>
                 <head>
                     <title>Receipt - ${lastPlacedOrder.id}</title>
                     <style>
-                        body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; color: #1a1a1a; padding: 20px; }
+                        body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; color: #1a1a1a; padding: 20px; line-height: 1.4; }
                         .header { text-align: center; border-bottom: 2px dashed #eee; padding-bottom: 20px; margin-bottom: 20px; }
-                        .restaurant-name { font-size: 24px; font-weight: bold; margin: 0; color: #d35400; }
+                        .restaurant-name { font-size: 24px; font-weight: bold; margin: 0; color: #4E2C1E; }
                         .order-info { margin-bottom: 20px; font-size: 14px; }
                         .items { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
                         .items th { text-align: left; border-bottom: 1px solid #eee; padding: 5px 0; font-size: 10px; text-transform: uppercase; color: #888; }
-                        .items td { padding: 8px 0; font-size: 14px; }
+                        .items td { padding: 8px 0; font-size: 14px; vertical-align: top; }
                         .items .qty { width: 30px; }
                         .items .price { text-align: right; }
                         .totals { border-top: 2px dashed #eee; padding-top: 15px; margin-top: 15px; }
                         .total-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
-                        .total-row.grand { font-size: 20px; font-weight: bold; margin-top: 10px; color: #2c3e50; }
-                        .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #888; }
-                        .qr { margin-top: 20px; text-align: center; opacity: 0.5; }
+                        .total-row.grand { font-size: 20px; font-weight: bold; margin-top: 10px; color: #1a1a1a; border-top: 1px solid #eee; padding-top: 10px; }
+                        .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 20px; }
                         @media print { .no-print { display: none; } }
                     </style>
                 </head>
@@ -48,9 +56,8 @@ const POS = () => {
                         <p>123 Gourmet Street, Nairobi<br>Tel: +254 700 000 000</p>
                     </div>
                     <div class="order-info">
-                        <div class="total-row"><span>Order ID:</span> <span>${lastPlacedOrder.id}</span></div>
+                        <div class="total-row"><span>ID:</span> <strong>#${lastPlacedOrder.id}</strong></div>
                         <div class="total-row"><span>Date:</span> <span>${new Date().toLocaleDateString()}</span></div>
-                        <div class="total-row"><span>Time:</span> <span>${new Date().toLocaleTimeString()}</span></div>
                         <div class="total-row"><span>Table:</span> <span>${lastPlacedOrder.table}</span></div>
                     </div>
                     <table class="items">
@@ -62,31 +69,33 @@ const POS = () => {
                                 <tr>
                                     <td class="qty">${item.quantity}</td>
                                     <td>${item.name}</td>
-                                    <td class="price">${item.price.toLocaleString()}</td>
+                                    <td class="price">${(item.price * item.quantity).toLocaleString()}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
                     <div class="totals">
                         <div class="total-row"><span>Subtotal</span> <span>KES ${lastPlacedOrder.total.replace('KES ', '')}</span></div>
-                        <div class="total-row"><span>VAT (16%)</span> <span>Included</span></div>
-                        <div class="total-row.grand"><span>TOTAL</span> <span>${lastPlacedOrder.total}</span></div>
+                        <div class="total-row"><span>Tax (VAT 16%)</span> <span>Incl.</span></div>
+                        <div class="total-row grand"><span>TOTAL</span> <span>${lastPlacedOrder.total}</span></div>
                     </div>
                     <div class="footer">
                         <p>Thank you for dining with us!<br>Visit again soon.</p>
-                        <div class="qr">● ● ● ● ●<br>GUEST COPY</div>
+                        <p style="font-size: 8px; margin-top: 10px;">GENERATED BY KOLAY RMS</p>
                     </div>
-                    <script>
-                        window.onload = () => {
-                            window.print();
-                            // window.close(); // Optional: close the window after printing
-                        };
-                    </script>
                 </body>
             </html>
         `;
+
         printWindow.document.write(receiptHtml);
         printWindow.document.close();
+        printWindow.focus();
+
+        // Give it a small moment to render styles before printing
+        setTimeout(() => {
+            printWindow.print();
+            // printWindow.close();
+        }, 250);
     };
 
     const addTable = () => {
