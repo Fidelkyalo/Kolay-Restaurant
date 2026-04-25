@@ -3,15 +3,17 @@ import { Clock, CheckCircle2, AlertCircle, ChefHat, Timer, ArrowRight, History, 
 import { Link } from 'react-router-dom';
 
 const KDS = () => {
-    const [activeOrders, setActiveOrders] = useState([]);
+    const [allOrders, setAllOrders] = useState([]);
+    const activeOrders = allOrders.filter(o => o.status === 'PENDING' || o.status === 'PREPARING');
+    const completedToday = allOrders.filter(o => o.status === 'READY' || o.status === 'SERVED').length;
 
     useEffect(() => {
         const loadOrders = () => {
             const saved = localStorage.getItem('kolay_orders');
             if (saved) {
-                const allOrders = JSON.parse(saved);
-                // Filter for PENDING or PREPARING (Uppercase as standardized)
-                setActiveOrders(allOrders.filter(o => o.status === 'PENDING' || o.status === 'PREPARING'));
+                setAllOrders(JSON.parse(saved));
+            } else {
+                setAllOrders([]);
             }
         };
         loadOrders();
@@ -20,15 +22,11 @@ const KDS = () => {
     }, []);
 
     const updateStatus = (id, newStatus) => {
-        const saved = localStorage.getItem('kolay_orders');
-        if (saved) {
-            const allOrders = JSON.parse(saved);
-            const updated = allOrders.map(order =>
-                order.id === id ? { ...order, status: newStatus } : order
-            );
-            localStorage.setItem('kolay_orders', JSON.stringify(updated));
-            setActiveOrders(updated.filter(o => o.status === 'PENDING' || o.status === 'PREPARING'));
-        }
+        const updated = allOrders.map(order =>
+            order.id === id ? { ...order, status: newStatus } : order
+        );
+        localStorage.setItem('kolay_orders', JSON.stringify(updated));
+        setAllOrders(updated);
     };
 
     return (
@@ -144,7 +142,7 @@ const KDS = () => {
                 </div>
                 <div className="bg-primary p-6 rounded-3xl border border-accent/20 flex-1 flex items-center justify-between shadow-xl">
                     <span className="text-sm font-bold text-white/50 uppercase tracking-widest">Completed Today</span>
-                    <span className="text-3xl font-display font-bold text-accent">124</span>
+                    <span className="text-3xl font-display font-bold text-accent">{completedToday}</span>
                 </div>
             </div>
         </div>
