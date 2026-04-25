@@ -84,8 +84,9 @@ function Dashboard() {
     const alerts = inventory.filter(item => item.status === 'LOW' || item.status === 'OUT');
     const activeOrders = orders.filter(o => o.status === 'In Progress' || o.status === 'Pending');
 
-    const totalRevenue = orders.reduce((sum, order) => {
-        const val = parseInt(order.total.replace(/[^0-9]/g, '')) || 0;
+    const totalRevenue = (orders || []).reduce((sum, order) => {
+        if (!order || !order.total) return sum;
+        const val = parseInt(String(order.total).replace(/[^0-9]/g, '')) || 0;
         return sum + val;
     }, 0);
 
@@ -138,7 +139,7 @@ function Dashboard() {
     };
 
     const getPeakStats = () => {
-        const moments = (archive || []).map(o => new Date(o.timestamp));
+        const moments = (archive || []).filter(o => o && o.timestamp).map(o => new Date(o.timestamp));
         const days = {}, months = {}, hours = {};
 
         moments.forEach(d => {
@@ -201,6 +202,7 @@ function Dashboard() {
     };
 
     const handleActualPrint = () => {
+        if (!previewData) return;
         const printWindow = window.open('', '_blank', 'width=1000,height=900');
         if (!printWindow) {
             alert('Popup blocked! Please allow popups to print reports.');
@@ -399,7 +401,7 @@ function Dashboard() {
                                             <div className="flex flex-col gap-1">
                                                 <span className="text-secondary font-black text-xs">#{order.id}</span>
                                                 <span className="text-sm font-bold text-primary truncate max-w-[200px]">
-                                                    {order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                                                    {(order.items || []).map(i => `${i.quantity || 1}x ${i.name || 'Item'}`).join(', ')}
                                                 </span>
                                             </div>
                                         </td>
@@ -666,7 +668,7 @@ function Dashboard() {
                                                         <div className="flex flex-col">
                                                             <span className="font-black text-xs text-secondary">#{o.id}</span>
                                                             <span className="text-primary/60 text-xs">
-                                                                {o.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}
+                                                                {(o.items || []).map(i => `${i.quantity || 1}x ${i.name || 'Unknown'}`).join(', ')}
                                                             </span>
                                                         </div>
                                                     </td>
