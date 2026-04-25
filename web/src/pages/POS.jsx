@@ -51,7 +51,7 @@ const POS = () => {
                             left: 50%;
                             transform: translate(-50%, -50%) rotate(-15deg);
                             width: 250px;
-                            opacity: 0.05;
+                            opacity: 0.15;
                             z-index: -1;
                             pointer-events: none;
                         }
@@ -72,7 +72,7 @@ const POS = () => {
                     </style>
                 </head>
                 <body>
-                    <img src="${window.location.origin}/Logo.png" class="watermark" />
+                    <img src="/Logo.png" class="watermark" />
                     <div class="header">
                         <h1 class="restaurant-name">KOLAY RESTAURANT</h1>
                         <p class="tagline">"Where Every Meal Feels Right"</p>
@@ -382,64 +382,15 @@ const POS = () => {
                         </span>
                     </div>
 
-                    {/* Cart Items */}
-                    <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-                        {cart.length === 0 ? (
-                            <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
-                                <ClipboardList className="w-20 h-20 mb-4" />
-                                <p className="font-bold">No items selected</p>
-                            </div>
-                        ) : (
-                            cart.map(item => (
-                                <div key={item.id} className="flex gap-4 p-3 rounded-2xl hover:bg-bg-cream transition-colors group">
-                                    <div className="w-16 h-16 bg-bg-cream rounded-xl flex items-center justify-center text-2xl shrink-0">
-                                        {item.image}
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h4 className="font-bold text-primary text-sm line-clamp-1">{item.name}</h4>
-                                            <button onClick={(e) => { e.stopPropagation(); removeFromCart(item.id); }} className="text-red-300 hover:text-red-500 transition-colors">
-                                                <X className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <p className="text-secondary font-bold text-xs">KES {(item.price * item.quantity).toLocaleString()}</p>
-                                            <div className="flex items-center gap-3 bg-white border border-cream rounded-lg px-2 py-1 shadow-sm">
-                                                <button onClick={() => updateQuantity(item.id, -1)} className="hover:text-secondary transition-colors"><Minus className="w-3 h-3" /></button>
-                                                <span className="text-xs font-bold w-4 text-center">{item.quantity}</span>
-                                                <button onClick={() => updateQuantity(item.id, 1)} className="hover:text-secondary transition-colors"><Plus className="w-3 h-3" /></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-
-                    {/* Summary & Checkout */}
-                    <div className="p-6 bg-white border-t border-cream space-y-4 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)]">
-                        <div className="space-y-2 text-sm text-charcoal/60">
-                            <div className="flex justify-between">
-                                <span>Subtotal</span>
-                                <span className="font-bold text-primary">KES {subtotal.toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span>Taxes (16% VAT)</span>
-                                <span className="font-bold text-primary">KES {tax.toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between text-lg pt-2 border-t border-cream">
-                                <span className="font-bold text-primary">Total</span>
-                                <span className="font-bold text-secondary text-2xl">KES {total.toLocaleString()}</span>
-                            </div>
-                        </div>
-
-                        <div className="pt-4 grid grid-cols-2 gap-4">
-                            <button className="flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-cream font-bold text-charcoal/40 hover:bg-bg-cream transition-all">
-                                <User className="w-5 h-5" /> Customer
+                    {/* Summary & Checkout - MOVED TO TOP */}
+                    <div className="p-6 bg-white border-b border-cream space-y-4 shadow-sm relative z-20">
+                        <div className="grid grid-cols-2 gap-3">
+                            <button className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-cream font-bold text-charcoal/40 hover:bg-bg-cream transition-all text-xs">
+                                <User className="w-4 h-4" /> Guest
                             </button>
                             <button
                                 onClick={() => setShowTableModal(true)}
-                                className="flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-secondary/50 text-secondary font-bold hover:bg-bg-cream transition-all group"
+                                className="flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-secondary/50 text-secondary font-bold hover:bg-orange-50 transition-all group text-xs"
                             >
                                 Table: {selectedTable}
                             </button>
@@ -448,10 +399,51 @@ const POS = () => {
                         <button
                             onClick={handlePlaceOrder}
                             disabled={cart.length === 0}
-                            className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-5 rounded-2xl shadow-xl transition-all active:transform active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-lg mt-2"
+                            className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-4 rounded-xl shadow-xl transition-all active:transform active:scale-95 flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed text-base"
                         >
-                            <CreditCard className="w-6 h-6" /> Place Order
+                            <CreditCard className="w-5 h-5 text-accent" /> Place Order
+                            <span className="ml-auto bg-white/10 px-3 py-1 rounded-lg text-xs tracking-tighter">
+                                KES {total.toLocaleString()}
+                            </span>
                         </button>
+                    </div>
+
+                    {/* Cart Items */}
+                    <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-bg-cream/20">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-[10px] font-black uppercase text-charcoal/40 tracking-widest">Order Details</h3>
+                            <button onClick={() => setCart([])} className="text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-tighter">Clear Cart</button>
+                        </div>
+                        {cart.length === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
+                                <ClipboardList className="w-20 h-20 mb-4" />
+                                <p className="font-bold">No items selected</p>
+                            </div>
+                        ) : (
+                            cart.map(item => (
+                                <div key={item.id} className="flex gap-4 p-3 rounded-2xl bg-white border border-cream/50 shadow-sm hover:shadow-md transition-all group">
+                                    <div className="w-14 h-14 bg-bg-cream rounded-xl flex items-center justify-center text-xl shrink-0 group-hover:scale-110 transition-transform">
+                                        {item.image}
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h4 className="font-bold text-primary text-sm line-clamp-1">{item.name}</h4>
+                                            <button onClick={(e) => { e.stopPropagation(); removeFromCart(item.id); }} className="text-red-300 hover:text-red-500 transition-colors">
+                                                <X className="w-3 h-3" />
+                                            </button>
+                                        </div>
+                                        <div className="flex justify-between items-center">
+                                            <p className="text-secondary font-black text-[10px]">KES {(item.price * item.quantity).toLocaleString()}</p>
+                                            <div className="flex items-center gap-3 bg-bg-cream rounded-lg px-2 py-1">
+                                                <button onClick={() => updateQuantity(item.id, -1)} className="hover:text-secondary transition-colors"><Minus className="w-2.5 h-2.5" /></button>
+                                                <span className="text-[10px] font-black w-4 text-center">{item.quantity}</span>
+                                                <button onClick={() => updateQuantity(item.id, 1)} className="hover:text-secondary transition-colors"><Plus className="w-2.5 h-2.5" /></button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
                 {/* Manage Dish Modal */}

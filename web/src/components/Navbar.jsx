@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Settings, RefreshCw, Shield, Menu, X, Home, LayoutGrid, Monitor, Package, ChevronRight } from 'lucide-react';
+import { Settings, RefreshCw, Shield, Menu, X, Home, LayoutGrid, Monitor, Package, ChevronRight, LogOut } from 'lucide-react';
 
 const Navbar = () => {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -146,6 +146,24 @@ const Navbar = () => {
                                     className="flex items-center gap-4 p-4 text-accent font-black uppercase text-xs tracking-widest hover:bg-white/5 rounded-2xl transition-all"
                                 >
                                     <Shield className="w-4 h-4" /> Admin Console
+                                </Link>
+                                <button
+                                    onClick={() => {
+                                        if (window.confirm('Reset all data?')) {
+                                            localStorage.clear();
+                                            window.location.reload();
+                                        }
+                                    }}
+                                    className="w-full flex items-center gap-4 p-4 text-red-400 font-black uppercase text-xs tracking-widest hover:bg-white/5 rounded-2xl transition-all"
+                                >
+                                    <RefreshCw className="w-4 h-4" /> Reset System
+                                </button>
+                                <Link
+                                    to="/login"
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="flex items-center gap-4 p-4 text-white/40 font-black uppercase text-xs tracking-widest hover:bg-white/5 rounded-2xl transition-all"
+                                >
+                                    <LogOut className="w-4 h-4" /> Logout
                                 </Link>
                             </div>
                         </div>
