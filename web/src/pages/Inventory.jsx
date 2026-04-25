@@ -3,6 +3,9 @@ import { Package, AlertTriangle, Plus, Search, ArrowLeft, RefreshCw, Filter } fr
 import { Link } from 'react-router-dom';
 
 const Inventory = () => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All Items');
+    const [isSyncing, setIsSyncing] = useState(false);
     const [inventory, setInventory] = useState([
         { id: 1, name: 'Beef Patties', stock: 12, unit: 'units', status: 'LOW', category: 'Meat' },
         { id: 2, name: 'Fresh Salmon', stock: 5, unit: 'kg', status: 'LOW', category: 'Fish' },
@@ -10,6 +13,45 @@ const Inventory = () => {
         { id: 4, name: 'Burger Buns', stock: 120, unit: 'units', status: 'OK', category: 'Bakery' },
         { id: 5, name: 'French Fries', stock: 8, unit: 'kg', status: 'OUT', category: 'Produce' },
     ]);
+
+    const filteredInventory = inventory.filter(item => {
+        const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === 'All Items' ||
+            (statusFilter === 'Low Stock' && item.status === 'LOW') ||
+            (statusFilter === 'Out of Stock' && item.status === 'OUT') ||
+            (statusFilter === 'Healthy' && item.status === 'OK');
+        return matchesSearch && matchesStatus;
+    });
+
+    const handleSync = () => {
+        setIsSyncing(true);
+        setTimeout(() => setIsSyncing(false), 2000);
+    };
+
+    const handleUpdateStock = (id, amount) => {
+        setInventory(prev => prev.map(item => {
+            if (item.id === id) {
+                const newStock = Math.max(0, item.stock + amount);
+                let newStatus = 'OK';
+                if (newStock === 0) newStatus = 'OUT';
+                else if (newStock < 20) newStatus = 'LOW';
+                return { ...item, stock: newStock, status: newStatus };
+            }
+            return item;
+        }));
+    };
+
+    const handleAddItem = () => {
+        const newItem = {
+            id: inventory.length + 1,
+            name: 'New Resource ' + (inventory.length + 1),
+            stock: 50,
+            unit: 'units',
+            status: 'OK',
+            category: 'Miscellaneous'
+        };
+        setInventory([...inventory, newItem]);
+    };
 
     return (
         <div className="min-h-screen bg-bg-cream p-8 font-body">
@@ -25,10 +67,17 @@ const Inventory = () => {
                     <p className="text-charcoal/50 mt-1">Manage and track your restaurant supplies in real-time.</p>
                 </div>
                 <div className="flex gap-4 w-full md:w-auto">
-                    <button className="flex-1 md:flex-none bg-white border border-cream px-6 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold text-sm shadow-sm hover:bg-cream transition-all">
-                        <RefreshCw className="w-4 h-4" /> Sync Stock
+                    <button
+                        onClick={handleSync}
+                        className="flex-1 md:flex-none bg-white border border-cream px-6 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold text-sm shadow-sm hover:bg-cream transition-all group"
+                    >
+                        <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin text-secondary' : ''}`} />
+                        {isSyncing ? 'Syncing...' : 'Sync Stock'}
                     </button>
-                    <button className="flex-1 md:flex-none bg-primary text-white px-6 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold text-sm shadow-lg hover:bg-primary-dark transition-all">
+                    <button
+                        onClick={handleAddItem}
+                        className="flex-1 md:flex-none bg-primary text-white px-6 py-3 rounded-2xl flex items-center justify-center gap-2 font-bold text-sm shadow-lg hover:bg-primary-dark transition-all active:scale-95"
+                    >
                         <Plus className="w-4 h-4" /> Add Item
                     </button>
                 </div>
@@ -44,14 +93,26 @@ const Inventory = () => {
                         <div className="space-y-4">
                             <div className="relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/30 w-4 h-4" />
-                                <input type="text" placeholder="Search stock..." className="w-full pl-10 pr-4 py-2.5 bg-bg-cream/50 border border-cream rounded-xl text-sm outline-none focus:ring-1 focus:ring-secondary" />
+                                <input
+                                    type="text"
+                                    placeholder="Search stock..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2.5 bg-bg-cream/50 border border-cream rounded-xl text-sm outline-none focus:ring-1 focus:ring-secondary"
+                                />
                             </div>
                             <div className="space-y-2">
                                 <p className="text-[10px] font-bold text-charcoal/30 uppercase tracking-widest">Status</p>
                                 {['All Items', 'Low Stock', 'Out of Stock', 'Healthy'].map(f => (
                                     <label key={f} className="flex items-center gap-3 cursor-pointer group">
-                                        <input type="radio" name="filter" className="w-4 h-4 text-secondary" />
-                                        <span className="text-sm text-charcoal/70 group-hover:text-primary">{f}</span>
+                                        <input
+                                            type="radio"
+                                            name="filter"
+                                            checked={statusFilter === f}
+                                            onChange={() => setStatusFilter(f)}
+                                            className="w-4 h-4 text-secondary accent-secondary"
+                                        />
+                                        <span className={`text-sm ${statusFilter === f ? 'text-primary font-bold' : 'text-charcoal/70 group-hover:text-primary'}`}>{f}</span>
                                     </label>
                                 ))}
                             </div>
@@ -69,25 +130,25 @@ const Inventory = () => {
                                     <th className="px-8 py-5 text-sm font-bold text-charcoal/60">Category</th>
                                     <th className="px-8 py-5 text-sm font-bold text-charcoal/60">Stock Level</th>
                                     <th className="px-8 py-5 text-sm font-bold text-charcoal/60">Status</th>
-                                    <th className="px-8 py-5 text-sm font-bold text-charcoal/60">Actions</th>
+                                    <th className="px-8 py-5 text-sm font-bold text-charcoal/60 text-right">Adjust Stock</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-cream">
-                                {inventory.map((item) => (
+                                {filteredInventory.map((item) => (
                                     <tr key={item.id} className="hover:bg-bg-cream/30 transition-colors">
                                         <td className="px-8 py-6">
                                             <p className="font-bold text-primary">{item.name}</p>
-                                            <p className="text-[10px] text-charcoal/30 uppercase font-black">SKU: KOL-{item.id}00X</p>
+                                            <p className="text-[10px] text-charcoal/40 uppercase font-bold tracking-tight">SKU: KOL-{item.id}00X</p>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className="text-xs font-bold px-3 py-1 bg-bg-cream border border-cream rounded-full">{item.category}</span>
+                                            <span className="text-[10px] font-black uppercase px-3 py-1 bg-bg-cream border border-cream rounded-full text-charcoal/60">{item.category}</span>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className="font-black text-primary">{item.stock}</span> <span className="text-xs text-charcoal/40 font-bold">{item.unit}</span>
+                                            <span className="font-black text-primary text-lg">{item.stock}</span> <span className="text-xs text-charcoal/40 font-bold">{item.unit}</span>
                                         </td>
                                         <td className="px-8 py-6">
                                             {item.status === 'LOW' && (
-                                                <span className="flex items-center gap-1.5 text-orange-600 text-xs font-black">
+                                                <span className="flex items-center gap-1.5 text-secondary text-xs font-black">
                                                     <AlertTriangle className="w-4 h-4" /> LOW STOCK
                                                 </span>
                                             )}
@@ -103,10 +164,30 @@ const Inventory = () => {
                                             )}
                                         </td>
                                         <td className="px-8 py-6 text-right">
-                                            <button className="text-secondary font-black text-xs hover:underline uppercase tracking-widest">Update</button>
+                                            <div className="flex justify-end gap-2 text-xs font-black">
+                                                <button
+                                                    onClick={() => handleUpdateStock(item.id, -1)}
+                                                    className="w-8 h-8 rounded-lg border border-cream flex items-center justify-center hover:bg-red-50 hover:text-red-600 transition-colors"
+                                                >
+                                                    -
+                                                </button>
+                                                <button
+                                                    onClick={() => handleUpdateStock(item.id, 1)}
+                                                    className="w-8 h-8 rounded-lg border border-cream flex items-center justify-center hover:bg-green-50 hover:text-green-600 transition-colors"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
+                                {filteredInventory.length === 0 && (
+                                    <tr>
+                                        <td colSpan="5" className="px-8 py-20 text-center text-charcoal/30 font-bold">
+                                            No stock items match your search.
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
