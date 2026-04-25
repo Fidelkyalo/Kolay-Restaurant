@@ -6,7 +6,11 @@ const POS = () => {
     const [activeCategory, setActiveCategory] = useState('All');
     const [cart, setCart] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedTable, setSelectedTable] = useState('T-01');
+    const [showTableModal, setShowTableModal] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+
+    const tables = ['T-01', 'T-02', 'T-03', 'T-04', 'T-05', 'T-08', 'T-10', 'T-12', 'T-15', 'Takeaway'];
 
     const categories = ['All', 'BreakFast', 'Main Dish', 'Beverages', 'Desserts', 'Side Dish'];
 
@@ -54,7 +58,7 @@ const POS = () => {
 
         const newOrder = {
             id: `#${Math.floor(1000 + Math.random() * 9000)}`,
-            table: 'T-01',
+            table: selectedTable,
             items: cart.map(item => ({ name: item.name, quantity: item.quantity, notes: '' })),
             total: `KES ${(subtotal + tax).toLocaleString()}`,
             status: 'PENDING',
@@ -75,6 +79,38 @@ const POS = () => {
 
     return (
         <div className="flex h-screen bg-bg-cream font-body overflow-hidden relative">
+            {/* Table Selection Modal */}
+            {showTableModal && (
+                <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+                    <div className="bg-white rounded-[2rem] w-full max-w-lg shadow-2xl p-8 animate-in zoom-in duration-200">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-2xl font-bold text-primary">Assign Table</h3>
+                            <button onClick={() => setShowTableModal(false)} className="text-charcoal/40 hover:text-primary text-2xl">&times;</button>
+                        </div>
+                        <div className="grid grid-cols-4 gap-4 mb-8">
+                            {tables.map(t => (
+                                <button
+                                    key={t}
+                                    onClick={() => { setSelectedTable(t); setShowTableModal(false); }}
+                                    className={`py-4 rounded-2xl font-bold text-sm transition-all border-2 ${selectedTable === t
+                                        ? 'bg-primary text-white border-primary shadow-lg scale-105'
+                                        : 'bg-bg-cream border-cream text-charcoal/60 hover:border-secondary/50'
+                                        }`}
+                                >
+                                    {t}
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            onClick={() => setShowTableModal(false)}
+                            className="w-full py-4 bg-bg-cream text-charcoal font-bold rounded-2xl hover:bg-cream transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Success Overlay */}
             {showSuccess && (
                 <div className="absolute inset-0 z-[100] flex items-center justify-center bg-primary/20 backdrop-blur-sm animate-in fade-in duration-300">
@@ -218,8 +254,11 @@ const POS = () => {
                         <button className="flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-cream font-bold text-charcoal/40 hover:bg-bg-cream transition-all">
                             <User className="w-5 h-5" /> Customer
                         </button>
-                        <button className="flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-secondary/50 text-secondary font-bold hover:bg-bg-cream transition-all">
-                            Table: T-01
+                        <button
+                            onClick={() => setShowTableModal(true)}
+                            className="flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-secondary/50 text-secondary font-bold hover:bg-bg-cream transition-all group"
+                        >
+                            Table: {selectedTable}
                         </button>
                     </div>
 
