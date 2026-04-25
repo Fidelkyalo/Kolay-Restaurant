@@ -240,18 +240,16 @@ function Dashboard() {
                                     </thead>
                                     <tbody className="divide-y divide-cream">
                                         {[...orders]
-                                            .filter(o => o.status !== 'SERVED')
-                                            .reverse()
-                                            .slice(0, 5)
-                                            .map((order, i) => (
-                                                <tr key={i} className="hover:bg-bg-cream/30 transition-colors cursor-pointer group">
-                                                    <td className="px-6 py-4 font-bold text-primary group-hover:text-secondary">{order.id}</td>
-                                                    <td className="px-6 py-4">{order.table}</td>
-                                                    <td className="px-6 py-4 text-sm text-charcoal/70">
-                                                        {Array.isArray(order.items)
-                                                            ? order.items.map(item => `${item.quantity}x ${item.name}`).join(', ')
-                                                            : order.items}
+                                            .slice(0, 10).map((order) => (
+                                                <tr key={order.id} className="hover:bg-cream/50 transition-colors cursor-pointer group" onClick={() => navigate('/pos')}>
+                                                    <td className="px-6 py-4 font-bold text-primary">{order.id}</td>
+                                                    <td className="px-6 py-4">
+                                                        <div className="flex flex-col">
+                                                            <span className="font-bold text-sm">{order.table}</span>
+                                                            <span className="text-[10px] text-gray-400 capitalize">{new Date(order.timestamp).toLocaleTimeString()}</span>
+                                                        </div>
                                                     </td>
+                                                    <td className="px-6 py-4 text-xs max-w-xs truncate">{order.items.map(i => `${i.quantity}x ${i.name}`).join(', ')}</td>
                                                     <td className="px-6 py-4 font-bold">{order.total}</td>
                                                     <td className="px-6 py-4">
                                                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${order.status === 'PENDING' ? 'bg-gray-100 text-gray-600' :
@@ -263,7 +261,7 @@ function Dashboard() {
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 text-right">
-                                                        {order.status === 'READY' && (
+                                                        {order.status === 'READY' ? (
                                                             <button
                                                                 onClick={(e) => {
                                                                     e.stopPropagation();
@@ -273,7 +271,11 @@ function Dashboard() {
                                                             >
                                                                 <CheckCircle2 className="w-3 h-3" /> MARK DELIVERED
                                                             </button>
-                                                        )}
+                                                        ) : order.status === 'SERVED' ? (
+                                                            <div className="flex items-center justify-end gap-2 text-green-600 text-[10px] font-black uppercase tracking-widest">
+                                                                <CheckCircle2 className="w-3 h-3" /> DELIVERED
+                                                            </div>
+                                                        ) : null}
                                                     </td>
                                                 </tr>
                                             ))}
