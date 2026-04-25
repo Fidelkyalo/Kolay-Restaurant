@@ -14,6 +14,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/pos" element={<POS />} />
         <Route path="/kds" element={<KDS />} />
+        <Route path="/inventory" element={<Inventory />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
