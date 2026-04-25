@@ -35,25 +35,23 @@ function Dashboard() {
                 </header>
 
                 {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                    {[
-                        { label: 'Total Revenue', value: 'KES 45,280', icon: '💰', trend: '+12.5%', color: 'border-l-secondary' },
-                        { label: 'Active Orders', value: '24', icon: '📝', trend: '8 pending', color: 'border-l-accent' },
-                        { label: 'Total Customers', value: '1,204', icon: '👥', trend: '+48 today', color: 'border-l-primary' },
-                        { label: 'Stock Alerts', value: '3 Items', icon: '⚠️', trend: 'Refill needed', color: 'border-l-red-500' },
-                    ].map((stat, i) => (
-                        <div key={i} className={`bg-white p-6 rounded-2xl shadow-sm border-l-4 ${stat.color} hover:shadow-md transition-shadow cursor-pointer`}>
-                            <div className="flex justify-between items-start mb-4">
-                                <span className="text-3xl">{stat.icon}</span>
-                                <span className={`text-xs font-bold px-2 py-1 rounded bg-cream border transition-all ${stat.trend.includes('+') ? 'text-green-600 border-green-100' : 'text-secondary border-orange-100'}`}>
-                                    {stat.trend}
-                                </span>
-                            </div>
-                            <h3 className="text-sm font-bold text-charcoal/50 uppercase tracking-wider">{stat.label}</h3>
-                            <p className="text-2xl font-bold text-primary">{stat.value}</p>
+                {[
+                    { label: 'Total Revenue', value: 'KES 45,280', icon: '💰', trend: '+12.5%', color: 'border-l-secondary', path: '/dashboard' },
+                    { label: 'Active Orders', value: '24', icon: '📝', trend: '8 pending', color: 'border-l-accent', path: '/pos' },
+                    { label: 'Total Customers', value: '1,204', icon: '👥', trend: '+48 today', color: 'border-l-primary', path: '/dashboard' },
+                    { label: 'Stock Alerts', value: '3 Items', icon: '⚠️', trend: 'Refill needed', color: 'border-l-red-500', path: '/inventory' },
+                ].map((stat, i) => (
+                    <Link key={i} to={stat.path} className={`bg-white p-6 rounded-2xl shadow-sm border-l-4 ${stat.color} hover:shadow-md transition-shadow cursor-pointer block`}>
+                        <div className="flex justify-between items-start mb-4">
+                            <span className="text-3xl">{stat.icon}</span>
+                            <span className={`text-xs font-bold px-2 py-1 rounded bg-cream border transition-all ${stat.trend.includes('+') ? 'text-green-600 border-green-100' : 'text-secondary border-orange-100'}`}>
+                                {stat.trend}
+                            </span>
                         </div>
-                    ))}
-                </div>
+                        <h3 className="text-sm font-bold text-charcoal/50 uppercase tracking-wider">{stat.label}</h3>
+                        <p className="text-2xl font-bold text-primary">{stat.value}</p>
+                    </Link>
+                ))}
 
                 {/* Content Area */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -62,7 +60,7 @@ function Dashboard() {
                         <div className="bg-white rounded-3xl shadow-sm overflow-hidden border border-cream">
                             <div className="p-6 border-b border-cream flex justify-between items-center bg-white">
                                 <h2 className="text-xl font-bold text-primary">Recent Orders</h2>
-                                <button className="text-secondary font-bold text-sm hover:underline">View All</button>
+                                <Link to="/pos" className="text-secondary font-bold text-sm hover:underline">View All</Link>
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left">
@@ -187,9 +185,9 @@ function Dashboard() {
                                     </div>
                                 ))}
                             </div>
-                            <button className="w-full mt-6 py-3 border-2 border-dashed border-cream rounded-2xl text-xs font-bold text-charcoal/40 hover:text-secondary hover:border-secondary/50 transition-all">
+                            <Link to="/inventory" className="w-full mt-6 py-3 border-2 border-dashed border-cream rounded-2xl text-xs font-bold text-charcoal/40 hover:text-secondary hover:border-secondary/50 transition-all flex items-center justify-center">
                                 Manage Inventory
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </div>
