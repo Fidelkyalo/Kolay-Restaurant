@@ -509,6 +509,16 @@ const POS = () => {
                                         </select>
                                     </div>
                                 </div>
+                                <div className="mt-4">
+                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Image URL (Unsplash or Local)</label>
+                                    <input
+                                        type="text"
+                                        placeholder="https://images.unsplash.com/..."
+                                        className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold text-sm"
+                                        value={newDish.image === '🍱' ? '' : newDish.image}
+                                        onChange={(e) => setNewDish({ ...newDish, image: e.target.value || '🍱' })}
+                                    />
+                                </div>
                                 <button
                                     onClick={addDish}
                                     className="w-full bg-secondary text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-all shadow-xl mt-4 active:scale-95"
