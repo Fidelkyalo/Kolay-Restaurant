@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, CreditCard, Check, Clock } from 'lucide-react';
+import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, ArrowRight, CreditCard, Check, Clock } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const GuestMenu = () => {
