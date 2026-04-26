@@ -359,7 +359,12 @@ const POS = () => {
                             >
                                 <div className="h-32 bg-bg-cream rounded-2xl mb-4 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform overflow-hidden">
                                     {product.image?.startsWith('http') || product.image?.startsWith('/') ? (
-                                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                                        <img
+                                            src={product.image}
+                                            alt={product.name}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600'; }}
+                                        />
                                     ) : (
                                         product.image
                                     )}
@@ -402,7 +407,12 @@ const POS = () => {
                                 <div key={item.id} className="flex gap-4 p-4 rounded-[2rem] bg-white border-2 border-cream shadow-sm hover:shadow-md transition-all group relative">
                                     <div className="w-16 h-16 bg-bg-cream rounded-2xl flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform overflow-hidden shadow-sm">
                                         {item.image?.startsWith('http') || item.image?.startsWith('/') ? (
-                                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                            <img
+                                                src={item.image}
+                                                alt={item.name}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600'; }}
+                                            />
                                         ) : (
                                             item.image
                                         )}

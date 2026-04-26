@@ -148,7 +148,12 @@ const GuestMenu = () => {
                             {/* Dish image using an img instead of emoji */}
                             <div className="relative h-56 overflow-hidden">
                                 {dish.image?.startsWith('http') || dish.image?.startsWith('/') ? (
-                                    <img src={dish.image} alt={dish.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                    <img
+                                        src={dish.image}
+                                        alt={dish.name}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600'; }}
+                                    />
                                 ) : (
                                     <div className="w-full h-full bg-[#1A1008] flex items-center justify-center font-display text-white/10 uppercase tracking-widest text-xl">Kolay</div>
                                 )}
@@ -207,7 +212,12 @@ const GuestMenu = () => {
                                         <div key={item.id} className="flex gap-4 p-4 bg-white/3 hover:bg-white/5 rounded-3xl border border-white/5 transition-colors">
                                             <div className="w-20 h-20 bg-[#0D0A07] rounded-2xl overflow-hidden shadow-sm shrink-0">
                                                 {item.image?.startsWith('http') || item.image?.startsWith('/') ? (
-                                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.name}
+                                                        className="w-full h-full object-cover"
+                                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600'; }}
+                                                    />
                                                 ) : <div className="w-full h-full bg-[#1A1008]" />}
                                             </div>
                                             <div className="flex-1 py-1 flex flex-col justify-between">
