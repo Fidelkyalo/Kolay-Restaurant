@@ -528,8 +528,8 @@ const Home = () => {
 
                                 <div className="space-y-4">
                                     {[
-                                        { icon: Phone, label: 'Call Us', value: '+254 700 000 000' },
-                                        { icon: MapPin, label: 'Location', value: 'Greenfield Plaza, Nairobi' },
+                                        { icon: Phone, label: 'Call Us', value: '+254 102 039 121' },
+                                        { icon: MapPin, label: 'Location', value: '123 Thome Street, Nairobi' },
                                         { icon: Clock, label: 'Hours', value: 'Mon–Sat • 10am – 10pm' },
                                     ].map(({ icon: Icon, label, value }) => (
                                         <div key={label} className="flex items-center gap-4">
@@ -624,7 +624,8 @@ const Home = () => {
                             <div className="rounded-3xl overflow-hidden border border-white/8 h-72">
                                 <iframe
                                     title="Kolay Restaurant Location"
-                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.819068887843!2d36.8219462!3d-1.2923532!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d22f39d883%3A0x9cc92c4c3ecc3bb4!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2ske!4v1680000000000"
+                                    // Thome, Nairobi coordinates approx: -1.2185, 36.8797
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.511613217424!2d36.8797!3d-1.2185!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1680d2288339%3A0xc47f2f11c833bb4!2sThome%2C%20Nairobi!5e0!3m2!1sen!2ske!4v1700000000000"
                                     width="100%"
                                     height="100%"
                                     style={{ border: 0, filter: 'invert(90%) hue-rotate(180deg)' }}
@@ -636,8 +637,8 @@ const Home = () => {
                             {/* Info blocks */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 {[
-                                    { icon: MapPin, label: 'Address', value: 'Greenfield Plaza, Westlands, Nairobi' },
-                                    { icon: Phone, label: 'Phone', value: '+254 700 000 000' },
+                                    { icon: MapPin, label: 'Address', value: '123 Thome Street, Nairobi' },
+                                    { icon: Phone, label: 'Phone', value: '+254 102 039 121' },
                                     { icon: Clock, label: 'Hours', value: 'Mon–Sat 10am–10pm' },
                                 ].map(({ icon: Icon, label, value }) => (
                                     <div key={label} className="bg-white/3 border border-white/5 rounded-2xl p-5">
