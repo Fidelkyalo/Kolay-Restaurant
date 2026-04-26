@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, ShoppingCart, Plus, Minus, X, CreditCard, User, ClipboardList, UtensilsCrossed, ArrowLeft, CheckCircle, Printer } from 'lucide-react';
+import { Search, ShoppingCart, Plus, Minus, X, CreditCard, User, ClipboardList, UtensilsCrossed, ArrowLeft, CheckCircle, Printer, Settings, Trash2, Edit3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
@@ -9,13 +9,19 @@ const POS = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [tables, setTables] = useState(() => {
         const saved = localStorage.getItem('kolay_tables');
-        return saved ? JSON.parse(saved) : ['T-01', 'T-02', 'T-03', 'T-04', 'T-05', 'T-08', 'T-10', 'T-12', 'T-15', 'Takeaway', 'Online Order'];
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            return parsed.map(t => t.startsWith('T-') ? `Kolay ${t}` : t);
+        }
+        return ['Kolay T-01', 'Kolay T-02', 'Kolay T-03', 'Kolay T-04', 'Kolay T-05', 'Kolay T-08', 'Kolay T-10', 'Kolay T-12', 'Kolay T-15', 'Takeaway', 'Online Order'];
     });
     const [newTableNumber, setNewTableNumber] = useState('');
-    const [selectedTable, setSelectedTable] = useState('T-01');
+    const [selectedTable, setSelectedTable] = useState('Kolay T-01');
     const [showTableModal, setShowTableModal] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [lastPlacedOrder, setLastPlacedOrder] = useState(null);
+    const [isManageMode, setIsManageMode] = useState(false);
+    const [editingDishId, setEditingDishId] = useState(null);
 
     const handlePrintReceipt = () => {
         if (!lastPlacedOrder) {
@@ -124,7 +130,13 @@ const POS = () => {
 
     const addTable = () => {
         if (!newTableNumber.trim()) return;
-        const formatted = newTableNumber.startsWith('T-') ? newTableNumber : `T-${newTableNumber}`;
+        let formatted = newTableNumber;
+        if (formatted.startsWith('T-')) {
+            formatted = `Kolay ${formatted}`;
+        } else if (!formatted.toLowerCase().includes('kolay') && !formatted.toLowerCase().includes('takeaway') && !formatted.toLowerCase().includes('online')) {
+            formatted = `Kolay T-${formatted}`;
+        }
+
         if (tables.includes(formatted)) return;
 
         const updated = [...tables, formatted];
@@ -149,18 +161,39 @@ const POS = () => {
     const [showDishModal, setShowDishModal] = useState(false);
     const [newDish, setNewDish] = useState({ name: '', price: '', category: 'Main Dish', image: '🍱' });
 
-    const addDish = () => {
+    const saveDish = () => {
         if (!newDish.name.trim() || !newDish.price) return;
-        const dishToAdd = {
-            id: Date.now(),
-            ...newDish,
-            price: parseFloat(newDish.price)
-        };
-        const updated = [...products, dishToAdd];
+
+        let updated;
+        if (editingDishId) {
+            updated = products.map(p => p.id === editingDishId ? {
+                ...newDish,
+                id: editingDishId,
+                price: parseFloat(newDish.price)
+            } : p);
+        } else {
+            const dishToAdd = {
+                id: Date.now(),
+                ...newDish,
+                price: parseFloat(newDish.price)
+            };
+            updated = [...products, dishToAdd];
+        }
+
         setProducts(updated);
         localStorage.setItem('kolay_dishes', JSON.stringify(updated));
         setNewDish({ name: '', price: '', category: 'Main Dish', image: '🍱' });
+        setEditingDishId(null);
         setShowDishModal(false);
+    };
+
+    const deleteDish = (id, e) => {
+        e.stopPropagation();
+        if (window.confirm('Are you sure you want to delete this dish entirely?')) {
+            const updated = products.filter(p => p.id !== id);
+            setProducts(updated);
+            localStorage.setItem('kolay_dishes', JSON.stringify(updated));
+        }
     };
 
     const categories = ['All', 'BreakFast', 'Main Dish', 'Beverages', 'Desserts', 'Side Dish'];
@@ -342,11 +375,24 @@ const POS = () => {
                             </button>
                         ))}
                         <button
-                            onClick={() => setShowDishModal(true)}
-                            className="bg-primary/5 hover:bg-primary text-primary hover:text-white px-6 py-2.5 rounded-full font-bold border border-primary/20 transition-all flex items-center gap-2"
+                            onClick={() => setIsManageMode(!isManageMode)}
+                            className={`px-6 py-2.5 rounded-full font-bold border transition-all flex items-center gap-2 ${isManageMode ? 'bg-primary text-white border-primary shadow-lg' : 'bg-primary/5 hover:bg-primary text-primary hover:text-white border-primary/20'
+                                }`}
                         >
-                            <Plus className="w-4 h-4" /> Manage Menu
+                            <Settings className="w-4 h-4" /> Edit Menu
                         </button>
+                        {isManageMode && (
+                            <button
+                                onClick={() => {
+                                    setEditingDishId(null);
+                                    setNewDish({ name: '', price: '', category: 'Main Dish', image: '🍱' });
+                                    setShowDishModal(true);
+                                }}
+                                className="bg-secondary text-white hover:bg-orange-600 px-6 py-2.5 rounded-full font-bold border border-secondary transition-all flex items-center gap-2 shadow-sm"
+                            >
+                                <Plus className="w-4 h-4" /> Add Dish
+                            </button>
+                        )}
                     </div>
 
                     {/* Product Grid */}
@@ -530,10 +576,10 @@ const POS = () => {
                                     />
                                 </div>
                                 <button
-                                    onClick={addDish}
+                                    onClick={saveDish}
                                     className="w-full bg-secondary text-white py-4 rounded-2xl font-bold hover:bg-orange-600 transition-all shadow-xl mt-4 active:scale-95"
                                 >
-                                    Add to Menu
+                                    {editingDishId ? 'Save Changes' : 'Add to Menu'}
                                 </button>
                             </div>
                         </div>
