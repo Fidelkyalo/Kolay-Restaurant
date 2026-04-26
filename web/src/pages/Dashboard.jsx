@@ -72,55 +72,95 @@ function Dashboard() {
 
     const handlePrintReceipt = (order) => {
         const printWindow = window.open('', '_blank');
-        const itemsHtml = (order.items || []).map(i => `
-            <div class="row item">
-                <span>${i.quantity || 1}x ${i.name || 'Item'}</span>
-                <span>KES ${((i.price || 0) * (i.quantity || 1)).toLocaleString()}</span>
-            </div>
-        `).join('');
-
-        const html = `
+        const receiptHtml = `
             <html>
                 <head>
                     <title>Kolay Receipt #${order.id}</title>
                     <style>
-                        body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; color: #000; padding: 20px; font-size: 14px; }
-                        .center { text-align: center; }
-                        .bold { font-weight: bold; }
-                        .row { display: flex; justify-content: space-between; margin: 5px 0; }
-                        .divider { border-top: 1px dashed #000; margin: 10px 0; }
-                        .item { font-size: 13px; margin: 3px 0; }
+                        body { 
+                            font-family: 'Courier New', Courier, monospace; 
+                            width: 300px; 
+                            margin: 0 auto; 
+                            color: #1a1a1a; 
+                            padding: 20px; 
+                            font-size: 12px;
+                            line-height: 1.4;
+                            position: relative;
+                            overflow: hidden;
+                        }
+                        .watermark {
+                            position: absolute;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%) rotate(-15deg);
+                            width: 250px;
+                            opacity: 0.15;
+                            z-index: -1;
+                            pointer-events: none;
+                        }
+                        .header { text-align: center; border-bottom: 2px dashed #eee; padding-bottom: 20px; margin-bottom: 20px; }
+                        .restaurant-name { font-size: 24px; font-weight: bold; margin: 0; color: #4E2C1E; }
+                        .tagline { font-size: 10px; font-style: italic; color: #888; margin-top: 4px; }
+                        .order-info { margin-bottom: 20px; font-size: 14px; }
+                        .items { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        .items th { text-align: left; border-bottom: 1px solid #eee; padding: 5px 0; font-size: 10px; text-transform: uppercase; color: #888; }
+                        .items td { padding: 8px 0; font-size: 14px; vertical-align: top; }
+                        .items .qty { width: 30px; }
+                        .items .price { text-align: right; }
+                        .totals { border-top: 2px dashed #eee; padding-top: 15px; margin-top: 15px; }
+                        .total-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
+                        .total-row.grand { font-size: 20px; font-weight: bold; margin-top: 10px; color: #1a1a1a; border-top: 1px solid #eee; padding-top: 10px; }
+                        .total-row.payment { font-size: 16px; font-weight: bold; margin-top: 5px; }
+                        .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #888; border-top: 1px solid #eee; padding-top: 20px; }
+                        .guest-box { background: #f9f9f9; padding: 10px; margin-bottom: 20px; border-radius: 5px; font-size: 12px; border: 1px solid #eee; }
+                        @media print { .no-print { display: none; } }
                     </style>
                 </head>
                 <body>
-                    <div class="center">
-                        <h2 class="bold" style="margin:0;">KOLAY RESTAURANT</h2>
-                        <p style="margin:5px 0;">Greenfield Plaza, Nairobi</p>
-                        <p style="margin:5px 0;">+254 700 000 000</p>
+                    <img src="/Logo.png" class="watermark" />
+                    <div class="header">
+                        <h1 class="restaurant-name">KOLAY RESTAURANT</h1>
+                        <p class="tagline">"Where Every Meal Feels Right"</p>
+                        <p style="font-size: 11px;">123 Thome Street, Nairobi<br>Tel: +254 102 039 121<br>Email: kolayrestaurant@gmail.com</p>
                     </div>
-                    <div class="divider"></div>
-                    <div class="row bold"><span>Order #</span><span>${order.id}</span></div>
-                    <div class="row"><span>Type</span><span>${order.table}</span></div>
-                    <div class="row"><span>Date</span><span>${new Date(order.timestamp).toLocaleString()}</span></div>
-                    ${order.guestName ? `<div class="row"><span>Guest</span><span>${order.guestName}</span></div>` : ''}
-                    ${order.guestPhone ? `<div class="row"><span>Phone</span><span>${order.guestPhone}</span></div>` : ''}
-                    ${order.guestAddress ? `<div class="row"><span>Address</span><span style="max-width:150px; text-align:right;">${order.guestAddress}</span></div>` : ''}
-                    <div class="divider"></div>
-                    ${itemsHtml}
-                    <div class="divider"></div>
-                    <div class="row bold" style="font-size:18px;">
-                        <span>TOTAL</span>
-                        <span>${order.total}</span>
+                    <div class="order-info">
+                        <div class="total-row"><span>ID:</span> <strong>${order.id}</strong></div>
+                        <div class="total-row"><span>Date:</span> <span>${new Date(order.timestamp).toLocaleDateString()}</span></div>
+                        <div class="total-row"><span>Time:</span> <span>${new Date(order.timestamp).toLocaleTimeString('en-GB')}</span></div>
+                        <div class="total-row"><span>Table/Mode:</span> <strong style="text-transform: uppercase;">${order.table}</strong></div>
                     </div>
-                    <div class="divider"></div>
-                    <div class="row bold">
-                        <span>PAYMENT</span>
-                        <span>${order.paymentStatus || 'UNPAID'}</span>
+                    
+                    ${order.guestName || order.guestPhone || order.guestAddress ? `
+                    <div class="guest-box">
+                        <div style="font-weight:bold; margin-bottom:5px; text-transform:uppercase; font-size:10px; color:#888;">Customer Details</div>
+                        ${order.guestName ? `<div class="total-row"><span>Name:</span> <strong>${order.guestName}</strong></div>` : ''}
+                        ${order.guestPhone ? `<div class="total-row"><span>Phone:</span> <strong>${order.guestPhone}</strong></div>` : ''}
+                        ${order.guestAddress ? `<div class="total-row"><span>Address:</span> <strong style="text-align:right; max-width:150px;">${order.guestAddress}</strong></div>` : ''}
+                    </div>` : ''}
+
+                    <table class="items">
+                        <thead>
+                            <tr><th class="qty">QTY</th><th>ITEM</th><th class="price">PRICE</th></tr>
+                        </thead>
+                        <tbody>
+                            ${(order.items || []).map(item => `
+                                <tr>
+                                    <td class="qty">${item.quantity || 1}</td>
+                                    <td>${item.name || 'Item'}</td>
+                                    <td class="price">${((item.price || 0) * (item.quantity || 1)).toLocaleString()}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div class="totals">
+                        <div class="total-row"><span>Subtotal</span> <span>KES ${order.total.replace('KES ', '')}</span></div>
+                        <div class="total-row"><span>Tax (VAT 16%)</span> <span>Incl.</span></div>
+                        <div class="total-row grand"><span>TOTAL</span> <span>${order.total}</span></div>
+                        <div class="total-row payment"><span>STATUS:</span> <span>${order.paymentStatus || 'UNPAID'}</span></div>
                     </div>
-                    <div class="divider"></div>
-                    <div class="center item" style="margin-top:20px;">
-                        <p class="bold">Thank you for dining with Kolay!</p>
-                        <p style="font-size:10px; margin-top:10px;">Printed: ${new Date().toLocaleString()}</p>
+                    <div class="footer">
+                        <p>Thank you for dining with us!<br>Visit again soon.</p>
+                        <p style="font-size: 8px; margin-top: 10px;">GENERATED BY KOLAY RMS</p>
                     </div>
                     <script>
                         window.onload = function() { window.print(); window.close(); }
@@ -128,7 +168,7 @@ function Dashboard() {
                 </body>
             </html>
         `;
-        printWindow.document.write(html);
+        printWindow.document.write(receiptHtml);
         printWindow.document.close();
     };
 

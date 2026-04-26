@@ -85,10 +85,10 @@ const POS = () => {
                         <p style="font-size: 11px;">123 Thome Street, Nairobi<br>Tel: +254 102 039 121<br>Email: kolayrestaurant@gmail.com</p>
                     </div>
                     <div class="order-info">
-                        <div class="total-row"><span>ID:</span> <strong>#${lastPlacedOrder.id}</strong></div>
-                        <div class="total-row"><span>Date:</span> <span>${new Date().toLocaleDateString()}</span></div>
-                        <div class="total-row"><span>Time:</span> <span>${new Date().toLocaleTimeString('en-GB')}</span></div>
-                        <div class="total-row"><span>Channel:</span> <strong>${lastPlacedOrder.table} ${lastPlacedOrder.table === 'Online Order' ? '(ONLINE)' : ''}</strong></div>
+                        <div class="total-row"><span>ID:</span> <strong>${lastPlacedOrder.id}</strong></div>
+                        <div class="total-row"><span>Date:</span> <span>${new Date(lastPlacedOrder.timestamp).toLocaleDateString()}</span></div>
+                        <div class="total-row"><span>Time:</span> <span>${new Date(lastPlacedOrder.timestamp).toLocaleTimeString('en-GB')}</span></div>
+                        <div class="total-row"><span>Table/Mode:</span> <strong style="text-transform: uppercase;">${lastPlacedOrder.table}</strong></div>
                     </div>
                     <table class="items">
                         <thead>
@@ -108,6 +108,9 @@ const POS = () => {
                         <div class="total-row"><span>Subtotal</span> <span>KES ${lastPlacedOrder.total.replace('KES ', '')}</span></div>
                         <div class="total-row"><span>Tax (VAT 16%)</span> <span>Incl.</span></div>
                         <div class="total-row grand"><span>TOTAL</span> <span>${lastPlacedOrder.total}</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 16px; font-weight: bold;">
+                            <span>STATUS:</span> <span>${lastPlacedOrder.paymentStatus || 'PAID'}</span>
+                        </div>
                     </div>
                     <div class="footer">
                         <p>Thank you for dining with us!<br>Visit again soon.</p>
@@ -235,6 +238,8 @@ const POS = () => {
             items: cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price, notes: '' })),
             total: `KES ${(subtotal + tax).toLocaleString()}`,
             status: 'PENDING',
+            paymentStatus: 'PAID',
+            timestamp: new Date().toISOString(),
             statusColor: 'bg-gray-100 text-gray-700'
         };
 
