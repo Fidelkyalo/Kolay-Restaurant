@@ -400,10 +400,26 @@ const POS = () => {
                         {filteredProducts.map(product => (
                             <div
                                 key={product.id}
-                                onClick={() => addToCart(product)}
-                                className="bg-white p-5 rounded-3xl border border-cream hover:border-secondary/30 hover:shadow-xl transition-all cursor-pointer group active:scale-95"
+                                onClick={() => {
+                                    if (isManageMode) {
+                                        setEditingDishId(product.id);
+                                        setNewDish({ name: product.name, price: product.price, category: product.category, image: product.image });
+                                        setShowDishModal(true);
+                                    } else {
+                                        addToCart(product);
+                                    }
+                                }}
+                                className={`bg-white p-5 rounded-3xl border border-cream hover:border-secondary/30 hover:shadow-xl transition-all cursor-pointer group active:scale-95 ${isManageMode ? 'ring-2 ring-primary/20' : ''}`}
                             >
-                                <div className="h-32 bg-bg-cream rounded-2xl mb-4 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform overflow-hidden">
+                                <div className="h-32 bg-bg-cream rounded-2xl mb-4 relative flex items-center justify-center text-5xl group-hover:scale-110 transition-transform overflow-hidden">
+                                    {isManageMode && (
+                                        <button
+                                            onClick={(e) => deleteDish(product.id, e)}
+                                            className="absolute top-2 right-2 bg-red-100 hover:bg-red-500 text-red-600 hover:text-white p-2 rounded-full shadow-sm transition-all z-10"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    )}
                                     {product.image?.startsWith('http') || product.image?.startsWith('/') ? (
                                         <img
                                             src={product.image}
