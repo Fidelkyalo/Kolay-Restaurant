@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, CreditCard, Check, Clock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const GuestMenu = () => {
     const [dishes, setDishes] = useState([]);
@@ -9,7 +9,14 @@ const GuestMenu = () => {
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [orderSuccess, setOrderSuccess] = useState(false);
-    const [guestInfo, setGuestInfo] = useState({ name: '', phone: '', mode: 'Takeaway' });
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const orderType = queryParams.get('type');
+
+    // We override 'Dining In' strictly if they clicked Delivery/Takeaway explicitly
+    const initialMode = orderType === 'delivery' ? 'Home Delivery' : (orderType === 'takeaway' ? 'Takeaway' : 'Takeaway');
+
+    const [guestInfo, setGuestInfo] = useState({ name: '', phone: '', address: '', mode: initialMode });
 
     useEffect(() => {
         let savedDishes;
@@ -68,11 +75,12 @@ const GuestMenu = () => {
             id: Math.floor(Math.random() * 1000000),
             items: cart,
             total: `KES ${cartTotal.toLocaleString()}`,
-            table: guestInfo.mode === 'Dining In' ? 'Awaiting Table' : 'Takeaway',
+            table: guestInfo.mode === 'Home Delivery' ? 'Home Delivery' : (guestInfo.mode === 'Dining In' ? 'Awaiting Table' : 'Takeaway'),
             status: 'PENDING',
             timestamp: new Date().toISOString(),
             guestName: guestInfo.name,
-            guestPhone: guestInfo.phone
+            guestPhone: guestInfo.phone,
+            guestAddress: guestInfo.mode === 'Home Delivery' ? guestInfo.address : null
         };
 
         const existingOrders = JSON.parse(localStorage.getItem('kolay_orders') || '[]');
@@ -279,19 +287,35 @@ const GuestMenu = () => {
                                     onChange={e => setGuestInfo({ ...guestInfo, phone: e.target.value })}
                                 />
                             </div>
-                            <div className="flex bg-white/3 p-1.5 rounded-2xl border border-white/5">
-                                {['Takeaway', 'Dining In'].map(m => (
-                                    <button
-                                        key={m}
-                                        type="button"
-                                        onClick={() => setGuestInfo({ ...guestInfo, mode: m })}
-                                        className={`flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${guestInfo.mode === m ? 'bg-[#E67E22] text-white shadow-[0_4px_15px_#E67E2240]' : 'text-white/30 hover:text-white'
-                                            }`}
-                                    >
-                                        {m}
-                                    </button>
-                                ))}
-                            </div>
+                            {guestInfo.mode === 'Home Delivery' && (
+                                <input
+                                    required
+                                    placeholder="Full Delivery Address (e.g. Westlands, 4th Street)"
+                                    className="w-full bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold transition-colors"
+                                    value={guestInfo.address}
+                                    onChange={e => setGuestInfo({ ...guestInfo, address: e.target.value })}
+                                />
+                            )}
+
+                            {orderType === 'delivery' || orderType === 'takeaway' ? (
+                                <div className="flex bg-[#E67E22]/10 p-4 rounded-2xl border border-[#E67E22]/20 items-center justify-center">
+                                    <span className="text-[#E67E22] font-black text-sm uppercase tracking-widest">{orderType === 'delivery' ? '🚗 Fast Home Delivery' : '🛍️ Quick Takeaway'}</span>
+                                </div>
+                            ) : (
+                                <div className="flex bg-white/3 p-1.5 rounded-2xl border border-white/5">
+                                    {['Takeaway', 'Dining In'].map(m => (
+                                        <button
+                                            key={m}
+                                            type="button"
+                                            onClick={() => setGuestInfo({ ...guestInfo, mode: m })}
+                                            className={`flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${guestInfo.mode === m ? 'bg-[#E67E22] text-white shadow-[0_4px_15px_#E67E2240]' : 'text-white/30 hover:text-white'
+                                                }`}
+                                        >
+                                            {m}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
                             <div className="p-5 bg-white/5 rounded-2xl border border-white/5 flex items-center gap-4">
                                 <div className="bg-[#E67E22]/20 border border-[#E67E22]/30 p-3 rounded-xl text-[#E67E22]">
                                     <CreditCard className="w-5 h-5" />

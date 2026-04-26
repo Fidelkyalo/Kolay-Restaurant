@@ -406,9 +406,25 @@ function Dashboard() {
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
-                                            <span className="px-3 py-1 bg-bg-cream border border-primary/5 rounded-lg text-xs font-bold text-primary">
-                                                {order.table}
-                                            </span>
+                                            <div className="flex flex-col gap-2">
+                                                <span className={`px-3 py-1 bg-bg-cream border border-primary/5 rounded-lg text-xs font-bold text-primary flex items-center gap-2 w-fit ${order.table === 'Home Delivery' ? 'bg-[#E67E22]/10 text-[#E67E22] border-[#E67E22]/20' :
+                                                        order.table === 'Takeaway' ? 'bg-[#D4A017]/10 text-[#D4A017] border-[#D4A017]/20' : ''
+                                                    }`}>
+                                                    {order.table === 'Home Delivery' ? '🚗 Delivery' : order.table === 'Takeaway' ? '🛍️ Takeaway' : `🪑 ${order.table}`}
+                                                </span>
+
+                                                {order.guestAddress && (
+                                                    <span className="text-[10px] text-charcoal/60 flex items-center gap-1 font-bold truncate max-w-[200px]" title={order.guestAddress}>
+                                                        📍 {order.guestAddress}
+                                                    </span>
+                                                )}
+
+                                                {order.guestPhone && (
+                                                    <span className="text-[10px] text-charcoal/60 flex items-center gap-1 font-bold">
+                                                        📞 {order.guestPhone} - {order.guestName}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-8 py-6 font-black text-primary">{order.total}</td>
                                         <td className="px-8 py-6">

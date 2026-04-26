@@ -424,7 +424,7 @@ const Home = () => {
                             </div>
                             <h3 className="text-white font-black text-xl mb-3">Home Delivery</h3>
                             <p className="text-white/40 text-sm leading-relaxed mb-6">Hot, fresh and at your doorstep within 45 minutes. Available within Nairobi.</p>
-                            <Link to="/order" className="inline-flex items-center gap-2 bg-[#E67E22] text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#D4A017] transition-all">
+                            <Link to="/order?type=delivery" className="inline-flex items-center gap-2 bg-[#E67E22] text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#D4A017] transition-all">
                                 Order Delivery <ArrowRight className="w-4 h-4" />
                             </Link>
                         </div>
@@ -436,7 +436,7 @@ const Home = () => {
                             </div>
                             <h3 className="text-white font-black text-xl mb-3">Takeaway</h3>
                             <p className="text-white/40 text-sm leading-relaxed mb-6">Pre-order and collect your food ready and waiting — zero wait time.</p>
-                            <Link to="/order" className="inline-flex items-center gap-2 bg-[#D4A017] text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#E67E22] transition-all">
+                            <Link to="/order?type=takeaway" className="inline-flex items-center gap-2 bg-[#D4A017] text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#E67E22] transition-all">
                                 Order Takeaway <ArrowRight className="w-4 h-4" />
                             </Link>
                         </div>
