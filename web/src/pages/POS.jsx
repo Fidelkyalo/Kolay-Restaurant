@@ -357,8 +357,12 @@ const POS = () => {
                                 onClick={() => addToCart(product)}
                                 className="bg-white p-5 rounded-3xl border border-cream hover:border-secondary/30 hover:shadow-xl transition-all cursor-pointer group active:scale-95"
                             >
-                                <div className="h-32 bg-bg-cream rounded-2xl mb-4 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform">
-                                    {product.image}
+                                <div className="h-32 bg-bg-cream rounded-2xl mb-4 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform overflow-hidden">
+                                    {product.image?.startsWith('http') || product.image?.startsWith('/') ? (
+                                        <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        product.image
+                                    )}
                                 </div>
                                 <h3 className="font-bold text-primary mb-1">{product.name}</h3>
                                 <p className="text-secondary font-bold">KES {product.price.toLocaleString()}</p>
@@ -396,8 +400,12 @@ const POS = () => {
                         ) : (
                             cart.map(item => (
                                 <div key={item.id} className="flex gap-4 p-4 rounded-[2rem] bg-white border-2 border-cream shadow-sm hover:shadow-md transition-all group relative">
-                                    <div className="w-16 h-16 bg-bg-cream rounded-2xl flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
-                                        {item.image}
+                                    <div className="w-16 h-16 bg-bg-cream rounded-2xl flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform overflow-hidden shadow-sm">
+                                        {item.image?.startsWith('http') || item.image?.startsWith('/') ? (
+                                            <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            item.image
+                                        )}
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex justify-between items-start mb-1">
