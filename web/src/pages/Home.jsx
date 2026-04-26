@@ -744,6 +744,7 @@ const Home = () => {
                         <div className="flex gap-8">
                             <span className="cursor-pointer hover:text-white/50 transition-colors">Privacy Policy</span>
                             <span className="cursor-pointer hover:text-white/50 transition-colors">Terms of Use</span>
+                            <Link to="/login" className="cursor-pointer hover:text-[#E67E22] transition-colors">Staff Portal</Link>
                         </div>
                     </div>
                 </div>
