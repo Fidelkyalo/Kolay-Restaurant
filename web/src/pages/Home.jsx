@@ -396,12 +396,12 @@ const Home = () => {
                         ))}
                     </div>
 
-                    <div className="text-center mt-10">
+                    <div className="text-center mt-12">
                         <Link
                             to="/menu"
-                            className="inline-flex items-center gap-2 text-white/30 hover:text-[#E67E22] font-black text-xs uppercase tracking-widest transition-colors"
+                            className="inline-flex items-center gap-3 bg-[#E67E22] hover:bg-[#D4A017] text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300 shadow-[0_0_40px_#E67E2240]"
                         >
-                            View Full Menu <ArrowRight className="w-3.5 h-3.5" />
+                            View Full Menu <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
                 </div>
