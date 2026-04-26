@@ -398,7 +398,7 @@ const Home = () => {
 
                     <div className="text-center mt-12">
                         <Link
-                            to="/menu"
+                            to="/order"
                             className="inline-flex items-center gap-3 bg-[#E67E22] hover:bg-[#D4A017] text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300 shadow-[0_0_40px_#E67E2240]"
                         >
                             View Full Menu <ArrowRight className="w-4 h-4" />
