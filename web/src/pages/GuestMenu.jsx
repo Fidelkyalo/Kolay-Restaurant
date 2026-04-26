@@ -77,6 +77,7 @@ const GuestMenu = () => {
             total: `KES ${cartTotal.toLocaleString()}`,
             table: guestInfo.mode === 'Home Delivery' ? 'Home Delivery' : (guestInfo.mode === 'Dining In' ? 'Awaiting Table' : 'Takeaway'),
             status: 'PENDING',
+            paymentStatus: 'UNPAID',
             timestamp: new Date().toISOString(),
             guestName: guestInfo.name,
             guestPhone: guestInfo.phone,

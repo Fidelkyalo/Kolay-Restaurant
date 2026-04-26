@@ -62,6 +62,76 @@ function Dashboard() {
         window.dispatchEvent(new Event('storage')); // Trigger refresh
     };
 
+    const handlePaymentUpdate = (orderId, newPaymentStatus) => {
+        const updatedOrders = orders.map(order =>
+            order.id === orderId ? { ...order, paymentStatus: newPaymentStatus } : order
+        );
+        setOrders(updatedOrders);
+        localStorage.setItem('kolay_orders', JSON.stringify(updatedOrders));
+    };
+
+    const handlePrintReceipt = (order) => {
+        const printWindow = window.open('', '_blank');
+        const itemsHtml = (order.items || []).map(i => `
+            <div class="row item">
+                <span>${i.quantity || 1}x ${i.name || 'Item'}</span>
+                <span>KES ${((i.price || 0) * (i.quantity || 1)).toLocaleString()}</span>
+            </div>
+        `).join('');
+
+        const html = `
+            <html>
+                <head>
+                    <title>Kolay Receipt #${order.id}</title>
+                    <style>
+                        body { font-family: 'Courier New', Courier, monospace; width: 300px; margin: 0 auto; color: #000; padding: 20px; font-size: 14px; }
+                        .center { text-align: center; }
+                        .bold { font-weight: bold; }
+                        .row { display: flex; justify-content: space-between; margin: 5px 0; }
+                        .divider { border-top: 1px dashed #000; margin: 10px 0; }
+                        .item { font-size: 13px; margin: 3px 0; }
+                    </style>
+                </head>
+                <body>
+                    <div class="center">
+                        <h2 class="bold" style="margin:0;">KOLAY RESTAURANT</h2>
+                        <p style="margin:5px 0;">Greenfield Plaza, Nairobi</p>
+                        <p style="margin:5px 0;">+254 700 000 000</p>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="row bold"><span>Order #</span><span>${order.id}</span></div>
+                    <div class="row"><span>Type</span><span>${order.table}</span></div>
+                    <div class="row"><span>Date</span><span>${new Date(order.timestamp).toLocaleString()}</span></div>
+                    ${order.guestName ? `<div class="row"><span>Guest</span><span>${order.guestName}</span></div>` : ''}
+                    ${order.guestPhone ? `<div class="row"><span>Phone</span><span>${order.guestPhone}</span></div>` : ''}
+                    ${order.guestAddress ? `<div class="row"><span>Address</span><span style="max-width:150px; text-align:right;">${order.guestAddress}</span></div>` : ''}
+                    <div class="divider"></div>
+                    ${itemsHtml}
+                    <div class="divider"></div>
+                    <div class="row bold" style="font-size:18px;">
+                        <span>TOTAL</span>
+                        <span>${order.total}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="row bold">
+                        <span>PAYMENT</span>
+                        <span>${order.paymentStatus || 'UNPAID'}</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="center item" style="margin-top:20px;">
+                        <p class="bold">Thank you for dining with Kolay!</p>
+                        <p style="font-size:10px; margin-top:10px;">Printed: ${new Date().toLocaleString()}</p>
+                    </div>
+                    <script>
+                        window.onload = function() { window.print(); window.close(); }
+                    </script>
+                </body>
+            </html>
+        `;
+        printWindow.document.write(html);
+        printWindow.document.close();
+    };
+
     // Auto-Reset Logic (24h)
     React.useEffect(() => {
         const lastReset = localStorage.getItem('kolay_last_reset');
@@ -381,7 +451,7 @@ function Dashboard() {
                                     <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Time</th>
                                     <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Order Details</th>
                                     <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Table/Mode</th>
-                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Total</th>
+                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Total &amp; Payment</th>
                                     <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Status</th>
                                     <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest text-right">Actions</th>
                                 </tr>
@@ -408,7 +478,7 @@ function Dashboard() {
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col gap-2">
                                                 <span className={`px-3 py-1 bg-bg-cream border border-primary/5 rounded-lg text-xs font-bold text-primary flex items-center gap-2 w-fit ${order.table === 'Home Delivery' ? 'bg-[#E67E22]/10 text-[#E67E22] border-[#E67E22]/20' :
-                                                        order.table === 'Takeaway' ? 'bg-[#D4A017]/10 text-[#D4A017] border-[#D4A017]/20' : ''
+                                                    order.table === 'Takeaway' ? 'bg-[#D4A017]/10 text-[#D4A017] border-[#D4A017]/20' : ''
                                                     }`}>
                                                     {order.table === 'Home Delivery' ? '🚗 Delivery' : order.table === 'Takeaway' ? '🛍️ Takeaway' : `🪑 ${order.table}`}
                                                 </span>
@@ -426,7 +496,18 @@ function Dashboard() {
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6 font-black text-primary">{order.total}</td>
+                                        <td className="px-8 py-6">
+                                            <div className="flex flex-col gap-2">
+                                                <span className="font-black text-primary text-sm">{order.total}</span>
+                                                <button
+                                                    onClick={() => handlePaymentUpdate(order.id, order.paymentStatus === 'PAID' ? 'UNPAID' : 'PAID')}
+                                                    className={`px-3 py-1 rounded-md text-[9px] font-black uppercase tracking-widest w-fit border transition-colors ${order.paymentStatus === 'PAID' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100'
+                                                        }`}
+                                                >
+                                                    {order.paymentStatus === 'PAID' ? 'PAID ✓' : '💳 MARK PAID'}
+                                                </button>
+                                            </div>
+                                        </td>
                                         <td className="px-8 py-6">
                                             <span className={`px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm ${order.status === 'READY' ? 'bg-green-500 text-white shadow-green-500/20' :
                                                 order.status === 'PENDING' ? 'bg-amber-500 text-white shadow-amber-500/20' :
@@ -436,16 +517,35 @@ function Dashboard() {
                                             </span>
                                         </td>
                                         <td className="px-8 py-6 text-right">
-                                            <button
-                                                onClick={() => handleStatusUpdate(order.id, order.status === 'READY' ? 'DELIVERED' : 'READY')}
-                                                className={`px-6 py-2 rounded-xl text-[10px] font-black transition-all active:scale-95 ${order.status === 'READY' ? 'bg-primary text-white hover:bg-secondary shadow-lg' :
-                                                    order.status === 'DELIVERED' ? 'bg-green-100 text-green-600 border border-green-200 cursor-default' :
-                                                        'bg-secondary/10 text-secondary border border-secondary/20 hover:bg-secondary hover:text-white'
-                                                    }`}
-                                                disabled={order.status === 'DELIVERED'}
-                                            >
-                                                {order.status === 'DELIVERED' ? 'DELIVERED ✓' : order.status === 'READY' ? 'MARK DELIVERED' : 'MARK READY'}
-                                            </button>
+                                            <div className="flex items-center justify-end gap-3 flex-wrap">
+                                                {/* PRINTER BUTTON */}
+                                                <button
+                                                    onClick={() => handlePrintReceipt(order)}
+                                                    className="p-2 bg-charcoal/5 hover:bg-charcoal/10 rounded-xl transition-colors text-charcoal"
+                                                    title="Print Thermal Receipt"
+                                                >
+                                                    <Printer className="w-4 h-4" />
+                                                </button>
+
+                                                {/* DISPATCH / PREP BUTTON */}
+                                                <button
+                                                    onClick={() => {
+                                                        const isOffPremises = order.table === 'Home Delivery' || order.table === 'Takeaway';
+                                                        if (isOffPremises && order.paymentStatus !== 'PAID' && order.status === 'READY') {
+                                                            alert('Cannot dispatch! Off-premises orders must be strictly PAID before delivery or collection.');
+                                                            return;
+                                                        }
+                                                        handleStatusUpdate(order.id, order.status === 'READY' ? 'DELIVERED' : 'READY');
+                                                    }}
+                                                    className={`px-5 py-2 rounded-xl text-[10px] font-black transition-all active:scale-95 ${order.status === 'READY' ? 'bg-primary text-white hover:bg-secondary shadow-lg' :
+                                                        order.status === 'DELIVERED' ? 'bg-green-100 text-green-600 border border-green-200 cursor-default' :
+                                                            'bg-secondary/10 text-secondary border border-secondary/20 hover:bg-secondary hover:text-white'
+                                                        }`}
+                                                    disabled={order.status === 'DELIVERED'}
+                                                >
+                                                    {order.status === 'DELIVERED' ? 'DELIVERED ✓' : order.status === 'READY' ? 'DISPATCH' : 'MARK READY'}
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
