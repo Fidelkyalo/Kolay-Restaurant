@@ -93,12 +93,9 @@ const Home = () => {
                             Fine Dining · Nairobi
                         </span>
 
-                        <h1 className="text-[clamp(3rem,8vw,6.5rem)] font-display font-black text-white leading-[0.9] tracking-tight">
-                            Where Every
-                            <br />
-                            <span className="italic text-[#E67E22]">Meal</span> Feels
-                            <br />
-                            Right.
+                        <h1 className="font-display font-black text-white leading-tight tracking-tight">
+                            <span className="block text-[clamp(2.5rem,6vw,5rem)] text-white">Kolay Restaurant</span>
+                            <span className="block text-[clamp(1.5rem,3.5vw,2.8rem)] italic text-[#E67E22] mt-1">Where Every Meal Feels Right.</span>
                         </h1>
 
                         <p className="text-lg text-white/50 leading-relaxed max-w-md font-medium">
@@ -126,7 +123,7 @@ const Home = () => {
                             {[
                                 { icon: Clock, text: 'Opens 10am Daily' },
                                 { icon: MapPin, text: 'Greenfield Plaza' },
-                                { icon: Phone, text: '+254 700 000 000' },
+                                { icon: Phone, text: '+254 102 039 121' },
                             ].map(({ icon: Icon, text }) => (
                                 <span key={text} className="flex items-center gap-2 text-white/40 text-xs font-semibold">
                                     <Icon className="w-3.5 h-3.5 text-[#E67E22]" /> {text}
