@@ -675,12 +675,9 @@ const Home = () => {
             <footer id="contact" className="border-t border-white/5 bg-[#0A0704] px-6 md:px-12 pt-20 pb-8">
                 <div className="max-w-7xl mx-auto">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-                        {/* Brand */}
                         <div className="space-y-5 lg:col-span-1">
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-[#E67E22] rounded-lg flex items-center justify-center">
-                                    <Utensils className="w-4 h-4 text-white" />
-                                </div>
+                                <img src="/Logo.png" alt="Kolay Logo" className="w-10 h-10 rounded shadow-sm" />
                                 <span className="text-xl font-display font-black text-white uppercase tracking-tight italic">Kolay Restaurant</span>
                             </div>
                             <p className="text-white/30 text-sm leading-relaxed">
