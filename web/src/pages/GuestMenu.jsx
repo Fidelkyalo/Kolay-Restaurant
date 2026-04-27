@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, ArrowRight, CreditCard, Check, Clock } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { MenuService, OrderService } from '../services/api';
 
 const GuestMenu = () => {
     const [dishes, setDishes] = useState([]);
@@ -19,31 +20,43 @@ const GuestMenu = () => {
     const [guestInfo, setGuestInfo] = useState({ name: '', phone: '', address: '', mode: initialMode });
 
     useEffect(() => {
-        let savedDishes;
-        try {
-            savedDishes = JSON.parse(localStorage.getItem('kolay_dishes'));
-            if (savedDishes && savedDishes.length > 0 && !savedDishes[0].image.includes('/')) {
-                // old emoji format detected
-                savedDishes = null;
+        const fetchMenu = async () => {
+            try {
+                const response = await MenuService.getProducts();
+                if (response.data && response.data.length > 0) {
+                    setDishes(response.data);
+                    return;
+                }
+            } catch (error) {
+                console.error("Failed to fetch menu from API, using fallback:", error);
             }
-        } catch (e) { }
 
-        if (savedDishes) {
-            setDishes(savedDishes);
-        } else {
-            // Default dishes if none exist — Real images and pricing
-            const defaults = [
-                { id: 1, name: 'Gourmet Beef Burger', price: 1200, category: 'Mains', image: '/assets/burger.png', desc: 'Aged wagyu beef, truffle aioli.' },
-                { id: 2, name: 'Crispy Calamari', price: 850, category: 'Starters', image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600', desc: 'Golden fried with spicy marinara.' },
-                { id: 3, name: 'Signature Ribeye', price: 3500, category: 'Mains', image: '/assets/steak.png', desc: 'Prime ribeye, garlic herb butter.' },
-                { id: 4, name: 'Herb-Crusted Salmon', price: 2100, category: 'Mains', image: '/assets/salmon.png', desc: 'Fresh salmon with sesame glaze.' },
-                { id: 5, name: 'Bruschetta', price: 650, category: 'Starters', image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600', desc: 'Fresh tomatoes, garlic, hand-torn basil.' },
-                { id: 6, name: 'Chocolate Fondant', price: 700, category: 'Desserts', image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600', desc: 'Warm dark chocolate lava cake.' },
-                { id: 7, name: 'Iced Latte', price: 450, category: 'Drinks', image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600', desc: 'Chilled espresso over milk.' }
-            ];
-            setDishes(defaults);
-            localStorage.setItem('kolay_dishes', JSON.stringify(defaults));
-        }
+            // Fallback logic
+            let savedDishes;
+            try {
+                savedDishes = JSON.parse(localStorage.getItem('kolay_dishes'));
+                if (savedDishes && savedDishes.length > 0 && !savedDishes[0].image.includes('/')) {
+                    savedDishes = null;
+                }
+            } catch (e) { }
+
+            if (savedDishes) {
+                setDishes(savedDishes);
+            } else {
+                const defaults = [
+                    { id: 1, name: 'Gourmet Beef Burger', price: 1200, category: 'Mains', image: '/assets/burger.png', desc: 'Aged wagyu beef, truffle aioli.' },
+                    { id: 2, name: 'Crispy Calamari', price: 850, category: 'Starters', image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600', desc: 'Golden fried with spicy marinara.' },
+                    { id: 3, name: 'Signature Ribeye', price: 3500, category: 'Mains', image: '/assets/steak.png', desc: 'Prime ribeye, garlic herb butter.' },
+                    { id: 4, name: 'Herb-Crusted Salmon', price: 2100, category: 'Mains', image: '/assets/salmon.png', desc: 'Fresh salmon with sesame glaze.' },
+                    { id: 5, name: 'Bruschetta', price: 650, category: 'Starters', image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600', desc: 'Fresh tomatoes, garlic, hand-torn basil.' },
+                    { id: 6, name: 'Chocolate Fondant', price: 700, category: 'Desserts', image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600', desc: 'Warm dark chocolate lava cake.' },
+                    { id: 7, name: 'Iced Latte', price: 450, category: 'Drinks', image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600', desc: 'Chilled espresso over milk.' }
+                ];
+                setDishes(defaults);
+                localStorage.setItem('kolay_dishes', JSON.stringify(defaults));
+            }
+        };
+        fetchMenu();
     }, []);
 
     const categories = ['ALL', ...new Set(dishes.map(d => d.category))];
@@ -85,8 +98,9 @@ const GuestMenu = () => {
         total = subtotal + tax;
     }
 
-    const handlePlaceOrder = (e) => {
+    const handlePlaceOrder = async (e) => {
         e.preventDefault();
+        const modeLabel = guestInfo.mode === 'Home Delivery' ? 'Home Delivery' : (guestInfo.mode === 'Dining In' ? 'Awaiting Table' : 'Takeaway');
         const newOrder = {
             id: Math.floor(Math.random() * 1000000),
             items: cart,
@@ -94,7 +108,7 @@ const GuestMenu = () => {
             subtotal: subtotal,
             tax: tax,
             totalAmount: total,
-            table: guestInfo.mode === 'Home Delivery' ? 'Home Delivery' : (guestInfo.mode === 'Dining In' ? 'Awaiting Table' : 'Takeaway'),
+            table: modeLabel,
             status: 'PENDING',
             paymentStatus: 'UNPAID',
             timestamp: new Date().toISOString(),
@@ -102,6 +116,19 @@ const GuestMenu = () => {
             guestPhone: guestInfo.phone,
             guestAddress: guestInfo.mode === 'Home Delivery' ? guestInfo.address : null
         };
+
+        // Attempt to sync with Backend
+        try {
+            await OrderService.placeOrder({
+                tableNumber: modeLabel,
+                items: cart.map(i => ({ productId: i.id, quantity: i.quantity })),
+                guestName: guestInfo.name,
+                guestPhone: guestInfo.phone,
+                guestAddress: guestInfo.address
+            });
+        } catch (error) {
+            console.error("Backend sync failed, order saved locally only:", error);
+        }
 
         const existingOrders = JSON.parse(localStorage.getItem('kolay_orders') || '[]');
         localStorage.setItem('kolay_orders', JSON.stringify([...existingOrders, newOrder]));

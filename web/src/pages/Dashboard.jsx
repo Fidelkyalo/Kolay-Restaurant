@@ -3,6 +3,7 @@ import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar, MessageSquare
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { OrderService, InventoryService } from '../services/api';
 
 function Dashboard() {
     const [viewMode, setViewMode] = useState('Weekly');
@@ -11,29 +12,53 @@ function Dashboard() {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [showReportPreview, setShowReportPreview] = useState(false);
     const [previewData, setPreviewData] = useState(null);
-    const [inventory] = useState(() => {
-        const saved = localStorage.getItem('kolay_inventory');
-        return saved ? JSON.parse(saved) : [];
-    });
-
-    const [orders, setOrders] = useState(() => {
-        const saved = localStorage.getItem('kolay_orders');
-        return saved ? JSON.parse(saved) : [];
-    });
-
-    const [archive] = useState(() => {
-        const saved = localStorage.getItem('kolay_archive');
-        return saved ? JSON.parse(saved) : [];
-    });
-
+    const [orders, setOrders] = useState([]);
+    const [inventory, setInventory] = useState([]);
+    const [archive, setArchive] = useState([]);
     const [notes, setNotes] = useState(() => {
         const saved = localStorage.getItem('kolay_dashboard_notes');
         return saved ? JSON.parse(saved) : "Great sales today! Need to restock on Beef Burger patties soon.";
     });
 
+    React.useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [ordersRes, invRes] = await Promise.all([
+                    OrderService.getActiveOrders(),
+                    InventoryService.getAll()
+                ]);
+                if (ordersRes.data) setOrders(ordersRes.data);
+                if (invRes.data) setInventory(invRes.data);
+            } catch (error) {
+                console.error("Dashboard data fetch failed, using fallback:", error);
+
+                // Fallback to local
+                const savedOrders = localStorage.getItem('kolay_orders');
+                const savedInv = localStorage.getItem('kolay_inventory');
+                const savedArc = localStorage.getItem('kolay_archive');
+
+                if (savedOrders) setOrders(JSON.parse(savedOrders));
+                if (savedInv) setInventory(JSON.parse(savedInv));
+                if (savedArc) setArchive(JSON.parse(savedArc));
+            }
+        };
+        fetchData();
+
+        // Polling for live orders every 30 seconds
+        const interval = setInterval(fetchData, 30000);
+        return () => clearInterval(interval);
+    }, []);
+
     const [filterStatus, setFilterStatus] = useState('ALL');
 
-    const handleStatusUpdate = (orderId, newStatus) => {
+    const handleStatusUpdate = async (orderId, newStatus) => {
+        // Sync with backend
+        try {
+            await OrderService.updateStatus(orderId, newStatus);
+        } catch (error) {
+            console.error("Backend status update failed:", error);
+        }
+
         const updatedOrders = orders.map(order =>
             order.id === orderId ? { ...order, status: newStatus } : order
         );
@@ -53,6 +78,7 @@ function Dashboard() {
                 if (!currentArchive.find(a => a.id === deliveredOrder.id)) {
                     const newArchive = [...currentArchive, archiveEntry];
                     localStorage.setItem('kolay_archive', JSON.stringify(newArchive));
+                    setArchive(newArchive);
                 }
             }
         }

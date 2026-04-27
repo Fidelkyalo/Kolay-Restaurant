@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, ShoppingCart, Plus, Minus, X, CreditCard, User, ClipboardList, UtensilsCrossed, ArrowLeft, CheckCircle, Printer, Settings, Trash2, Edit3 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { MenuService, OrderService } from '../services/api';
 
 const POS = () => {
     const [activeCategory, setActiveCategory] = useState('All');
@@ -159,25 +160,63 @@ const POS = () => {
         setNewTableNumber('');
     };
 
-    const [products, setProducts] = useState(() => {
-        const saved = localStorage.getItem('kolay_dishes');
-        return saved ? JSON.parse(saved) : [
-            { id: 1, name: 'Beef Burger', price: 850, category: 'Main Dish', image: '🍔' },
-            { id: 2, name: 'Margherita Pizza', price: 1100, category: 'Main Dish', image: '🍕' },
-            { id: 3, name: 'Grilled Salmon', price: 1850, category: 'Main Dish', image: '🐟' },
-            { id: 4, name: 'Cappuccino', price: 350, category: 'Beverages', image: '☕' },
-            { id: 5, name: 'Iced Tea', price: 250, category: 'Beverages', image: '🍹' },
-            { id: 6, name: 'French Fries', price: 300, category: 'Side Dish', image: '🍟' },
-            { id: 7, name: 'Fruit Salad', price: 450, category: 'Desserts', image: '🥗' },
-            { id: 8, name: 'Pancakes', price: 550, category: 'BreakFast', image: '🥞' },
-        ];
-    });
+    const [products, setProducts] = useState([]);
+
+    React.useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const response = await MenuService.getProducts();
+                if (response.data && response.data.length > 0) {
+                    setProducts(response.data);
+                    return;
+                }
+            } catch (error) {
+                console.error("Backend fetch failed, using local fallback:", error);
+            }
+
+            const saved = localStorage.getItem('kolay_dishes');
+            const defaults = [
+                { id: 1, name: 'Beef Burger', price: 850, category: 'Main Dish', image: '🍔' },
+                { id: 2, name: 'Margherita Pizza', price: 1100, category: 'Main Dish', image: '🍕' },
+                { id: 3, name: 'Grilled Salmon', price: 1850, category: 'Main Dish', image: '🐟' },
+                { id: 4, name: 'Cappuccino', price: 350, category: 'Beverages', image: '☕' },
+                { id: 5, name: 'Iced Tea', price: 250, category: 'Beverages', image: '🍹' },
+                { id: 6, name: 'French Fries', price: 300, category: 'Side Dish', image: '🍟' },
+                { id: 7, name: 'Fruit Salad', price: 450, category: 'Desserts', image: '🥗' },
+                { id: 10, name: 'Pancakes', price: 550, category: 'BreakFast', image: '🥞' },
+            ];
+            setProducts(saved ? JSON.parse(saved) : defaults);
+        };
+        fetchProducts();
+    }, []);
     const [showDishModal, setShowDishModal] = useState(false);
     const [newDish, setNewDish] = useState({ name: '', price: '', category: 'Main Dish', image: '🍱' });
 
-    const saveDish = () => {
+    const saveDish = async () => {
         if (!newDish.name.trim() || !newDish.price) return;
 
+        try {
+            const dishData = {
+                ...newDish,
+                price: parseFloat(newDish.price)
+            };
+
+            let response;
+            if (editingDishId) {
+                // In a real app, we'd use PUT /products/:id
+                // For now, we'll just save it to local and let the UI refresh
+                // But we could attempt to sync if we had the endpoint
+            } else {
+                response = await MenuService.createProduct(dishData);
+                if (response.data) {
+                    setProducts([...products, response.data]);
+                }
+            }
+        } catch (error) {
+            console.error("Backend dish save failed:", error);
+        }
+
+        // Keep local storage in sync for fallback
         let updated;
         if (editingDishId) {
             updated = products.map(p => p.id === editingDishId ? {
@@ -240,7 +279,7 @@ const POS = () => {
         }));
     };
 
-    const handlePlaceOrder = () => {
+    const handlePlaceOrder = async () => {
         if (cart.length === 0) return;
 
         const newOrder = {
@@ -256,6 +295,16 @@ const POS = () => {
             timestamp: new Date().toISOString(),
             statusColor: 'bg-gray-100 text-gray-700'
         };
+
+        // Sync with backend
+        try {
+            await OrderService.placeOrder({
+                tableNumber: selectedTable,
+                items: cart.map(item => ({ productId: item.id, quantity: item.quantity }))
+            });
+        } catch (error) {
+            console.error("Backend order sync failed:", error);
+        }
 
         const existing = JSON.parse(localStorage.getItem('kolay_orders') || '[]');
         localStorage.setItem('kolay_orders', JSON.stringify([newOrder, ...existing]));
