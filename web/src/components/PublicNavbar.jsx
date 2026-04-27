@@ -15,12 +15,12 @@ const PublicNavbar = () => {
     }, []);
 
     const navLinks = [
-        { name: 'Home', href: '#home' },
-        { name: 'About', href: '#about' },
-        { name: 'Menu', href: '#menu' },
-        { name: 'Reservations', href: '#reservations' },
-        { name: 'Gallery', href: '#gallery' },
-        { name: 'Contact', href: '#contact' },
+        { name: 'Home', href: '/#home' },
+        { name: 'About', href: '/#about' },
+        { name: 'Menu', href: '/#menu' },
+        { name: 'Reservations', href: '/reservations' },
+        { name: 'Gallery', href: '/#gallery' },
+        { name: 'Contact', href: '/#contact' },
     ];
 
     return (
@@ -32,16 +32,25 @@ const PublicNavbar = () => {
                     <span className="text-white text-2xl font-display font-black tracking-tighter uppercase">Kolay</span>
                 </Link>
 
-                {/* Desktop Links */}
                 <div className="hidden md:flex items-center gap-10">
                     {navLinks.map((link) => (
-                        <a
-                            key={link.name}
-                            href={link.href}
-                            className="text-white/80 hover:text-accent font-black text-[10px] uppercase tracking-widest transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-accent hover:after:w-full after:transition-all after:duration-300"
-                        >
-                            {link.name}
-                        </a>
+                        link.href.startsWith('/#') ? (
+                            <a
+                                key={link.name}
+                                href={link.href}
+                                className="text-white/80 hover:text-accent font-black text-[10px] uppercase tracking-widest transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-accent hover:after:w-full after:transition-all after:duration-300"
+                            >
+                                {link.name}
+                            </a>
+                        ) : (
+                            <Link
+                                key={link.name}
+                                to={link.href}
+                                className="text-white/80 hover:text-accent font-black text-[10px] uppercase tracking-widest transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-accent hover:after:w-full after:transition-all after:duration-300"
+                            >
+                                {link.name}
+                            </Link>
+                        )
                     ))}
                     <Link
                         to="/order"
@@ -64,14 +73,25 @@ const PublicNavbar = () => {
             {isMobileMenuOpen && (
                 <div className="md:hidden absolute top-full left-0 w-full bg-primary p-8 space-y-6 animate-in slide-in-from-top duration-300 shadow-2xl border-t border-white/5">
                     {navLinks.map((link) => (
-                        <a
-                            key={link.name}
-                            href={link.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="block text-2xl font-black text-white hover:text-accent transition-colors"
-                        >
-                            {link.name}
-                        </a>
+                        link.href.startsWith('/#') ? (
+                            <a
+                                key={link.name}
+                                href={link.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="block text-2xl font-black text-white hover:text-accent transition-colors"
+                            >
+                                {link.name}
+                            </a>
+                        ) : (
+                            <Link
+                                key={link.name}
+                                to={link.href}
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="block text-2xl font-black text-white hover:text-accent transition-colors"
+                            >
+                                {link.name}
+                            </Link>
+                        )
                     ))}
                     <Link
                         to="/order"

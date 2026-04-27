@@ -40,4 +40,11 @@ export const InventoryService = {
         api.patch(`/inventory/${id}/stock`, null, { params: { amount, isAddition } }),
 };
 
+export const ReservationService = {
+    create: (reservationData) => api.post('/reservations', reservationData),
+    getAll: () => api.get('/reservations'),
+    getByDate: (date) => api.get(`/reservations/date/${date}`),
+    updateStatus: (id, status) => api.patch(`/reservations/${id}/status`, null, { params: { status } }),
+};
+
 export default api;
