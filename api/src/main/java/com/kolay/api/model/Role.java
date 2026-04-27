@@ -1,17 +1,9 @@
 package com.kolay.api.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "roles")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,5 +22,45 @@ public class Role {
         STOREKEEPER,
         ACCOUNTANT,
         CUSTOMER
+    }
+
+    public Role() {
+    }
+
+    public Role(RoleName name) {
+        this.name = name;
+    }
+
+    public static RoleBuilder builder() {
+        return new RoleBuilder();
+    }
+
+    public static class RoleBuilder {
+        private RoleName name;
+
+        public RoleBuilder name(RoleName name) {
+            this.name = name;
+            return this;
+        }
+
+        public Role build() {
+            return new Role(name);
+        }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public RoleName getName() {
+        return name;
+    }
+
+    public void setName(RoleName name) {
+        this.name = name;
     }
 }
