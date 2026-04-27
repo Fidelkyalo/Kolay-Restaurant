@@ -67,14 +67,33 @@ const GuestMenu = () => {
         }).filter(Boolean));
     };
 
-    const cartTotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    // Get Tax Settings
+    const systemSettings = JSON.parse(localStorage.getItem('kolay_settings') || '{"taxRate": 16, "isTaxInclusive": true}');
+    const taxRate = systemSettings.taxRate || 16;
+    const isTaxInclusive = systemSettings.isTaxInclusive !== undefined ? systemSettings.isTaxInclusive : true;
+
+    const rawSubtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    let subtotal, tax, total;
+
+    if (isTaxInclusive) {
+        total = rawSubtotal;
+        tax = total - (total / (1 + taxRate / 100));
+        subtotal = total - tax;
+    } else {
+        subtotal = rawSubtotal;
+        tax = subtotal * (taxRate / 100);
+        total = subtotal + tax;
+    }
 
     const handlePlaceOrder = (e) => {
         e.preventDefault();
         const newOrder = {
             id: Math.floor(Math.random() * 1000000),
             items: cart,
-            total: `KES ${cartTotal.toLocaleString()}`,
+            total: `KES ${total.toLocaleString()}`,
+            subtotal: subtotal,
+            tax: tax,
+            totalAmount: total,
             table: guestInfo.mode === 'Home Delivery' ? 'Home Delivery' : (guestInfo.mode === 'Dining In' ? 'Awaiting Table' : 'Takeaway'),
             status: 'PENDING',
             paymentStatus: 'UNPAID',

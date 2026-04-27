@@ -102,10 +102,21 @@ const POS = () => {
                                     <td class="price">${((item.price || 0) * item.quantity).toLocaleString()}</td>
                                 </tr>
                             `).join('')}
+                            <tr>
+                                <td colspan="2" style="padding-top: 10px; border-top: 1px dashed #eee;">SUBTOTAL</td>
+                                <td style="padding-top: 10px; border-top: 1px dashed #eee; text-align: right;">KES ${lastPlacedOrder.subtotal.toLocaleString()}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">${isTaxInclusive ? `VAT (${taxRate}% Incl.)` : `VAT (${taxRate}%)`}</td>
+                                <td style="text-align: right;">KES ${lastPlacedOrder.tax.toLocaleString()}</td>
+                            </tr>
+                            <tr style="font-weight: bold; font-size: 14px;">
+                                <td colspan="2" style="padding-top: 5px;">TOTAL PAYABLE</td>
+                                <td style="padding-top: 5px; text-align: right;">KES ${lastPlacedOrder.totalAmount.toLocaleString()}</td>
+                            </tr>
                         </tbody>
                     </table>
                     <div class="totals">
-                        <div class="total-row"><span>Subtotal</span> <span>KES ${lastPlacedOrder.total.replace('KES ', '')}</span></div>
                         <div class="total-row"><span>Tax (VAT 16%)</span> <span>Incl.</span></div>
                         <div class="total-row grand"><span>TOTAL</span> <span>${lastPlacedOrder.total}</span></div>
                         <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 16px; font-weight: bold;">
@@ -237,6 +248,9 @@ const POS = () => {
             table: selectedTable,
             items: cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price, notes: '' })),
             total: `KES ${(subtotal + tax).toLocaleString()}`,
+            subtotal: subtotal,
+            tax: tax,
+            totalAmount: total,
             status: 'PENDING',
             paymentStatus: 'PAID',
             timestamp: new Date().toISOString(),
@@ -259,9 +273,23 @@ const POS = () => {
         }, 8000); // Increased time to allow for receipt printing
     };
 
-    const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-    const tax = subtotal * 0.16; // 16% VAT
-    const total = subtotal + tax;
+    // Get Tax Settings
+    const systemSettings = JSON.parse(localStorage.getItem('kolay_settings') || '{"taxRate": 16, "isTaxInclusive": true}');
+    const taxRate = systemSettings.taxRate || 16;
+    const isTaxInclusive = systemSettings.isTaxInclusive !== undefined ? systemSettings.isTaxInclusive : true;
+
+    const rawSubtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+    let subtotal, tax, total;
+
+    if (isTaxInclusive) {
+        total = rawSubtotal;
+        tax = total - (total / (1 + taxRate / 100));
+        subtotal = total - tax;
+    } else {
+        subtotal = rawSubtotal;
+        tax = subtotal * (taxRate / 100);
+        total = subtotal + tax;
+    }
 
     return (
         <div className="flex flex-col h-screen bg-bg-cream font-body overflow-hidden relative">

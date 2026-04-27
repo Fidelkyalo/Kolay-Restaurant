@@ -11,7 +11,9 @@ function AdminPanel() {
         const saved = localStorage.getItem('kolay_settings');
         return saved ? JSON.parse(saved) : {
             restaurantName: 'Kolay Restaurant',
-            currency: 'Kenya Shillings (KES)'
+            currency: 'Kenya Shillings (KES)',
+            taxRate: 16,
+            isTaxInclusive: true
         };
     });
 
@@ -44,6 +46,14 @@ function AdminPanel() {
             window.dispatchEvent(new Event('storage'));
         } else if (editConfig.type === 'CURRENCY') {
             const updated = { ...settings, currency: editConfig.value };
+            setSettings(updated);
+            localStorage.setItem('kolay_settings', JSON.stringify(updated));
+        } else if (editConfig.type === 'TAX_RATE') {
+            const updated = { ...settings, taxRate: parseFloat(editConfig.value) };
+            setSettings(updated);
+            localStorage.setItem('kolay_settings', JSON.stringify(updated));
+        } else if (editConfig.type === 'TAX_MODE') {
+            const updated = { ...settings, isTaxInclusive: editConfig.value === 'INCLUSIVE' };
             setSettings(updated);
             localStorage.setItem('kolay_settings', JSON.stringify(updated));
         } else if (editConfig.type === 'USER') {
@@ -98,6 +108,26 @@ function AdminPanel() {
                                     >
                                         Update
                                     </button>
+                                </div>
+                                <div className="flex items-center justify-between p-4 bg-bg-cream rounded-2xl border border-primary/5">
+                                    <div>
+                                        <h3 className="font-bold">Tax Configuration</h3>
+                                        <p className="text-sm text-charcoal/60">{settings.taxRate}% - {settings.isTaxInclusive ? 'Inclusive' : 'Exclusive'}</p>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <button
+                                            onClick={() => setEditConfig({ type: 'TAX_RATE', value: settings.taxRate })}
+                                            className="text-secondary font-bold text-sm hover:underline"
+                                        >
+                                            Rate
+                                        </button>
+                                        <button
+                                            onClick={() => setEditConfig({ type: 'TAX_MODE', value: settings.isTaxInclusive ? 'INCLUSIVE' : 'EXCLUSIVE' })}
+                                            className="text-secondary font-bold text-sm hover:underline"
+                                        >
+                                            Toggle Mode
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </section>
@@ -206,6 +236,20 @@ function AdminPanel() {
                                             <option>ADMIN</option>
                                             <option>MANAGER</option>
                                             <option>STAFF</option>
+                                        </select>
+                                    </div>
+                                )}
+
+                                {editConfig.type === 'TAX_MODE' && (
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Pricing Strategy</label>
+                                        <select
+                                            className="w-full bg-bg-cream border border-primary/5 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20 font-bold appearance-none"
+                                            value={editConfig.value}
+                                            onChange={(e) => setEditConfig({ ...editConfig, value: e.target.value })}
+                                        >
+                                            <option value="INCLUSIVE">Tax Inclusive (Prices include VAT)</option>
+                                            <option value="EXCLUSIVE">Tax Exclusive (VAT added at checkout)</option>
                                         </select>
                                     </div>
                                 )}
