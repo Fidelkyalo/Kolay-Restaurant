@@ -3,15 +3,20 @@ package com.kolay.api;
 import com.kolay.api.model.Category;
 import com.kolay.api.model.Product;
 import com.kolay.api.model.Role;
+import com.kolay.api.model.User;
 import com.kolay.api.repository.CategoryRepository;
 import com.kolay.api.repository.ProductRepository;
 import com.kolay.api.repository.RoleRepository;
+import com.kolay.api.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -24,6 +29,12 @@ public class DataInitializer implements CommandLineRunner {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
@@ -66,6 +77,21 @@ public class DataInitializer implements CommandLineRunner {
                     .build());
 
             System.out.println("Finished seeding menu data.");
+        }
+
+        if (userRepository.count() == 0) {
+            Role adminRole = roleRepository.findByName(Role.RoleName.ROLE_ADMIN)
+                    .orElseThrow(() -> new RuntimeException("Error: Role Admin is not found."));
+
+            User admin = User.builder()
+                    .username("admin")
+                    .email("admin@kolay.com")
+                    .password(passwordEncoder.encode("admin123"))
+                    .roles(new HashSet<>(Collections.singletonList(adminRole)))
+                    .build();
+
+            userRepository.save(admin);
+            System.out.println("Finished seeding default admin user (admin / admin123).");
         }
     }
 }
