@@ -252,7 +252,7 @@ const POS = () => {
             tax: tax,
             totalAmount: total,
             status: 'PENDING',
-            paymentStatus: 'PAID',
+            paymentStatus: 'UNPAID',
             timestamp: new Date().toISOString(),
             statusColor: 'bg-gray-100 text-gray-700'
         };
