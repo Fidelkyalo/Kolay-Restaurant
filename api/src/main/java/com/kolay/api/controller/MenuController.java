@@ -50,4 +50,31 @@ public class MenuController {
     public ResponseEntity<Product> createProduct(@RequestBody Product product) {
         return ResponseEntity.ok(productRepository.save(product));
     }
+
+    @PutMapping("/products/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product updated) {
+        return productRepository.findById(id)
+                .map(product -> {
+                    product.setName(updated.getName());
+                    product.setDescription(updated.getDescription());
+                    product.setPrice(updated.getPrice());
+                    product.setAvailable(updated.getAvailable());
+                    if (updated.getImageUrl() != null) product.setImageUrl(updated.getImageUrl());
+                    return ResponseEntity.ok(productRepository.save(product));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/products/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteProduct(@PathVariable Long id) {
+        return productRepository.findById(id)
+                .map(product -> {
+                    product.setAvailable(false);
+                    productRepository.save(product);
+                    return ResponseEntity.ok().build();
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

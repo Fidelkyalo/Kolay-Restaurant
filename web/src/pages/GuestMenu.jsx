@@ -292,7 +292,7 @@ const GuestMenu = () => {
                                 <div className="pt-6 pb-8 px-8 bg-[#0D0A07] border-t border-white/5">
                                     <div className="flex justify-between items-end mb-6">
                                         <span className="text-white/40 font-black uppercase tracking-widest text-[10px]">Total Amount</span>
-                                        <span className="text-3xl font-black text-[#E67E22]">KES {cartTotal.toLocaleString()}</span>
+                                        <span className="text-3xl font-black text-[#E67E22]">KES {total.toLocaleString()}</span>
                                     </div>
                                     <button
                                         onClick={() => setIsCheckoutOpen(true)}
@@ -376,7 +376,7 @@ const GuestMenu = () => {
                                 type="submit"
                                 className="w-full bg-[#E67E22] hover:bg-[#D4A017] text-white font-black mt-2 py-4 rounded-xl text-sm uppercase tracking-widest transition-all active:scale-95 shadow-[0_0_30px_#E67E2230]"
                             >
-                                Confirm Order • {cartTotal.toLocaleString()} KES
+                                Confirm Order • {total.toLocaleString()} KES
                             </button>
                         </form>
                     </div>

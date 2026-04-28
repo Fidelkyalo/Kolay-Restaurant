@@ -53,8 +53,12 @@ public class WebSecurityConfig {
         http.csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/health/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/menu/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/orders").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/reservations").permitAll()
                         .anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());

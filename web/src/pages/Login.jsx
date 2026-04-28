@@ -1,21 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChefHat, Lock, User, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { AuthService } from '../services/api';
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({ username: '', password: '' });
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        // Simulation of login
-        setTimeout(() => {
-            setIsLoading(false);
+        setError('');
+        try {
+            const response = await AuthService.login(formData);
+            localStorage.setItem('kolay_auth_user', JSON.stringify(response.data));
             navigate('/dashboard');
-        }, 1500);
+        } catch (err) {
+            setError(err.response?.data?.message || 'Invalid username or password.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -40,6 +47,11 @@ const Login = () => {
                     </div>
 
                     <form onSubmit={handleLogin} className="space-y-6">
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 text-sm font-semibold px-4 py-3 rounded-xl">
+                                {error}
+                            </div>
+                        )}
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-charcoal/70 flex items-center gap-2">
                                 <User className="w-4 h-4" /> Username

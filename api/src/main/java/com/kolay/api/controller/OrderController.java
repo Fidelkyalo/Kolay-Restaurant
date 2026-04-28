@@ -21,7 +21,6 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping
-    @PreAuthorize("hasRole('WAITER') or hasRole('ADMIN')")
     public ResponseEntity<?> placeOrder(@Valid @RequestBody OrderRequest orderRequest) {
         orderService.createOrder(orderRequest);
         return ResponseEntity.ok(new MessageResponse("Order placed successfully!"));

@@ -21,10 +21,19 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
+export const AuthService = {
+    login: (credentials) => api.post('/auth/signin', credentials),
+    signup: (userData) => api.post('/auth/signup', userData),
+    logout: () => { localStorage.removeItem('kolay_auth_user'); },
+};
+
 export const MenuService = {
     getCategories: () => api.get('/menu/categories'),
     getProducts: () => api.get('/menu/products'),
     getCategoryProducts: (id) => api.get(`/menu/categories/${id}/products`),
+    createProduct: (productData) => api.post('/menu/products', productData),
+    updateProduct: (id, productData) => api.put(`/menu/products/${id}`, productData),
+    deleteProduct: (id) => api.delete(`/menu/products/${id}`),
 };
 
 export const OrderService = {

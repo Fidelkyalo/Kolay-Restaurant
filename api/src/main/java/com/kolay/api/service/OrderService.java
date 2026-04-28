@@ -25,11 +25,18 @@ public class OrderService {
 
     @Transactional
     public Order createOrder(OrderRequest orderRequest) {
-        // Get current user (waiter)
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
-        User waiter = new User();
-        waiter.setId(userDetails.getId());
+        // Waiter is optional — guest orders arrive unauthenticated
+        User waiter = null;
+        try {
+            var authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.isAuthenticated()
+                    && authentication.getPrincipal() instanceof UserDetailsImpl) {
+                UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+                waiter = new User();
+                waiter.setId(userDetails.getId());
+            }
+        } catch (Exception ignored) {
+        }
 
         Order order = Order.builder()
                 .tableNumber(orderRequest.getTableNumber())
