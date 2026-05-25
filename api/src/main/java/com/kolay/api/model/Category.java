@@ -1,5 +1,6 @@
 package com.kolay.api.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
@@ -22,6 +23,7 @@ public class Category {
     private String imageUrl;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Product> products = new ArrayList<>();
 
     public Category() {
