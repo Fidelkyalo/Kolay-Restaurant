@@ -79,7 +79,8 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("Finished seeding menu data.");
         }
 
-        if (userRepository.count() == 0) {
+        // Always ensure the admin user exists, regardless of other users in the DB
+        if (!userRepository.existsByUsername("admin")) {
             Role adminRole = roleRepository.findByName(Role.RoleName.ADMIN)
                     .orElseThrow(() -> new RuntimeException("Error: Role Admin is not found."));
 
