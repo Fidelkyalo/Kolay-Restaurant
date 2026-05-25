@@ -96,6 +96,51 @@ The Kolay Restaurant Management System aims to transform traditional restaurant 
 
 ---
 
+## Getting Started
+
+### Default Admin Credentials
+After first startup the system seeds a default admin account:
+- **Username:** `admin`
+- **Password:** `admin123`
+
+### Local Development
+
+**Backend (Spring Boot — no MySQL required):**
+```bash
+cd api
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+```
+This uses an H2 in-memory database. The H2 console is available at `http://localhost:8080/h2-console`.
+
+**Frontend (React):**
+```bash
+cd web
+cp .env.example .env          # set VITE_API_URL=http://localhost:8080/api
+npm install
+npm run dev
+```
+
+### Production Deployment (Vercel + Docker)
+
+The frontend is deployed on Vercel. The backend must be hosted separately (e.g. Railway, Render, Fly.io) and the `VITE_API_URL` environment variable **must** be set in Vercel's project settings to point to the live backend URL.
+
+> ⚠️ **Login will fail with "Invalid username or password"** if `VITE_API_URL` is not set — the frontend will try to reach `http://localhost:8080/api` which does not exist in the browser.
+
+**Steps:**
+1. Deploy the backend (Docker image from `api/Dockerfile`) to a cloud provider
+2. In Vercel → Project Settings → Environment Variables, add:
+   ```
+   VITE_API_URL = https://<your-backend-host>/api
+   ```
+3. Redeploy the Vercel project
+
+For full-stack local Docker:
+```bash
+docker compose up --build
+```
+
+---
+
 ### Kolay Restaurant Theme Colors
 * **Primary Color (Main Brand Color)**: Deep Brown / Coffee Brown (#4E2C1E or #5A3825)
 * **Secondary Color (Appetite / Energy)**: Warm Orange / Amber (#E67E22 or #F28C28)

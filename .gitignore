@@ -2,6 +2,11 @@
 target/
 *.class
 
+# Maven local install (bundled for offline use)
+api/maven/
+api/maven.zip
+api/.mvn/wrapper/maven-wrapper.jar
+
 # IDE
 .idea/
 .netbeans/
@@ -18,3 +23,15 @@ dist/
 # System
 .DS_Store
 Thumbs.db
+
+# JVM crash logs
+hs_err_pid*.log
+replay_pid*.log
+
+# Local scripts
+start-api.cmd
+start-web.cmd
+package-lock.json
+
+# H2 local repo (bundled jar for offline dev)
+api/local-repo/
