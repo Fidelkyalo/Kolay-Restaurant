@@ -83,14 +83,12 @@ public class DataInitializer implements CommandLineRunner {
         Role adminRole = roleRepository.findByName(Role.RoleName.ADMIN)
                 .orElseThrow(() -> new RuntimeException("Error: Role Admin is not found."));
 
-        // Remove any old lowercase "admin" user if it exists
-        userRepository.findByUsername("admin").ifPresent(oldAdmin -> {
-            userRepository.delete(oldAdmin);
-            System.out.println("Removed old admin user.");
-        });
+        // If old lowercase "admin" exists, update it in-place (avoids FK constraint issues)
+        // Otherwise look for "Admin", or create a brand new user
+        User admin = userRepository.findByUsername("admin")
+                .orElse(userRepository.findByUsername("Admin")
+                        .orElse(new User()));
 
-        // Create or update the "Admin" user
-        User admin = userRepository.findByUsername("Admin").orElse(new User());
         admin.setUsername("Admin");
         admin.setEmail("admin@kolay.com");
         admin.setPassword(passwordEncoder.encode("Admin123"));
