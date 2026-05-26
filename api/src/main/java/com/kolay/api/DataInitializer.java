@@ -79,20 +79,23 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("Finished seeding menu data.");
         }
 
-        // Always ensure the admin user exists, regardless of other users in the DB
-        if (!userRepository.existsByUsername("Admin")) {
-            Role adminRole = roleRepository.findByName(Role.RoleName.ADMIN)
-                    .orElseThrow(() -> new RuntimeException("Error: Role Admin is not found."));
+        // Always ensure the admin user exists with the correct credentials
+        Role adminRole = roleRepository.findByName(Role.RoleName.ADMIN)
+                .orElseThrow(() -> new RuntimeException("Error: Role Admin is not found."));
 
-            User admin = User.builder()
-                    .username("Admin")
-                    .email("admin@kolay.com")
-                    .password(passwordEncoder.encode("Admin123"))
-                    .roles(new HashSet<>(Collections.singletonList(adminRole)))
-                    .build();
+        // Remove any old lowercase "admin" user if it exists
+        userRepository.findByUsername("admin").ifPresent(oldAdmin -> {
+            userRepository.delete(oldAdmin);
+            System.out.println("Removed old admin user.");
+        });
 
-            userRepository.save(admin);
-            System.out.println("Finished seeding default admin user (Admin / Admin123).");
-        }
+        // Create or update the "Admin" user
+        User admin = userRepository.findByUsername("Admin").orElse(new User());
+        admin.setUsername("Admin");
+        admin.setEmail("admin@kolay.com");
+        admin.setPassword(passwordEncoder.encode("Admin123"));
+        admin.setRoles(new HashSet<>(Collections.singletonList(adminRole)));
+        userRepository.save(admin);
+        System.out.println("Admin user ensured: Admin / Admin123");
     }
 }
