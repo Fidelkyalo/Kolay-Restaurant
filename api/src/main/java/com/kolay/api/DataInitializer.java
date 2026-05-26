@@ -80,19 +80,19 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // Always ensure the admin user exists, regardless of other users in the DB
-        if (!userRepository.existsByUsername("admin")) {
+        if (!userRepository.existsByUsername("Admin")) {
             Role adminRole = roleRepository.findByName(Role.RoleName.ADMIN)
                     .orElseThrow(() -> new RuntimeException("Error: Role Admin is not found."));
 
             User admin = User.builder()
-                    .username("admin")
+                    .username("Admin")
                     .email("admin@kolay.com")
-                    .password(passwordEncoder.encode("admin123"))
+                    .password(passwordEncoder.encode("Admin123"))
                     .roles(new HashSet<>(Collections.singletonList(adminRole)))
                     .build();
 
             userRepository.save(admin);
-            System.out.println("Finished seeding default admin user (admin / admin123).");
+            System.out.println("Finished seeding default admin user (Admin / Admin123).");
         }
     }
 }
