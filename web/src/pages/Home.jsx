@@ -144,8 +144,8 @@ const Home = () => {
                         {/* Quick info pills */}
                         <div className="flex flex-wrap gap-3 pt-4">
                             {[
-                                { icon: Clock, text: 'Opens 10am Daily' },
-                                { icon: MapPin, text: 'Greenfield Plaza' },
+                                { icon: Clock, text: 'Open 24/7' },
+                                { icon: MapPin, text: 'Thome Estate' },
                                 { icon: Phone, text: '+254 102 039 121' },
                             ].map(({ icon: Icon, text }) => (
                                 <span key={text} className="flex items-center gap-2 text-white/40 text-xs font-semibold">
@@ -166,10 +166,10 @@ const Home = () => {
                         {/* Floating info card */}
                         <div className="absolute -bottom-6 -left-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 w-56 shadow-xl">
                             <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1 font-black">
-                                {activeSpecialty ? `${activeSpecialty.season} Special` : "Tonight's Special"}
+                                {activeSpecialty ? `${activeSpecialty.season} Special` : "KOLAY RESTAURANT"}
                             </p>
                             <p className="text-white font-black text-sm leading-tight mb-2">
-                                {activeSpecialty ? activeSpecialty.name : 'Signature Ribeye'}
+                                {activeSpecialty ? activeSpecialty.name : 'DELICIOUSLY MADE'}
                             </p>
                             {activeSpecialty && (
                                 <div className="flex items-center gap-2 mb-2">
