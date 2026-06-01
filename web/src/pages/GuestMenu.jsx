@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, ArrowRight, CreditCard, Check, Clock } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, ArrowRight, CreditCard, Check, Clock, Lock } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MenuService, OrderService } from '../services/api';
 
 const MENU_DEFAULTS = [
@@ -58,6 +58,15 @@ const GuestMenu = () => {
     const [dishes, setDishes] = useState(() => [...getLocalDishes(), ...getActiveSpecialties()]);
     const [cart, setCart] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
+    const [showAuthGate, setShowAuthGate] = useState(false); // shown when guest tries to order specialty
+
+    // Check if user is logged in (has a kolay_auth_user in localStorage)
+    const isLoggedIn = (() => {
+        try {
+            const u = JSON.parse(localStorage.getItem('kolay_auth_user'));
+            return !!(u && (u.accessToken || u.username));
+        } catch { return false; }
+    })();
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [orderSuccess, setOrderSuccess] = useState(false);
@@ -116,6 +125,11 @@ const GuestMenu = () => {
     });
 
     const addToCart = (dish) => {
+        // Specialties require a logged-in account
+        if (dish.isSpecialty && !isLoggedIn) {
+            setShowAuthGate(true);
+            return;
+        }
         const existing = cart.find(item => item.id === dish.id);
         if (existing) {
             setCart(cart.map(item => item.id === dish.id ? { ...item, quantity: item.quantity + 1 } : item));
@@ -266,11 +280,22 @@ const GuestMenu = () => {
 
                 {/* Specialties discount notice */}
                 {selectedCategory === 'Specialties' && (
-                    <div className="flex items-center justify-center gap-3 mb-8 bg-[#E67E22]/10 border border-[#E67E22]/30 rounded-2xl px-6 py-4 max-w-lg mx-auto">
-                        <span className="text-2xl">🎉</span>
-                        <p className="text-[#E67E22] font-black text-sm">
-                            All Specialties include a <strong>10% discount</strong> — automatically applied at checkout!
-                        </p>
+                    <div className="flex flex-col items-center gap-3 mb-8 max-w-lg mx-auto">
+                        <div className="flex items-center justify-center gap-3 bg-[#E67E22]/10 border border-[#E67E22]/30 rounded-2xl px-6 py-4 w-full">
+                            <span className="text-2xl">🎉</span>
+                            <p className="text-[#E67E22] font-black text-sm">
+                                All Specialties include a <strong>10% discount</strong> — automatically applied at checkout!
+                            </p>
+                        </div>
+                        {!isLoggedIn && (
+                            <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-3 w-full">
+                                <Lock className="w-4 h-4 text-white/40 shrink-0" />
+                                <p className="text-white/50 text-xs font-bold">
+                                    You need an account to order specialties.{' '}
+                                    <Link to="/staff" className="text-[#E67E22] hover:underline font-black">Sign in here</Link>
+                                </p>
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -323,7 +348,10 @@ const GuestMenu = () => {
                                         onClick={() => addToCart(dish)}
                                         className="bg-white/5 hover:bg-[#E67E22] border border-white/10 text-white w-12 h-12 rounded-2xl flex items-center justify-center transition-all active:scale-95 group/btn shadow-lg"
                                     >
-                                        <Plus className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+                                        {dish.isSpecialty && !isLoggedIn
+                                            ? <Lock className="w-4 h-4 text-white/40" />
+                                            : <Plus className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+                                        }
                                     </button>
                                 </div>
                             </div>
@@ -507,6 +535,36 @@ const GuestMenu = () => {
                         >
                             Return to Menu
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Auth Gate Modal — shown when guest tries to order a specialty */}
+            {showAuthGate && (
+                <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-[#0D0A07]/90 backdrop-blur-md" onClick={() => setShowAuthGate(false)} />
+                    <div className="relative bg-[#1A1008] border border-white/10 rounded-[2.5rem] p-10 max-w-sm w-full text-center shadow-2xl animate-in zoom-in duration-300">
+                        <div className="w-16 h-16 bg-[#E67E22]/20 border border-[#E67E22]/30 rounded-2xl mx-auto flex items-center justify-center mb-6">
+                            <Lock className="w-8 h-8 text-[#E67E22]" />
+                        </div>
+                        <h2 className="text-2xl font-display font-black text-white mb-3">Account Required</h2>
+                        <p className="text-white/40 text-sm leading-relaxed mb-8">
+                            Ordering specialties is exclusive to registered members. Sign in or create an account to enjoy our seasonal specials with a <strong className="text-[#E67E22]">10% discount</strong>.
+                        </p>
+                        <div className="space-y-3">
+                            <Link
+                                to="/staff"
+                                className="w-full bg-[#E67E22] hover:bg-[#D4A017] text-white font-black py-4 rounded-xl text-sm uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2 shadow-[0_0_30px_#E67E2230]"
+                            >
+                                Sign In to Order
+                            </Link>
+                            <button
+                                onClick={() => setShowAuthGate(false)}
+                                className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/50 font-black py-3 rounded-xl text-[10px] uppercase tracking-widest transition-colors"
+                            >
+                                Continue Browsing
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar, MessageSquare, Clock, RefreshCw, CheckCircle2, Printer, Settings, Shield, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, AlertTriangle, Package, DollarSign, Calendar, MessageSquare, Clock, RefreshCw, CheckCircle2, Printer, Settings, Shield, X, UserCheck, Users } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -8,6 +8,35 @@ import { isAdmin } from '../hooks/useRole';
 
 function Dashboard() {
     const adminMode = isAdmin();
+
+    // Staff identity — read from localStorage (set via login)
+    const staffName = (() => {
+        try {
+            const saved = localStorage.getItem('kolay_staff_name');
+            if (saved) return saved;
+            const user = JSON.parse(localStorage.getItem('kolay_auth_user'));
+            return user?.username || 'Staff';
+        } catch { return 'Staff'; }
+    })();
+
+    // Reservations assigned to this staff member (staff portal only)
+    const getMyReservations = () => {
+        try {
+            const all = JSON.parse(localStorage.getItem('kolay_reservations_local') || '[]');
+            return all.filter(r => r.assignedTo === staffName);
+        } catch { return []; }
+    };
+
+    const [myReservations, setMyReservations] = useState(getMyReservations);
+
+    useEffect(() => {
+        if (!adminMode) {
+            const handler = () => setMyReservations(getMyReservations());
+            window.addEventListener('storage', handler);
+            return () => window.removeEventListener('storage', handler);
+        }
+    }, [adminMode]);
+
     const [viewMode, setViewMode] = useState('Weekly');
     const [reportScope, setReportScope] = useState('Day');
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -626,9 +655,10 @@ function Dashboard() {
                     </div>
                 </section>
 
+                {/* ── ADMIN: 3-col layout with statistics chart on the left ── */}
+                {adminMode && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
-                        {adminMode && (
                         <div className="bg-white p-8 rounded-3xl border border-cream shadow-sm relative overflow-hidden">
                             <div className="flex justify-between items-center mb-8">
                                 <div>
@@ -717,10 +747,9 @@ function Dashboard() {
                                 </div>
                             </div>
                         </div>
-                        )} {/* end adminMode statistics */}
                     </div>
 
-                    {/* Side Module: Quick Actions */}
+                    {/* Admin side column */}
                     <div className="space-y-6">
                         <div className="bg-primary p-8 rounded-3xl text-white shadow-xl relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-4 opacity-10 transform scale-150 group-hover:scale-175 transition-transform">
@@ -732,7 +761,6 @@ function Dashboard() {
                                 + Create New Order
                             </Link>
                         </div>
-
                         <div className="bg-white p-6 rounded-3xl shadow-sm border border-cream">
                             <h3 className="text-lg font-bold text-primary mb-4">Kitchen Load</h3>
                             <div className="space-y-4">
@@ -756,8 +784,6 @@ function Dashboard() {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Stock Alerts Panel */}
                         <div className="bg-white p-6 rounded-3xl shadow-sm border border-cream">
                             <div className="flex items-center gap-2 mb-6">
                                 <AlertTriangle className="text-secondary w-5 h-5" />
@@ -786,6 +812,176 @@ function Dashboard() {
                         </div>
                     </div>
                 </div>
+                )} {/* end adminMode 3-col layout */}
+
+                {/* ── STAFF: clean dashboard ── */}
+                {!adminMode && (
+                <div className="space-y-6">
+
+                    {/* Top row: greeting + quick actions */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Quick Order CTA */}
+                        <div className="bg-primary p-8 rounded-3xl text-white shadow-xl relative overflow-hidden group">
+                            <div className="absolute top-0 right-0 p-4 opacity-10 transform scale-150 group-hover:scale-175 transition-transform">
+                                <img src="/Logo.png" alt="" className="w-32 h-32" />
+                            </div>
+                            <h3 className="text-xl font-bold mb-3 relative z-10">Quick Order</h3>
+                            <p className="text-white/60 mb-5 text-sm relative z-10">Open the POS and start a new order.</p>
+                            <Link to="/pos" className="w-full bg-secondary hover:bg-orange-600 text-white font-bold py-3 rounded-xl transition-all shadow-lg active:scale-95 relative z-10 flex items-center justify-center text-sm">
+                                + Create New Order
+                            </Link>
+                        </div>
+
+                        {/* Kitchen Load */}
+                        <div className="bg-white p-6 rounded-3xl shadow-sm border border-cream">
+                            <h3 className="text-lg font-bold text-primary mb-5 flex items-center gap-2">
+                                <RefreshCw className="w-4 h-4 text-secondary" /> Kitchen Load
+                            </h3>
+                            <div className="space-y-5">
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="font-medium text-charcoal">Grill Station</span>
+                                        <span className={`font-black text-sm ${grillLoad > 70 ? 'text-secondary' : 'text-green-600'}`}>{grillLoad}%</span>
+                                    </div>
+                                    <div className="h-3 w-full bg-cream rounded-full overflow-hidden">
+                                        <div className={`h-full rounded-full transition-all duration-500 ${grillLoad > 70 ? 'bg-secondary' : 'bg-green-500'}`} style={{ width: `${grillLoad}%` }}></div>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between text-sm">
+                                        <span className="font-medium text-charcoal">Pizza Oven</span>
+                                        <span className={`font-black text-sm ${pizzaLoad > 70 ? 'text-secondary' : 'text-green-600'}`}>{pizzaLoad}%</span>
+                                    </div>
+                                    <div className="h-3 w-full bg-cream rounded-full overflow-hidden">
+                                        <div className={`h-full rounded-full transition-all duration-500 ${pizzaLoad > 70 ? 'bg-accent' : 'bg-green-500'}`} style={{ width: `${pizzaLoad}%` }}></div>
+                                    </div>
+                                </div>
+                                <div className="pt-2 border-t border-cream">
+                                    <p className="text-[11px] text-charcoal/40 font-bold uppercase tracking-widest">
+                                        {activeOrders.length} active order{activeOrders.length !== 1 ? 's' : ''} in queue
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Inventory Alerts */}
+                        <div className="bg-white p-6 rounded-3xl shadow-sm border border-cream">
+                            <div className="flex items-center gap-2 mb-5">
+                                <AlertTriangle className="text-secondary w-5 h-5" />
+                                <h3 className="text-lg font-bold text-primary">Stock Alerts</h3>
+                                {alerts.length > 0 && (
+                                    <span className="ml-auto bg-red-100 text-red-600 text-[10px] font-black px-2.5 py-1 rounded-full">{alerts.length}</span>
+                                )}
+                            </div>
+                            <div className="space-y-3">
+                                {alerts.length > 0 ? alerts.slice(0, 4).map((item, i) => (
+                                    <div key={i} className="flex justify-between items-center p-3 bg-bg-cream/50 rounded-xl border border-cream/30">
+                                        <div>
+                                            <p className="font-bold text-sm text-primary">{item.name}</p>
+                                            <p className="text-[10px] text-charcoal/40 uppercase font-bold">{item.stock} {item.unit} left</p>
+                                        </div>
+                                        <span className={`font-black text-[10px] px-2.5 py-1 rounded-lg ${item.status === 'OUT' ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-600'}`}>
+                                            {item.status === 'OUT' ? 'OUT' : 'LOW'}
+                                        </span>
+                                    </div>
+                                )) : (
+                                    <div className="text-center py-6">
+                                        <CheckCircle2 className="w-8 h-8 text-green-400 mx-auto mb-2" />
+                                        <p className="text-sm text-charcoal/40 font-bold">All items well stocked</p>
+                                    </div>
+                                )}
+                            </div>
+                            <Link to="/inventory" className="w-full mt-4 py-3 border-2 border-dashed border-cream rounded-2xl text-xs font-bold text-charcoal/40 hover:text-secondary hover:border-secondary/50 transition-all flex items-center justify-center">
+                                View Inventory
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* My Assigned Reservations */}
+                    <div className="bg-white rounded-3xl border border-cream shadow-sm overflow-hidden">
+                        <div className="p-6 border-b border-cream flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-blue-50 rounded-xl">
+                                    <Calendar className="w-5 h-5 text-blue-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-primary">My Reservations</h3>
+                                    <p className="text-xs text-charcoal/40 font-bold">Bookings assigned to you</p>
+                                </div>
+                            </div>
+                            <Link to="/admin/reservations"
+                                className="text-xs font-black text-secondary hover:underline uppercase tracking-widest">
+                                View All
+                            </Link>
+                        </div>
+                        {myReservations.length === 0 ? (
+                            <div className="p-12 text-center">
+                                <Calendar className="w-10 h-10 text-charcoal/20 mx-auto mb-3" />
+                                <p className="text-charcoal/40 font-bold text-sm">No reservations assigned to you yet.</p>
+                                <p className="text-charcoal/30 text-xs mt-1">An admin will assign bookings to you from the reservations page.</p>
+                            </div>
+                        ) : (
+                            <div className="divide-y divide-cream">
+                                {myReservations.slice(0, 5).map((res, i) => (
+                                    <div key={res.id || i} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-bg-cream/30 transition-colors">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center shrink-0">
+                                                <UserCheck className="w-5 h-5 text-blue-600" />
+                                            </div>
+                                            <div>
+                                                <p className="font-black text-primary text-sm">{res.guestName}</p>
+                                                <p className="text-[11px] text-charcoal/40 font-bold">{res.phone} · {res.email}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                                            <div className="flex items-center gap-1.5 text-xs font-bold text-charcoal/60">
+                                                <Calendar className="w-3.5 h-3.5 text-secondary" />
+                                                {res.reservationDate ? new Date(res.reservationDate).toLocaleDateString() : '—'}
+                                            </div>
+                                            <div className="flex items-center gap-1.5 text-xs font-bold text-charcoal/60">
+                                                <Clock className="w-3.5 h-3.5 text-secondary" />
+                                                {res.reservationTime || '—'}
+                                            </div>
+                                            <div className="flex items-center gap-1.5 text-xs font-bold text-charcoal/60">
+                                                <Users className="w-3.5 h-3.5 text-secondary" />
+                                                {res.numberOfGuests} guests
+                                            </div>
+                                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter ${
+                                                res.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
+                                                res.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
+                                                res.status === 'PENDING' ? 'bg-amber-100 text-amber-700' :
+                                                'bg-charcoal/5 text-charcoal/60'
+                                            }`}>{res.status}</span>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Quick Links */}
+                    <div className="bg-white rounded-3xl border border-cream shadow-sm p-6">
+                        <h3 className="text-sm font-black uppercase text-charcoal/40 tracking-widest mb-5">Quick Links</h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+                            {[
+                                { label: 'POS',           path: '/pos',                  color: 'bg-secondary/10 text-secondary hover:bg-secondary hover:text-white',   icon: '🛒' },
+                                { label: 'KDS',           path: '/kds',                  color: 'bg-primary/10 text-primary hover:bg-primary hover:text-white',         icon: '🍳' },
+                                { label: 'Reservations',  path: '/admin/reservations',   color: 'bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white',          icon: '📅' },
+                                { label: 'Inventory',     path: '/inventory',            color: 'bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white',       icon: '📦' },
+                                { label: 'Employees',     path: '/employees',            color: 'bg-green-50 text-green-600 hover:bg-green-600 hover:text-white',       icon: '👥' },
+                                { label: 'Specialties',   path: '/specialties',          color: 'bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white',    icon: '✨' },
+                            ].map(link => (
+                                <Link key={link.path} to={link.path}
+                                    className={`flex flex-col items-center gap-2 py-4 px-3 rounded-2xl font-bold text-xs text-center transition-all ${link.color}`}>
+                                    <span className="text-2xl">{link.icon}</span>
+                                    {link.label}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+
+                </div>
+                )} {/* end staff grid */}
             </main>
 
             {/* Footer */}

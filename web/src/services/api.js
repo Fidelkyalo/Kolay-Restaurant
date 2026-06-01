@@ -55,6 +55,7 @@ export const ReservationService = {
     getAll: () => api.get('/reservations'),
     getByDate: (date) => api.get(`/reservations/date/${date}`),
     updateStatus: (id, status) => api.patch(`/reservations/${id}/status`, null, { params: { status } }),
+    assign: (id, staffName) => api.patch(`/reservations/${id}/assign`, null, { params: { staffName } }),
 };
 
 export default api;
