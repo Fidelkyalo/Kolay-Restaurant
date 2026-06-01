@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, UserPlus, LogIn, ChevronRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const PublicNavbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
 
     const isLoggedIn = (() => {
         try {
@@ -46,6 +48,21 @@ const PublicNavbar = () => {
         }
     };
 
+    // Logo click — scroll to hero if already on home, else navigate to home then scroll
+    const handleLogoClick = (e) => {
+        e.preventDefault();
+        setIsMobileMenuOpen(false);
+        if (location.pathname === '/') {
+            const el = document.getElementById('home');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+            else window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            navigate('/');
+            // After navigation, scroll to top (hero is at top of home page)
+            setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
+        }
+    };
+
     const linkCls = "text-white/75 hover:text-white font-semibold text-[11px] uppercase tracking-widest transition-colors duration-200 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[2px] after:bg-[#E67E22] hover:after:w-full after:transition-all after:duration-300 py-1";
 
     const renderLink = (link, onClick) =>
@@ -68,8 +85,8 @@ const PublicNavbar = () => {
             <div className="max-w-7xl mx-auto px-6 md:px-10">
                 <div className="flex items-center justify-between h-16 md:h-18 gap-8">
 
-                    {/* ── LEFT: Logo — clicking goes to Home ── */}
-                    <Link to="/" className="flex items-center gap-3 shrink-0 group" aria-label="Go to Home">
+                    {/* ── LEFT: Logo — clicking scrolls to hero / navigates home ── */}
+                    <a href="/" onClick={handleLogoClick} className="flex items-center gap-3 shrink-0 group cursor-pointer" aria-label="Go to Home">
                         <img
                             src="/Logo.png"
                             alt="Kolay"
@@ -78,7 +95,7 @@ const PublicNavbar = () => {
                         <span className="text-white font-display font-black text-xl tracking-tight uppercase leading-none hidden sm:block">
                             Kolay
                         </span>
-                    </Link>
+                    </a>
 
                     {/* ── CENTRE: Nav links — shifted slightly right ── */}
                     <div className="hidden lg:flex items-center gap-8 flex-1 justify-end pr-10">
