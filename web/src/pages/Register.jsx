@@ -61,7 +61,11 @@ const Register = () => {
             setSuccess(true);
             setTimeout(() => navigate('/order'), 1800);
         } catch (err) {
-            const msg = err?.response?.data?.message || 'Registration failed. Please try again.';
+            const isTimeout = err.code === 'ECONNABORTED' || err.message?.includes('timeout');
+            const serverMsg = err?.response?.data?.message;
+            const msg = isTimeout
+                ? 'The server is taking too long to respond. Please try again in a moment.'
+                : serverMsg || 'Registration failed. Please try again.';
             setError(msg);
         } finally {
             setIsLoading(false);
@@ -103,8 +107,8 @@ const Register = () => {
                     <div className="inline-flex items-center justify-center p-3 bg-white/20 rounded-2xl shadow-lg mb-4">
                         <ChefHat className="w-8 h-8 text-white" />
                     </div>
-                    <h1 className="text-3xl font-display font-bold text-white tracking-tight">KOLAY</h1>
-                    <p className="text-white/70 text-sm mt-1">Create your account</p>
+                    <h1 className="text-3xl font-display font-bold text-white tracking-tight">Kolay Restaurant</h1>
+                    <p className="text-white/80 text-sm mt-1 font-semibold italic">Where Every Meal Feels Right.</p>
                 </div>
 
                 <div className="p-8">
