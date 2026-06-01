@@ -176,21 +176,27 @@ const POS = () => {
 
             const saved = localStorage.getItem('kolay_dishes');
             const defaults = [
-                { id: 1, name: 'Beef Burger', price: 850, category: 'Main Dish', image: '🍔' },
-                { id: 2, name: 'Margherita Pizza', price: 1100, category: 'Main Dish', image: '🍕' },
-                { id: 3, name: 'Grilled Salmon', price: 1850, category: 'Main Dish', image: '🐟' },
-                { id: 4, name: 'Cappuccino', price: 350, category: 'Beverages', image: '☕' },
-                { id: 5, name: 'Iced Tea', price: 250, category: 'Beverages', image: '🍹' },
-                { id: 6, name: 'French Fries', price: 300, category: 'Side Dish', image: '🍟' },
-                { id: 7, name: 'Fruit Salad', price: 450, category: 'Desserts', image: '🥗' },
-                { id: 10, name: 'Pancakes', price: 550, category: 'BreakFast', image: '🥞' },
+                { id: 1,  name: 'Gourmet Beef Burger',    price: 1200, category: 'Main Dish',  image: '/assets/burger.png',  desc: 'Aged wagyu beef, truffle aioli.' },
+                { id: 2,  name: 'Signature Ribeye',        price: 3500, category: 'Main Dish',  image: '/assets/steak.png',   desc: 'Prime ribeye, garlic herb butter.' },
+                { id: 3,  name: 'Herb-Crusted Salmon',     price: 2100, category: 'Main Dish',  image: '/assets/salmon.png',  desc: 'Fresh salmon with sesame glaze.' },
+                { id: 4,  name: 'Crispy Calamari',         price: 850,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600', desc: 'Golden fried with spicy marinara.' },
+                { id: 5,  name: 'Bruschetta',              price: 650,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600', desc: 'Fresh tomatoes, garlic, hand-torn basil.' },
+                { id: 6,  name: 'Chocolate Fondant',       price: 700,  category: 'Desserts',   image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600', desc: 'Warm dark chocolate lava cake.' },
+                { id: 7,  name: 'Iced Latte',              price: 450,  category: 'Beverages',  image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600', desc: 'Chilled espresso over milk.' },
+                { id: 8,  name: 'Margherita Pizza',        price: 1100, category: 'Main Dish',  image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&q=80&w=600', desc: 'Fresh mozzarella, basil, tomato sauce.' },
+                { id: 9,  name: 'French Fries',            price: 300,  category: 'Side Dish',  image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&q=80&w=600', desc: 'Crispy golden fries with sea salt.' },
+                { id: 10, name: 'Pancakes',                price: 550,  category: 'BreakFast',  image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&q=80&w=600', desc: 'Fluffy stack with maple syrup.' },
             ];
+            // Seed localStorage so GuestMenu picks up the same data
+            if (!saved) {
+                localStorage.setItem('kolay_dishes', JSON.stringify(defaults));
+            }
             setProducts(saved ? JSON.parse(saved) : defaults);
         };
         fetchProducts();
     }, []);
     const [showDishModal, setShowDishModal] = useState(false);
-    const [newDish, setNewDish] = useState({ name: '', price: '', category: 'Main Dish', image: '🍱' });
+    const [newDish, setNewDish] = useState({ name: '', price: '', category: 'Main Dish', image: '', desc: '' });
 
     const saveDish = async () => {
         if (!newDish.name.trim() || !newDish.price) return;
@@ -235,7 +241,7 @@ const POS = () => {
 
         setProducts(updated);
         localStorage.setItem('kolay_dishes', JSON.stringify(updated));
-        setNewDish({ name: '', price: '', category: 'Main Dish', image: '🍱' });
+        setNewDish({ name: '', price: '', category: 'Main Dish', image: '', desc: '' });
         setEditingDishId(null);
         setShowDishModal(false);
     };
@@ -249,7 +255,7 @@ const POS = () => {
         }
     };
 
-    const categories = ['All', 'BreakFast', 'Main Dish', 'Beverages', 'Desserts', 'Side Dish'];
+    const categories = ['All', 'BreakFast', 'Starters', 'Main Dish', 'Side Dish', 'Desserts', 'Beverages'];
 
     const filteredProducts = products.filter(p =>
         (activeCategory === 'All' || p.category === activeCategory) &&
@@ -467,7 +473,7 @@ const POS = () => {
                             <button
                                 onClick={() => {
                                     setEditingDishId(null);
-                                    setNewDish({ name: '', price: '', category: 'Main Dish', image: '🍱' });
+                                    setNewDish({ name: '', price: '', category: 'Main Dish', image: '', desc: '' });
                                     setShowDishModal(true);
                                 }}
                                 className="bg-secondary text-white hover:bg-orange-600 px-6 py-2.5 rounded-full font-bold border border-secondary transition-all flex items-center gap-2 shadow-sm"
@@ -485,7 +491,7 @@ const POS = () => {
                                 onClick={() => {
                                     if (isManageMode) {
                                         setEditingDishId(product.id);
-                                        setNewDish({ name: product.name, price: product.price, category: product.category, image: product.image });
+                                        setNewDish({ name: product.name, price: product.price, category: product.category, image: product.image, desc: product.desc || '' });
                                         setShowDishModal(true);
                                     } else {
                                         addToCart(product);
@@ -625,10 +631,23 @@ const POS = () => {
                     <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[120] flex items-center justify-center p-4">
                         <div className="bg-white rounded-[2.5rem] w-full max-w-md shadow-2xl p-8 animate-in zoom-in duration-200">
                             <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-2xl font-bold text-primary">Add New Dish</h3>
+                                <h3 className="text-2xl font-bold text-primary">{editingDishId ? 'Edit Dish' : 'Add New Dish'}</h3>
                                 <button onClick={() => setShowDishModal(false)} className="text-charcoal/40 hover:text-primary text-2xl">&times;</button>
                             </div>
                             <div className="space-y-4">
+                                {/* Image Preview */}
+                                <div className="w-full h-40 bg-bg-cream rounded-2xl overflow-hidden border border-cream flex items-center justify-center">
+                                    {newDish.image?.startsWith('http') || newDish.image?.startsWith('/') ? (
+                                        <img
+                                            src={newDish.image}
+                                            alt="Preview"
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600'; }}
+                                        />
+                                    ) : (
+                                        <span className="text-charcoal/20 text-sm font-bold uppercase tracking-widest">Image Preview</span>
+                                    )}
+                                </div>
                                 <div>
                                     <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Dish Name</label>
                                     <input
@@ -637,6 +656,16 @@ const POS = () => {
                                         className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold"
                                         value={newDish.name}
                                         onChange={(e) => setNewDish({ ...newDish, name: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Description</label>
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. Crispy wings with house sauce"
+                                        className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold text-sm"
+                                        value={newDish.desc}
+                                        onChange={(e) => setNewDish({ ...newDish, desc: e.target.value })}
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
@@ -663,14 +692,14 @@ const POS = () => {
                                         </select>
                                     </div>
                                 </div>
-                                <div className="mt-4">
-                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Image URL (Unsplash or Local)</label>
+                                <div>
+                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Image URL (Unsplash or /assets/...)</label>
                                     <input
                                         type="text"
-                                        placeholder="https://images.unsplash.com/..."
+                                        placeholder="https://images.unsplash.com/... or /assets/burger.png"
                                         className="w-full px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold text-sm"
-                                        value={newDish.image === '🍱' ? '' : newDish.image}
-                                        onChange={(e) => setNewDish({ ...newDish, image: e.target.value || '🍱' })}
+                                        value={newDish.image}
+                                        onChange={(e) => setNewDish({ ...newDish, image: e.target.value })}
                                     />
                                 </div>
                                 <button
