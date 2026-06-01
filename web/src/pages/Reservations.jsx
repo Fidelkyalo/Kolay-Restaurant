@@ -76,7 +76,7 @@ const Reservations = () => {
                                     </div>
                                     <div>
                                         <p className="font-bold text-sm uppercase tracking-widest text-white/50 mb-1">Hours</p>
-                                        <p className="text-white/90">Mon - Sun: 8:00 AM - 11:00 PM</p>
+                                        <p className="text-white/90">Open 24/7</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">

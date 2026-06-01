@@ -530,7 +530,7 @@ const Home = () => {
                                     {[
                                         { icon: Phone, label: 'Call Us', value: '+254 102 039 121' },
                                         { icon: MapPin, label: 'Location', value: '123 Thome Street, Nairobi' },
-                                        { icon: Clock, label: 'Hours', value: 'Mon–Sat • 10am – 10pm' },
+                        { icon: Clock, label: 'Hours', value: 'Open 24/7' },
                                     ].map(({ icon: Icon, label, value }) => (
                                         <div key={label} className="flex items-center gap-4">
                                             <div className="w-10 h-10 bg-[#E67E22]/10 border border-[#E67E22]/20 rounded-xl flex items-center justify-center shrink-0">
@@ -639,7 +639,7 @@ const Home = () => {
                                 {[
                                     { icon: MapPin, label: 'Address', value: '123 Thome Street, Nairobi' },
                                     { icon: Phone, label: 'Phone', value: '+254 102 039 121' },
-                                    { icon: Clock, label: 'Hours', value: 'Mon–Sat 10am–10pm' },
+                                    { icon: Clock, label: 'Hours', value: 'Open 24/7' },
                                 ].map(({ icon: Icon, label, value }) => (
                                     <div key={label} className="bg-white/3 border border-white/5 rounded-2xl p-5">
                                         <div className="w-8 h-8 bg-[#E67E22]/10 border border-[#E67E22]/20 rounded-lg flex items-center justify-center mb-3">
@@ -709,9 +709,7 @@ const Home = () => {
                             <h4 className="text-white font-black text-xs uppercase tracking-[0.3em]">Hours</h4>
                             <ul className="space-y-3 text-sm">
                                 {[
-                                    { days: 'Mon – Thu', time: '10am – 10pm' },
-                                    { days: 'Fri – Sat', time: '10am – 12am' },
-                                    { days: 'Sunday', time: 'Closed' },
+                                    { days: 'Every Day', time: 'Open 24/7' },
                                 ].map(({ days, time }) => (
                                     <li key={days} className="flex justify-between gap-4">
                                         <span className="text-white/30">{days}</span>
