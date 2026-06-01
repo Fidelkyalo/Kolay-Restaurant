@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Plus, Trash2, Edit3, Check, X, Users, FileText, Clock, ChevronDown, ChevronUp, Eye } from 'lucide-react';
+import { Briefcase, Plus, Trash2, Edit3, Check, X, Users, FileText, Clock, ChevronDown, ChevronUp, Eye, UserPlus } from 'lucide-react';
 import Navbar from '../components/Navbar';
 
 const EMPTY_JOB = {
@@ -86,6 +86,42 @@ export default function AdminCareers() {
         const updated = applications.map(a => a.id === appId ? { ...a, status } : a);
         setApplications(updated);
         localStorage.setItem('kolay_applications', JSON.stringify(updated));
+    };
+
+    // Hire applicant: create employee record pre-filled from application data
+    const hireApplicant = (app) => {
+        const employees = JSON.parse(localStorage.getItem('kolay_employees') || '[]');
+        const nums = employees.map(e => parseInt(e.empNo?.replace('KLY-', '') || '0')).filter(n => !isNaN(n));
+        const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
+        const empNo = `KLY-${String(next).padStart(3, '0')}`;
+        const job = jobs.find(j => j.id === app.jobId);
+        const nameParts = (app.fullName || '').trim().split(' ');
+        const newEmployee = {
+            id: Date.now(),
+            empNo,
+            firstName: nameParts[0] || '',
+            lastName: nameParts.slice(1).join(' ') || '',
+            designation: job?.title || '',
+            department: job?.department || '',
+            email: app.email || '',
+            phone: app.phone || '',
+            nationalId: '',
+            gender: 'Male',
+            dob: '',
+            address: '',
+            emergencyContact: '',
+            contractStart: new Date().toISOString().split('T')[0],
+            contractEnd: '',
+            contractYears: job?.contractYears || 5,
+            salary: '',
+            status: 'Active',
+            notes: `Hired from job application on ${new Date().toLocaleDateString()}`,
+            image: app.profileImage || '',
+        };
+        localStorage.setItem('kolay_employees', JSON.stringify([...employees, newEmployee]));
+        // Mark application as Approved
+        updateAppStatus(app.id, 'Approved');
+        alert(`${app.fullName} has been added as employee ${empNo}. Go to the Employees section to complete their profile.`);
     };
 
     const handleCancel = () => {
@@ -303,12 +339,18 @@ export default function AdminCareers() {
                             applications.map(app => {
                                 const job = jobs.find(j => j.id === app.jobId);
                                 const isExpanded = expandedApp === app.id;
+                                const initials = (app.fullName || '').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
                                 return (
                                     <div key={app.id} className="bg-white rounded-3xl border border-primary/5 shadow-sm overflow-hidden">
                                         <div className="flex items-center justify-between p-6 cursor-pointer" onClick={() => setExpandedApp(isExpanded ? null : app.id)}>
                                             <div className="flex items-center gap-4">
-                                                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-sm text-white ${app.type === 'renewal' ? 'bg-green-600' : 'bg-secondary'}`}>
-                                                    {app.type === 'renewal' ? '↻' : 'N'}
+                                                {app.profileImage ? (
+                                                    <img src={app.profileImage} alt={app.fullName}
+                                                        className="w-12 h-12 rounded-2xl object-cover border border-primary/10 shrink-0"
+                                                        onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+                                                ) : null}
+                                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-sm text-white shrink-0 ${app.type === 'renewal' ? 'bg-green-600' : 'bg-secondary'} ${app.profileImage ? 'hidden' : 'flex'}`}>
+                                                    {app.type === 'renewal' ? '↻' : (initials || 'N')}
                                                 </div>
                                                 <div>
                                                     <p className="font-black text-primary">{app.fullName}</p>
@@ -316,6 +358,14 @@ export default function AdminCareers() {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3">
+                                                {app.type === 'new' && app.status !== 'Rejected' && (
+                                                    <button
+                                                        onClick={e => { e.stopPropagation(); hireApplicant(app); }}
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl text-xs font-black transition-all"
+                                                        title="Hire this applicant">
+                                                        <UserPlus className="w-3.5 h-3.5" /> Hire
+                                                    </button>
+                                                )}
                                                 <select
                                                     value={app.status}
                                                     onClick={e => e.stopPropagation()}
@@ -336,6 +386,17 @@ export default function AdminCareers() {
 
                                         {isExpanded && (
                                             <div className="border-t border-primary/5 p-6 bg-bg-cream/30 space-y-4">
+                                                {/* Profile photo in expanded view */}
+                                                {app.profileImage && (
+                                                    <div className="flex items-center gap-4 bg-white rounded-2xl p-4 border border-primary/5">
+                                                        <img src={app.profileImage} alt={app.fullName}
+                                                            className="w-20 h-20 rounded-2xl object-cover border border-primary/10" />
+                                                        <div>
+                                                            <p className="text-[10px] font-black uppercase text-charcoal/40 mb-1">Profile Photo</p>
+                                                            <p className="text-xs text-charcoal/50 font-semibold">Submitted with application</p>
+                                                        </div>
+                                                    </div>
+                                                )}
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                                                     {Object.entries(app.answers || {}).map(([q, a]) => (
                                                         <div key={q} className="bg-white rounded-2xl p-4 border border-primary/5">

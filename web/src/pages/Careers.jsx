@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Briefcase, MapPin, Clock, ChevronDown, ChevronUp, ArrowRight, Check, X, User, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Briefcase, MapPin, Clock, ChevronDown, ChevronUp, ArrowRight, Check, X, User, RefreshCw, Upload, Camera } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
 
 const getJobs = () => {
@@ -50,9 +50,12 @@ export default function Careers() {
     const [authForm, setAuthForm] = useState({ name: '', email: '', phone: '', password: '', confirmPassword: '' });
     const [authError, setAuthError] = useState('');
 
-    // Application answers
+    // Application answers + profile image
     const [answers, setAnswers] = useState({});
+    const [profileImage, setProfileImage] = useState('');
+    const [imageError, setImageError] = useState('');
     const [submitted, setSubmitted] = useState(false);
+    const fileRef = useRef();
 
     useEffect(() => {
         const handler = () => setJobs(getJobs());
@@ -63,7 +66,10 @@ export default function Careers() {
     const openApply = (job) => {
         setSelectedJob(job);
         setFlow('choose');
+        setFlowType('new');
         setAnswers({});
+        setProfileImage('');
+        setImageError('');
         setAuthError('');
     };
 
@@ -73,6 +79,8 @@ export default function Careers() {
         if (account) { setFlow('renewal'); }
         else { setFlow('choose'); }
         setAnswers({});
+        setProfileImage('');
+        setImageError('');
         setAuthError('');
     };
 
@@ -111,6 +119,12 @@ export default function Careers() {
     // ── Submit application ────────────────────────────────────────────────────
     const handleSubmitApplication = (e) => {
         e.preventDefault();
+        // Profile image is required for new hire applications
+        if (flowType === 'new' && !profileImage) {
+            setImageError('A profile photo is required to submit your application.');
+            return;
+        }
+        setImageError('');
         const apps = JSON.parse(localStorage.getItem('kolay_applications') || '[]');
         const newApp = {
             id: Date.now(),
@@ -119,6 +133,7 @@ export default function Careers() {
             fullName: account.name,
             email: account.email,
             phone: account.phone,
+            profileImage: profileImage || '',
             answers,
             status: 'Pending',
             submittedAt: new Date().toISOString(),
@@ -127,6 +142,14 @@ export default function Careers() {
         window.dispatchEvent(new Event('storage'));
         setSubmitted(true);
         setFlow('done');
+    };
+
+    const handleImageFile = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => { setProfileImage(ev.target.result); setImageError(''); };
+        reader.readAsDataURL(file);
     };
 
     const questions = flowType === 'renewal' ? RENEWAL_QUESTIONS : NEW_HIRE_QUESTIONS;
@@ -348,6 +371,42 @@ export default function Careers() {
                                     <div className="bg-[#E67E22]/10 border border-[#E67E22]/20 rounded-2xl px-4 py-3 text-sm text-[#E67E22] font-bold mb-2">
                                         Applying as: {account?.name} ({account?.email})
                                     </div>
+
+                                    {/* Profile Photo — required for new hire applications */}
+                                    {flowType === 'new' && (
+                                        <div>
+                                            <label className={`${labelCls} flex items-center gap-1`}>
+                                                <Camera className="w-3 h-3" /> Profile Photo <span className="text-red-400">*</span>
+                                            </label>
+                                            <p className="text-white/30 text-xs mb-3">A clear, recent photo is required as part of your application.</p>
+
+                                            {profileImage ? (
+                                                <div className="flex items-center gap-4 p-3 bg-white/5 rounded-2xl border border-white/10">
+                                                    <img src={profileImage} alt="Profile preview"
+                                                        className="w-16 h-16 rounded-xl object-cover border border-white/10" />
+                                                    <div className="flex-1">
+                                                        <p className="text-white/60 text-xs font-semibold mb-2">Photo uploaded</p>
+                                                        <button type="button" onClick={() => { setProfileImage(''); if (fileRef.current) fileRef.current.value = ''; }}
+                                                            className="text-xs text-red-400 hover:text-red-300 font-bold transition-colors">
+                                                            Remove
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div>
+                                                    <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageFile} />
+                                                    <button type="button" onClick={() => fileRef.current.click()}
+                                                        className={`w-full border-2 border-dashed rounded-2xl py-6 flex flex-col items-center gap-2 transition-all ${imageError ? 'border-red-400/50 bg-red-400/5' : 'border-white/10 hover:border-[#E67E22]/40 bg-white/3 hover:bg-white/5'}`}>
+                                                        <Upload className={`w-6 h-6 ${imageError ? 'text-red-400' : 'text-white/30'}`} />
+                                                        <span className={`text-sm font-bold ${imageError ? 'text-red-400' : 'text-white/40'}`}>Click to upload your photo</span>
+                                                        <span className="text-white/20 text-xs">JPG, PNG, WEBP accepted</span>
+                                                    </button>
+                                                </div>
+                                            )}
+                                            {imageError && <p className="text-red-400 text-xs font-bold mt-2">{imageError}</p>}
+                                        </div>
+                                    )}
+
                                     {questions.map(q => (
                                         <div key={q.key}>
                                             <label className={labelCls}>{q.label}</label>
