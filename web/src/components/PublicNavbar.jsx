@@ -80,8 +80,8 @@ const PublicNavbar = () => {
                         </span>
                     </Link>
 
-                    {/* ── CENTRE: Nav links (no Home — logo handles it) ── */}
-                    <div className="hidden lg:flex items-center gap-8 flex-1 justify-center">
+                    {/* ── CENTRE: Nav links — shifted slightly right ── */}
+                    <div className="hidden lg:flex items-center gap-8 flex-1 justify-end pr-10">
                         {navLinks.map(link => renderLink(link))}
                     </div>
 
@@ -107,22 +107,12 @@ const PublicNavbar = () => {
                                 </Link>
                                 <Link
                                     to="/register"
-                                    className="flex items-center gap-1.5 bg-[#E67E22] hover:bg-[#cf6d17] text-white text-[11px] font-black uppercase tracking-widest px-4 py-2 rounded-full transition-all duration-200 shadow-md hover:shadow-[#E67E22]/40 hover:shadow-lg active:scale-95"
+                                    className="flex items-center gap-1.5 bg-[#E67E22] hover:bg-[#cf6d17] text-white text-[11px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full transition-all duration-200 shadow-md hover:shadow-[#E67E22]/40 hover:shadow-lg active:scale-95"
                                 >
                                     <UserPlus className="w-3.5 h-3.5" /> Create Account
                                 </Link>
                             </>
                         )}
-
-                        {/* Divider */}
-                        <div className="w-px h-5 bg-white/15" />
-
-                        <Link
-                            to="/order"
-                            className="flex items-center gap-1.5 bg-[#D4A017] hover:bg-[#b8891a] text-white text-[11px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full transition-all duration-200 shadow-md hover:shadow-[#D4A017]/40 hover:shadow-lg active:scale-95"
-                        >
-                            Order Online
-                        </Link>
                     </div>
 
                     {/* ── MOBILE: Hamburger ── */}
@@ -185,19 +175,12 @@ const PublicNavbar = () => {
                                     <Link
                                         to="/register"
                                         onClick={() => setIsMobileMenuOpen(false)}
-                                        className="flex items-center justify-center gap-2 bg-[#E67E22] hover:bg-[#cf6d17] text-white font-bold text-sm py-3 rounded-2xl transition-all shadow-lg"
+                                        className="col-span-1 flex items-center justify-center gap-2 bg-[#E67E22] hover:bg-[#cf6d17] text-white font-bold text-sm py-3 rounded-2xl transition-all shadow-lg"
                                     >
-                                        <UserPlus className="w-4 h-4" /> Register
+                                        <UserPlus className="w-4 h-4" /> Create Account
                                     </Link>
                                 </>
                             )}
-                            <Link
-                                to="/order"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="col-span-2 flex items-center justify-center gap-2 bg-[#D4A017] hover:bg-[#b8891a] text-white font-black text-sm py-4 rounded-2xl transition-all shadow-lg"
-                            >
-                                Order Online
-                            </Link>
                         </div>
                     </div>
                 </div>
