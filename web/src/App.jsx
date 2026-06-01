@@ -5,7 +5,6 @@ import POS from './pages/POS';
 import KDS from './pages/KDS';
 import Inventory from './pages/Inventory';
 import AdminPanel from './pages/AdminPanel';
-import Login from './pages/Login';
 import Home from './pages/Home';
 import GuestMenu from './pages/GuestMenu';
 import Reservations from './pages/Reservations';
@@ -14,6 +13,8 @@ import Specialties from './pages/Specialties';
 import Careers from './pages/Careers';
 import AdminCareers from './pages/AdminCareers';
 import Employees from './pages/Employees';
+import StaffEntry from './pages/StaffEntry';
+import AdminEntry from './pages/AdminEntry';
 import './index.css';
 
 function App() {
@@ -24,7 +25,6 @@ function App() {
         <Route path="/order" element={<GuestMenu />} />
         <Route path="/reservations" element={<Reservations />} />
         <Route path="/admin/reservations" element={<ManageReservations />} />
-        <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/pos" element={<POS />} />
         <Route path="/kds" element={<KDS />} />
@@ -34,6 +34,8 @@ function App() {
         <Route path="/careers" element={<Careers />} />
         <Route path="/admin/careers" element={<AdminCareers />} />
         <Route path="/employees" element={<Employees />} />
+        <Route path="/staff" element={<StaffEntry />} />
+        <Route path="/admin-portal" element={<AdminEntry />} />
       </Routes>
     </Router>
   );

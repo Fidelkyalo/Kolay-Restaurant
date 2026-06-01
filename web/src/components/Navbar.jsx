@@ -59,7 +59,7 @@ const Navbar = () => {
     const handleLogout = () => {
         clearRole();
         localStorage.removeItem('kolay_auth_user');
-        navigate('/login');
+        navigate('/');
     };
 
     const portalLabel = isAdmin ? 'Admin Portal' : 'Staff Portal';
