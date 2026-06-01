@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Utensils, Star, Clock, MapPin, Phone, Camera, MessageCircle,
     Send, ArrowRight, Calendar, ChevronDown, Check, ChefHat,
@@ -10,6 +10,21 @@ import { Link } from 'react-router-dom';
 const Home = () => {
     const [reservationSuccess, setReservationSuccess] = useState(false);
     const [activeMenuTab, setActiveMenuTab] = useState('Starters');
+
+    const [tonightsSpecial, setTonightsSpecial] = useState(() => {
+        const saved = localStorage.getItem('kolay_settings');
+        return saved ? (JSON.parse(saved).tonightsSpecial || 'Signature Ribeye') : 'Signature Ribeye';
+    });
+
+    // Keep in sync if admin updates it in another tab
+    useEffect(() => {
+        const handleStorage = () => {
+            const saved = localStorage.getItem('kolay_settings');
+            if (saved) setTonightsSpecial(JSON.parse(saved).tonightsSpecial || 'Signature Ribeye');
+        };
+        window.addEventListener('storage', handleStorage);
+        return () => window.removeEventListener('storage', handleStorage);
+    }, []);
 
     const featuredMeals = [
         { id: 1, name: 'Gourmet Beef Burger', price: 1200, desc: 'Aged wagyu beef, truffle aioli, melted brie on brioche.', tag: 'Best Seller', image: '/assets/burger.png' },
@@ -143,16 +158,13 @@ const Home = () => {
                         {/* Floating info card */}
                         <div className="absolute -bottom-6 -left-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 w-52 shadow-xl">
                             <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1 font-black">Tonight's Special</p>
-                            <p className="text-white font-black text-sm leading-tight mb-2">Signature Ribeye</p>
+                            <p className="text-white font-black text-sm leading-tight mb-2">{tonightsSpecial}</p>
                             <div className="flex items-center gap-1">
                                 {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-[#E67E22] text-[#E67E22]" />)}
                             </div>
                         </div>
 
-                        {/* Price badge */}
-                        <div className="absolute top-6 right-6 bg-[#E67E22] text-white px-4 py-2 rounded-xl font-black text-sm shadow-glow">
-                            KES 3,500
-                        </div>
+                        {/* Price badge — removed */}
                     </div>
                 </div>
 
