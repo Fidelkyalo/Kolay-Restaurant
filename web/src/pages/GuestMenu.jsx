@@ -3,8 +3,33 @@ import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, ArrowRight, CreditCa
 import { Link, useLocation } from 'react-router-dom';
 import { MenuService, OrderService } from '../services/api';
 
+const MENU_DEFAULTS = [
+    { id: 1,  name: 'Gourmet Beef Burger',    price: 1200, category: 'Main Dish',  image: '/assets/burger.png',  desc: 'Aged wagyu beef, truffle aioli.' },
+    { id: 2,  name: 'Signature Ribeye',        price: 3500, category: 'Main Dish',  image: '/assets/steak.png',   desc: 'Prime ribeye, garlic herb butter.' },
+    { id: 3,  name: 'Herb-Crusted Salmon',     price: 2100, category: 'Main Dish',  image: '/assets/salmon.png',  desc: 'Fresh salmon with sesame glaze.' },
+    { id: 4,  name: 'Crispy Calamari',         price: 850,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600', desc: 'Golden fried with spicy marinara.' },
+    { id: 5,  name: 'Bruschetta',              price: 650,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600', desc: 'Fresh tomatoes, garlic, hand-torn basil.' },
+    { id: 6,  name: 'Chocolate Fondant',       price: 700,  category: 'Desserts',   image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600', desc: 'Warm dark chocolate lava cake.' },
+    { id: 7,  name: 'Iced Latte',              price: 450,  category: 'Beverages',  image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600', desc: 'Chilled espresso over milk.' },
+    { id: 8,  name: 'Margherita Pizza',        price: 1100, category: 'Main Dish',  image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&q=80&w=600', desc: 'Fresh mozzarella, basil, tomato sauce.' },
+    { id: 9,  name: 'French Fries',            price: 300,  category: 'Side Dish',  image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&q=80&w=600', desc: 'Crispy golden fries with sea salt.' },
+    { id: 10, name: 'Pancakes',                price: 550,  category: 'BreakFast',  image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&q=80&w=600', desc: 'Fluffy stack with maple syrup.' },
+];
+
+// Load the best available local data synchronously so the menu renders immediately
+const getLocalDishes = () => {
+    try {
+        const saved = JSON.parse(localStorage.getItem('kolay_dishes'));
+        if (saved && saved.length > 0 && saved[0].image &&
+            (saved[0].image.startsWith('http') || saved[0].image.startsWith('/'))) {
+            return saved;
+        }
+    } catch (e) { /* ignore */ }
+    return MENU_DEFAULTS;
+};
+
 const GuestMenu = () => {
-    const [dishes, setDishes] = useState([]);
+    const [dishes, setDishes] = useState(getLocalDishes);
     const [cart, setCart] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -21,50 +46,23 @@ const GuestMenu = () => {
     const [guestInfo, setGuestInfo] = useState({ name: '', phone: '', address: '', mode: initialMode });
 
     useEffect(() => {
-        const fetchMenu = async () => {
+        // Silently refresh from API in the background — menu is already visible from local data
+        const refreshFromApi = async () => {
             try {
                 const response = await MenuService.getProducts();
                 if (response.data && response.data.length > 0) {
                     setDishes(response.data);
-                    if (!viewAll) setSelectedCategory(response.data[0]?.category || '');
-                    return;
+                    localStorage.setItem('kolay_dishes', JSON.stringify(response.data));
+                    if (!viewAll && !selectedCategory) {
+                        setSelectedCategory(response.data[0]?.category || '');
+                    }
                 }
             } catch (error) {
-                console.error("Failed to fetch menu from API, using fallback:", error);
-            }
-
-            // Fallback logic
-            let savedDishes;
-            try {
-                savedDishes = JSON.parse(localStorage.getItem('kolay_dishes'));
-                // Invalidate old emoji-based data
-                if (savedDishes && savedDishes.length > 0 && savedDishes[0].image && !savedDishes[0].image.startsWith('http') && !savedDishes[0].image.startsWith('/')) {
-                    savedDishes = null;
-                }
-            } catch (e) { }
-
-            if (savedDishes) {
-                setDishes(savedDishes);
-                if (!viewAll) setSelectedCategory(savedDishes[0]?.category || '');
-            } else {
-                const defaults = [
-                    { id: 1,  name: 'Gourmet Beef Burger',    price: 1200, category: 'Main Dish',  image: '/assets/burger.png',  desc: 'Aged wagyu beef, truffle aioli.' },
-                    { id: 2,  name: 'Signature Ribeye',        price: 3500, category: 'Main Dish',  image: '/assets/steak.png',   desc: 'Prime ribeye, garlic herb butter.' },
-                    { id: 3,  name: 'Herb-Crusted Salmon',     price: 2100, category: 'Main Dish',  image: '/assets/salmon.png',  desc: 'Fresh salmon with sesame glaze.' },
-                    { id: 4,  name: 'Crispy Calamari',         price: 850,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600', desc: 'Golden fried with spicy marinara.' },
-                    { id: 5,  name: 'Bruschetta',              price: 650,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600', desc: 'Fresh tomatoes, garlic, hand-torn basil.' },
-                    { id: 6,  name: 'Chocolate Fondant',       price: 700,  category: 'Desserts',   image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600', desc: 'Warm dark chocolate lava cake.' },
-                    { id: 7,  name: 'Iced Latte',              price: 450,  category: 'Beverages',  image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600', desc: 'Chilled espresso over milk.' },
-                    { id: 8,  name: 'Margherita Pizza',        price: 1100, category: 'Main Dish',  image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&q=80&w=600', desc: 'Fresh mozzarella, basil, tomato sauce.' },
-                    { id: 9,  name: 'French Fries',            price: 300,  category: 'Side Dish',  image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&q=80&w=600', desc: 'Crispy golden fries with sea salt.' },
-                    { id: 10, name: 'Pancakes',                price: 550,  category: 'BreakFast',  image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&q=80&w=600', desc: 'Fluffy stack with maple syrup.' },
-                ];
-                setDishes(defaults);
-                if (!viewAll) setSelectedCategory(defaults[0].category);
-                localStorage.setItem('kolay_dishes', JSON.stringify(defaults));
+                // API unavailable — local data already shown, nothing to do
+                console.warn("Menu API unavailable, showing cached data:", error.message);
             }
         };
-        fetchMenu();
+        refreshFromApi();
     }, []);
 
     const categories = [...new Set(dishes.map(d => d.category))];
@@ -214,6 +212,7 @@ const GuestMenu = () => {
                                     <img
                                         src={dish.image}
                                         alt={dish.name}
+                                        loading="lazy"
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         onError={(e) => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600'; }}
                                     />
