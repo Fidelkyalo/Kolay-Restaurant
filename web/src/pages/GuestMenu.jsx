@@ -6,13 +6,14 @@ import { MenuService, OrderService } from '../services/api';
 const GuestMenu = () => {
     const [dishes, setDishes] = useState([]);
     const [cart, setCart] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('ALL');
+    const [selectedCategory, setSelectedCategory] = useState('');
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [orderSuccess, setOrderSuccess] = useState(false);
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const orderType = queryParams.get('type');
+    const viewAll = queryParams.get('view') === 'all';
 
     // We override 'Dining In' strictly if they clicked Delivery/Takeaway explicitly
     const initialMode = orderType === 'delivery' ? 'Home Delivery' : (orderType === 'takeaway' ? 'Takeaway' : 'Takeaway');
@@ -25,6 +26,7 @@ const GuestMenu = () => {
                 const response = await MenuService.getProducts();
                 if (response.data && response.data.length > 0) {
                     setDishes(response.data);
+                    if (!viewAll) setSelectedCategory(response.data[0]?.category || '');
                     return;
                 }
             } catch (error) {
@@ -43,6 +45,7 @@ const GuestMenu = () => {
 
             if (savedDishes) {
                 setDishes(savedDishes);
+                if (!viewAll) setSelectedCategory(savedDishes[0]?.category || '');
             } else {
                 const defaults = [
                     { id: 1,  name: 'Gourmet Beef Burger',    price: 1200, category: 'Main Dish',  image: '/assets/burger.png',  desc: 'Aged wagyu beef, truffle aioli.' },
@@ -57,13 +60,14 @@ const GuestMenu = () => {
                     { id: 10, name: 'Pancakes',                price: 550,  category: 'BreakFast',  image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&q=80&w=600', desc: 'Fluffy stack with maple syrup.' },
                 ];
                 setDishes(defaults);
+                if (!viewAll) setSelectedCategory(defaults[0].category);
                 localStorage.setItem('kolay_dishes', JSON.stringify(defaults));
             }
         };
         fetchMenu();
     }, []);
 
-    const categories = ['ALL', ...new Set(dishes.map(d => d.category))];
+    const categories = [...new Set(dishes.map(d => d.category))];
 
     const addToCart = (dish) => {
         const existing = cart.find(item => item.id === dish.id);
@@ -202,7 +206,7 @@ const GuestMenu = () => {
 
                 {/* Dishes Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {dishes.filter(d => selectedCategory === 'ALL' || d.category === selectedCategory).map(dish => (
+                    {dishes.filter(d => !selectedCategory || d.category === selectedCategory).map(dish => (
                         <div key={dish.id} className="group relative bg-white/3 border border-white/5 hover:border-[#E67E22]/40 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-1">
                             {/* Dish image using an img instead of emoji */}
                             <div className="relative h-56 overflow-hidden">
