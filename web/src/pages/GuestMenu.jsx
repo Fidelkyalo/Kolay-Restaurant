@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, ArrowRight, CreditCard, Check, Clock, Lock } from 'lucide-react';
+import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, ArrowRight, CreditCard, Check, Clock, Lock, UserPlus, LogIn } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MenuService, OrderService } from '../services/api';
 
@@ -234,17 +234,46 @@ const GuestMenu = () => {
                             </span>
                         </div>
                     </div>
-                    <button
-                        onClick={() => setIsCartOpen(true)}
-                        className="relative bg-[#E67E22] hover:bg-[#D4A017] text-white p-4 rounded-2xl shadow-[0_0_30px_#E67E2240] hover:scale-105 active:scale-95 transition-all"
-                    >
-                        <ShoppingCart className="w-6 h-6" />
-                        {cart.length > 0 && (
-                            <span className="absolute -top-2 -right-2 bg-white text-[#E67E22] w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border border-white/20">
-                                {cart.reduce((acc, item) => acc + item.quantity, 0)}
-                            </span>
+                    <div className="flex items-center gap-3">
+                        {/* Auth buttons — only shown when not logged in */}
+                        {!isLoggedIn && (
+                            <div className="hidden sm:flex items-center gap-2">
+                                <Link
+                                    to="/staff"
+                                    className="flex items-center gap-1.5 text-white/50 hover:text-white font-black text-[10px] uppercase tracking-widest transition-colors px-3 py-2 rounded-xl hover:bg-white/5 border border-white/10"
+                                >
+                                    <LogIn className="w-3.5 h-3.5" /> Sign In
+                                </Link>
+                                <Link
+                                    to="/register"
+                                    className="flex items-center gap-1.5 bg-[#E67E22] hover:bg-[#D4A017] text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
+                                >
+                                    <UserPlus className="w-3.5 h-3.5" /> Create Account
+                                </Link>
+                            </div>
                         )}
-                    </button>
+                        {isLoggedIn && (
+                            <div className="hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+                                <div className="w-6 h-6 bg-[#E67E22] rounded-full flex items-center justify-center text-[10px] font-black text-white">
+                                    {(() => { try { return JSON.parse(localStorage.getItem('kolay_auth_user'))?.username?.[0]?.toUpperCase() || '?'; } catch { return '?'; } })()}
+                                </div>
+                                <span className="text-white/60 text-xs font-bold">
+                                    {(() => { try { return JSON.parse(localStorage.getItem('kolay_auth_user'))?.username || 'Member'; } catch { return 'Member'; } })()}
+                                </span>
+                            </div>
+                        )}
+                        <button
+                            onClick={() => setIsCartOpen(true)}
+                            className="relative bg-[#E67E22] hover:bg-[#D4A017] text-white p-4 rounded-2xl shadow-[0_0_30px_#E67E2240] hover:scale-105 active:scale-95 transition-all"
+                        >
+                            <ShoppingCart className="w-6 h-6" />
+                            {cart.length > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-white text-[#E67E22] w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black border border-white/20">
+                                    {cart.reduce((acc, item) => acc + item.quantity, 0)}
+                                </span>
+                            )}
+                        </button>
+                    </div>
                 </div>
             </header>
 
@@ -549,18 +578,24 @@ const GuestMenu = () => {
                         </div>
                         <h2 className="text-2xl font-display font-black text-white mb-3">Account Required</h2>
                         <p className="text-white/40 text-sm leading-relaxed mb-8">
-                            Ordering specialties is exclusive to registered members. Sign in or create an account to enjoy our seasonal specials with a <strong className="text-[#E67E22]">10% discount</strong>.
+                            Ordering specialties is exclusive to registered members. Sign in or create a free account to enjoy our seasonal specials with a <strong className="text-[#E67E22]">10% discount</strong>.
                         </p>
                         <div className="space-y-3">
                             <Link
-                                to="/staff"
+                                to="/register"
                                 className="w-full bg-[#E67E22] hover:bg-[#D4A017] text-white font-black py-4 rounded-xl text-sm uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2 shadow-[0_0_30px_#E67E2230]"
                             >
-                                Sign In to Order
+                                <UserPlus className="w-4 h-4" /> Create Free Account
+                            </Link>
+                            <Link
+                                to="/staff"
+                                className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black py-3.5 rounded-xl text-sm uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2"
+                            >
+                                <LogIn className="w-4 h-4" /> Sign In
                             </Link>
                             <button
                                 onClick={() => setShowAuthGate(false)}
-                                className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white/50 font-black py-3 rounded-xl text-[10px] uppercase tracking-widest transition-colors"
+                                className="w-full text-white/30 hover:text-white/50 font-bold py-2 text-xs uppercase tracking-widest transition-colors"
                             >
                                 Continue Browsing
                             </button>

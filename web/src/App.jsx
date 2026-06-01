@@ -15,6 +15,7 @@ import AdminCareers from './pages/AdminCareers';
 import Employees from './pages/Employees';
 import StaffEntry from './pages/StaffEntry';
 import AdminEntry from './pages/AdminEntry';
+import Register from './pages/Register';
 import './index.css';
 
 function App() {
@@ -36,6 +37,8 @@ function App() {
         <Route path="/employees" element={<Employees />} />
         <Route path="/staff" element={<StaffEntry />} />
         <Route path="/admin-portal" element={<AdminEntry />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<StaffEntry />} />
       </Routes>
     </Router>
   );
