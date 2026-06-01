@@ -11,19 +11,27 @@ const Home = () => {
     const [reservationSuccess, setReservationSuccess] = useState(false);
     const [activeMenuTab, setActiveMenuTab] = useState('Starters');
 
-    const [tonightsSpecial, setTonightsSpecial] = useState(() => {
-        const saved = localStorage.getItem('kolay_settings');
-        return saved ? (JSON.parse(saved).tonightsSpecial || 'Signature Ribeye') : 'Signature Ribeye';
-    });
+    // Read the first currently-active specialty for the hero card
+    const getActiveSpecialty = () => {
+        try {
+            const list = JSON.parse(localStorage.getItem('kolay_specialties') || '[]');
+            const now = new Date();
+            return list.find(sp => {
+                const start = sp.startDate ? new Date(sp.startDate) : null;
+                const end = sp.endDate ? new Date(sp.endDate) : null;
+                if (start && now < start) return false;
+                if (end && now > end) return false;
+                return true;
+            }) || null;
+        } catch { return null; }
+    };
 
-    // Keep in sync if admin updates it in another tab
+    const [activeSpecialty, setActiveSpecialty] = useState(getActiveSpecialty);
+
     useEffect(() => {
-        const handleStorage = () => {
-            const saved = localStorage.getItem('kolay_settings');
-            if (saved) setTonightsSpecial(JSON.parse(saved).tonightsSpecial || 'Signature Ribeye');
-        };
-        window.addEventListener('storage', handleStorage);
-        return () => window.removeEventListener('storage', handleStorage);
+        const handler = () => setActiveSpecialty(getActiveSpecialty());
+        window.addEventListener('storage', handler);
+        return () => window.removeEventListener('storage', handler);
     }, []);
 
     const featuredMeals = [
@@ -156,9 +164,20 @@ const Home = () => {
                         </div>
 
                         {/* Floating info card */}
-                        <div className="absolute -bottom-6 -left-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 w-52 shadow-xl">
-                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1 font-black">Tonight's Special</p>
-                            <p className="text-white font-black text-sm leading-tight mb-2">{tonightsSpecial}</p>
+                        <div className="absolute -bottom-6 -left-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 w-56 shadow-xl">
+                            <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1 font-black">
+                                {activeSpecialty ? `${activeSpecialty.season} Special` : "Tonight's Special"}
+                            </p>
+                            <p className="text-white font-black text-sm leading-tight mb-2">
+                                {activeSpecialty ? activeSpecialty.name : 'Signature Ribeye'}
+                            </p>
+                            {activeSpecialty && (
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="text-white/40 line-through text-xs">KES {activeSpecialty.originalPrice.toLocaleString()}</span>
+                                    <span className="text-[#E67E22] font-black text-xs">KES {activeSpecialty.discountedPrice.toLocaleString()}</span>
+                                    <span className="bg-[#E67E22] text-white text-[9px] font-black px-1.5 py-0.5 rounded-md">10% OFF</span>
+                                </div>
+                            )}
                             <div className="flex items-center gap-1">
                                 {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-[#E67E22] text-[#E67E22]" />)}
                             </div>

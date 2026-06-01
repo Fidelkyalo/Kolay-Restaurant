@@ -10,6 +10,7 @@ import Home from './pages/Home';
 import GuestMenu from './pages/GuestMenu';
 import Reservations from './pages/Reservations';
 import ManageReservations from './pages/ManageReservations';
+import Specialties from './pages/Specialties';
 import './index.css';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/kds" element={<KDS />} />
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/admin" element={<AdminPanel />} />
+        <Route path="/specialties" element={<Specialties />} />
       </Routes>
     </Router>
   );

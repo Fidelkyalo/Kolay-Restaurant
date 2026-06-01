@@ -99,10 +99,20 @@ const POS = () => {
                             ${lastPlacedOrder.items.map(item => `
                                 <tr>
                                     <td class="qty">${item.quantity}</td>
-                                    <td>${item.name}</td>
-                                    <td class="price">${((item.price || 0) * item.quantity).toLocaleString()}</td>
+                                    <td>${item.name}${item.isSpecialty ? ' <span style="color:#E67E22;font-size:9px;font-weight:bold;">★ SPECIAL</span>' : ''}</td>
+                                    <td class="price">
+                                        ${item.isSpecialty && item.originalPrice
+                                            ? `<span style="text-decoration:line-through;color:#aaa;font-size:11px;">KES ${(item.originalPrice * item.quantity).toLocaleString()}</span><br><strong>KES ${(item.price * item.quantity).toLocaleString()}</strong>`
+                                            : `KES ${((item.price || 0) * item.quantity).toLocaleString()}`
+                                        }
+                                    </td>
                                 </tr>
                             `).join('')}
+                            ${lastPlacedOrder.specialtyDiscount > 0 ? `
+                            <tr style="color:#E67E22;">
+                                <td colspan="2" style="padding-top: 8px; border-top: 1px dashed #eee; font-weight:bold;">🎉 Specialty Discount (10%)</td>
+                                <td style="padding-top: 8px; border-top: 1px dashed #eee; text-align: right; font-weight:bold;">- KES ${lastPlacedOrder.specialtyDiscount.toLocaleString()}</td>
+                            </tr>` : ''}
                             <tr>
                                 <td colspan="2" style="padding-top: 10px; border-top: 1px dashed #eee;">SUBTOTAL</td>
                                 <td style="padding-top: 10px; border-top: 1px dashed #eee; text-align: right;">KES ${lastPlacedOrder.subtotal.toLocaleString()}</td>
@@ -294,10 +304,11 @@ const POS = () => {
         const newOrder = {
             id: `#${Math.floor(1000 + Math.random() * 9000)}`,
             table: selectedTable,
-            items: cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price, notes: '' })),
+            items: cart.map(item => ({ name: item.name, quantity: item.quantity, price: item.price, originalPrice: item.originalPrice, isSpecialty: item.isSpecialty, notes: '' })),
             total: `KES ${(subtotal + tax).toLocaleString()}`,
             subtotal: subtotal,
             tax: tax,
+            specialtyDiscount: cart.reduce((acc, item) => item.isSpecialty && item.originalPrice ? acc + ((item.originalPrice - item.price) * item.quantity) : acc, 0),
             totalAmount: total,
             status: 'PENDING',
             paymentStatus: 'UNPAID',

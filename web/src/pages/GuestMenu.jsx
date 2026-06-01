@@ -28,8 +28,34 @@ const getLocalDishes = () => {
     return MENU_DEFAULTS;
 };
 
+// Get currently active specialties from localStorage
+const getActiveSpecialties = () => {
+    try {
+        const list = JSON.parse(localStorage.getItem('kolay_specialties') || '[]');
+        const now = new Date();
+        return list.filter(sp => {
+            const start = sp.startDate ? new Date(sp.startDate) : null;
+            const end = sp.endDate ? new Date(sp.endDate) : null;
+            if (start && now < start) return false;
+            if (end && now > end) return false;
+            return true;
+        }).map(sp => ({
+            id: `sp_${sp.id}`,
+            name: sp.name,
+            // Store the discounted price as the cart price; keep original for display
+            price: sp.discountedPrice,
+            originalPrice: sp.originalPrice,
+            discount: sp.discount,
+            category: 'Specialties',
+            image: sp.image || '',
+            desc: sp.description || `${sp.season} special — ${sp.discount}% off`,
+            isSpecialty: true,
+        }));
+    } catch { return []; }
+};
+
 const GuestMenu = () => {
-    const [dishes, setDishes] = useState(getLocalDishes);
+    const [dishes, setDishes] = useState(() => [...getLocalDishes(), ...getActiveSpecialties()]);
     const [cart, setCart] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isCartOpen, setIsCartOpen] = useState(false);
@@ -51,21 +77,30 @@ const GuestMenu = () => {
             try {
                 const response = await MenuService.getProducts();
                 if (response.data && response.data.length > 0) {
-                    setDishes(response.data);
                     localStorage.setItem('kolay_dishes', JSON.stringify(response.data));
+                    setDishes([...response.data, ...getActiveSpecialties()]);
                     if (!viewAll && !selectedCategory) {
                         setSelectedCategory(response.data[0]?.category || '');
                     }
                 }
             } catch (error) {
-                // API unavailable — local data already shown, nothing to do
                 console.warn("Menu API unavailable, showing cached data:", error.message);
             }
         };
         refreshFromApi();
+
+        // Re-merge specialties when admin updates them
+        const handleStorage = () => {
+            setDishes(prev => {
+                const nonSpecialty = prev.filter(d => !d.isSpecialty);
+                return [...nonSpecialty, ...getActiveSpecialties()];
+            });
+        };
+        window.addEventListener('storage', handleStorage);
+        return () => window.removeEventListener('storage', handleStorage);
     }, []);
 
-    const CATEGORY_ORDER = ['All', 'BreakFast', 'Starters', 'Main Dish', 'Side Dish', 'Desserts', 'Beverages'];
+    const CATEGORY_ORDER = ['All', 'BreakFast', 'Starters', 'Main Dish', 'Side Dish', 'Desserts', 'Beverages', 'Specialties'];
     const categories = [...new Set(dishes.map(d => d.category))]
         .sort((a, b) => {
             const ai = CATEGORY_ORDER.indexOf(a);
@@ -101,6 +136,14 @@ const GuestMenu = () => {
     const taxRate = systemSettings.taxRate || 16;
     const isTaxInclusive = systemSettings.isTaxInclusive !== undefined ? systemSettings.isTaxInclusive : true;
 
+    // Specialty items already carry the discounted price; compute the saved amount for display
+    const specialtyDiscount = cart.reduce((acc, item) => {
+        if (item.isSpecialty && item.originalPrice) {
+            return acc + ((item.originalPrice - item.price) * item.quantity);
+        }
+        return acc;
+    }, 0);
+
     const rawSubtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
     let subtotal, tax, total;
 
@@ -123,6 +166,7 @@ const GuestMenu = () => {
             total: `KES ${total.toLocaleString()}`,
             subtotal: subtotal,
             tax: tax,
+            specialtyDiscount: specialtyDiscount,
             totalAmount: total,
             table: modeLabel,
             status: 'PENDING',
@@ -201,16 +245,31 @@ const GuestMenu = () => {
                             <button
                                 key={cat}
                                 onClick={() => setSelectedCategory(cat)}
-                                className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${selectedCategory === cat
-                                    ? 'bg-[#E67E22] text-white shadow-[0_0_20px_#E67E2240]'
-                                    : 'text-white/40 hover:text-white'
-                                    }`}
+                                className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300 ${
+                                    cat === 'Specialties'
+                                        ? selectedCategory === cat
+                                            ? 'bg-[#E67E22] text-white shadow-[0_0_20px_#E67E2240]'
+                                            : 'text-[#E67E22] border border-[#E67E22]/40 hover:bg-[#E67E22]/10'
+                                        : selectedCategory === cat
+                                            ? 'bg-[#E67E22] text-white shadow-[0_0_20px_#E67E2240]'
+                                            : 'text-white/40 hover:text-white'
+                                }`}
                             >
-                                {cat}
+                                {cat === 'Specialties' ? '✦ Specialties' : cat}
                             </button>
                         ))}
                     </div>
                 </div>
+
+                {/* Specialties discount notice */}
+                {selectedCategory === 'Specialties' && (
+                    <div className="flex items-center justify-center gap-3 mb-8 bg-[#E67E22]/10 border border-[#E67E22]/30 rounded-2xl px-6 py-4 max-w-lg mx-auto">
+                        <span className="text-2xl">🎉</span>
+                        <p className="text-[#E67E22] font-black text-sm">
+                            All Specialties include a <strong>10% discount</strong> — automatically applied at checkout!
+                        </p>
+                    </div>
+                )}
 
                 {/* Dishes Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -239,7 +298,15 @@ const GuestMenu = () => {
                                 <h3 className="text-white font-black text-lg group-hover:text-[#E67E22] transition-colors mb-2 leading-tight line-clamp-1">{dish.name}</h3>
                                 <p className="text-white/30 text-xs leading-relaxed line-clamp-2 mb-6">{dish.desc || 'Finest local ingredients, gourmet prep.'}</p>
                                 <div className="flex justify-between items-center mt-auto">
-                                    <span className="text-[#E67E22] font-black text-lg shrink-0">KES {dish.price.toLocaleString()}</span>
+                                    <div>
+                                        {dish.isSpecialty && dish.originalPrice && (
+                                            <div className="flex items-center gap-2 mb-0.5">
+                                                <span className="text-white/30 line-through text-xs">KES {dish.originalPrice.toLocaleString()}</span>
+                                                <span className="bg-[#E67E22] text-white text-[9px] font-black px-1.5 py-0.5 rounded-md">10% OFF</span>
+                                            </div>
+                                        )}
+                                        <span className="text-[#E67E22] font-black text-lg shrink-0">KES {dish.price.toLocaleString()}</span>
+                                    </div>
                                     <button
                                         onClick={() => addToCart(dish)}
                                         className="bg-white/5 hover:bg-[#E67E22] border border-white/10 text-white w-12 h-12 rounded-2xl flex items-center justify-center transition-all active:scale-95 group/btn shadow-lg"
@@ -307,6 +374,12 @@ const GuestMenu = () => {
                                     ))}
                                 </div>
                                 <div className="pt-6 pb-8 px-8 bg-[#0D0A07] border-t border-white/5">
+                                    {specialtyDiscount > 0 && (
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="text-green-400 font-black uppercase tracking-widest text-[10px]">🎉 Specialty Savings</span>
+                                            <span className="text-green-400 font-black text-sm">- KES {specialtyDiscount.toLocaleString()}</span>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between items-end mb-6">
                                         <span className="text-white/40 font-black uppercase tracking-widest text-[10px]">Total Amount</span>
                                         <span className="text-3xl font-black text-[#E67E22]">KES {total.toLocaleString()}</span>

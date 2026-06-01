@@ -14,7 +14,6 @@ function AdminPanel() {
             currency: 'Kenya Shillings (KES)',
             taxRate: 16,
             isTaxInclusive: true,
-            tonightsSpecial: 'Signature Ribeye'
         };
     });
 
@@ -57,11 +56,6 @@ function AdminPanel() {
             const updated = { ...settings, isTaxInclusive: editConfig.value === 'INCLUSIVE' };
             setSettings(updated);
             localStorage.setItem('kolay_settings', JSON.stringify(updated));
-        } else if (editConfig.type === 'TONIGHTS_SPECIAL') {
-            const updated = { ...settings, tonightsSpecial: editConfig.value };
-            setSettings(updated);
-            localStorage.setItem('kolay_settings', JSON.stringify(updated));
-            window.dispatchEvent(new Event('storage'));
         } else if (editConfig.type === 'USER') {
             const updatedUsers = users.map(u =>
                 u.id === editConfig.id ? { ...u, name: editConfig.value, role: editConfig.role } : u
@@ -134,19 +128,6 @@ function AdminPanel() {
                                             Toggle Mode
                                         </button>
                                     </div>
-                                </div>
-                                <div className="flex items-center justify-between p-4 bg-bg-cream rounded-2xl border border-primary/5">
-                                    <div>
-                                        <h3 className="font-bold">Tonight's Special</h3>
-                                        <p className="text-sm text-charcoal/60">{settings.tonightsSpecial || 'Signature Ribeye'}</p>
-                                        <p className="text-[11px] text-charcoal/40 mt-0.5">Shown on the home page hero section</p>
-                                    </div>
-                                    <button
-                                        onClick={() => setEditConfig({ type: 'TONIGHTS_SPECIAL', value: settings.tonightsSpecial || 'Signature Ribeye' })}
-                                        className="text-secondary font-bold text-sm hover:underline"
-                                    >
-                                        Update
-                                    </button>
                                 </div>
                             </div>
                         </section>
@@ -235,7 +216,6 @@ function AdminPanel() {
                                     <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">
                                         {editConfig.type === 'NAME' ? 'Restaurant Name'
                                             : editConfig.type === 'CURRENCY' ? 'Currency'
-                                            : editConfig.type === 'TONIGHTS_SPECIAL' ? "Tonight's Special Dish Name"
                                             : 'Full Name'}
                                     </label>
                                     <input
