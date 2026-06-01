@@ -9,8 +9,8 @@ const CREDENTIALS = {
     staff: { username: 'Kolay Staff', password: 'Staff_123' },
 };
 
-const Login = () => {
-    const [portal, setPortal] = useState('admin'); // 'admin' | 'staff'
+const Login = ({ defaultPortal = 'staff' }) => {
+    const [portal, setPortal] = useState(defaultPortal); // 'admin' | 'staff'
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({ username: '', password: '' });
