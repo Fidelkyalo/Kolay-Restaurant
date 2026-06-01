@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Plus, Trash2, Edit3, X, Check, Calendar, Tag, Star, ChevronDown } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import { isAdmin } from '../hooks/useRole';
 
 const EMPTY_FORM = {
     id: null,
@@ -56,6 +57,7 @@ const getMenuDishes = () => {
 };
 
 export default function Specialties() {
+    const adminMode = isAdmin();
     const [specialties, setSpecialties] = useState(getSpecialties);
     const [menuDishes, setMenuDishes] = useState(getMenuDishes);
     const [form, setForm] = useState(EMPTY_FORM);
@@ -164,7 +166,7 @@ export default function Specialties() {
                             Manage seasonal & nightly specials. All specialties carry a <strong className="text-secondary">{DISCOUNT_RATE}% discount</strong> applied automatically at checkout.
                         </p>
                     </div>
-                    {!showForm && (
+                    {!showForm && adminMode && (
                         <button
                             onClick={() => setShowForm(true)}
                             className="flex items-center gap-2 bg-secondary text-white px-6 py-3 rounded-2xl font-bold shadow-lg hover:bg-orange-600 transition-all active:scale-95"
@@ -175,7 +177,7 @@ export default function Specialties() {
                 </div>
 
                 {/* Form */}
-                {showForm && (
+                {showForm && adminMode && (
                     <div className="bg-white rounded-3xl border border-primary/5 shadow-premium p-8 mb-10 animate-in fade-in slide-in-from-top-4 duration-200">
                         <h2 className="text-xl font-bold text-primary mb-6 flex items-center gap-2">
                             {editingId ? <Edit3 className="w-5 h-5 text-secondary" /> : <Plus className="w-5 h-5 text-secondary" />}
@@ -416,7 +418,8 @@ export default function Specialties() {
                                             </div>
                                         )}
 
-                                        {/* Actions */}
+                                        {/* Actions — admin only */}
+                                        {adminMode && (
                                         <div className="flex gap-3 pt-3 border-t border-primary/5">
                                             <button
                                                 onClick={() => handleEdit(sp)}
@@ -431,6 +434,7 @@ export default function Specialties() {
                                                 <Trash2 className="w-3.5 h-3.5" /> Delete
                                             </button>
                                         </div>
+                                        )}
                                     </div>
                                 </div>
                             );

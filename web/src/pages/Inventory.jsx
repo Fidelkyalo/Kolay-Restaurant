@@ -295,6 +295,7 @@ const Inventory = () => {
                                                 <StatusBadge status={item.status} />
                                             </td>
                                             <td className="px-6 py-5 text-right">
+                                                {adminMode ? (
                                                 <div className="flex justify-end gap-2">
                                                     <button onClick={() => updateStock(item.id, -1)}
                                                         className="w-8 h-8 rounded-lg border border-cream flex items-center justify-center font-black hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors text-sm">
@@ -305,6 +306,9 @@ const Inventory = () => {
                                                         +
                                                     </button>
                                                 </div>
+                                                ) : (
+                                                <span className="text-[10px] font-black text-charcoal/20 uppercase tracking-widest">—</span>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, Users, Phone, Mail, CheckCircle, XCircle, Search, Filter, RefreshCw, ChevronRight, MessageSquare } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { ReservationService } from '../services/api';
+import { isAdmin } from '../hooks/useRole';
 
 const ManageReservations = () => {
+    const adminMode = isAdmin();
     const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filterStatus, setFilterStatus] = useState('ALL');
@@ -151,33 +153,41 @@ const ManageReservations = () => {
                                 )}
 
                                 <div className="flex gap-3 pt-6 border-t border-primary/5">
-                                    {res.status === 'PENDING' && (
+                                    {adminMode ? (
                                         <>
-                                            <button
-                                                onClick={() => handleStatusUpdate(res.id, 'CONFIRMED')}
-                                                className="flex-1 bg-green-500 text-white py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-md hover:bg-green-600 transition-all active:scale-95 flex items-center justify-center gap-2"
-                                            >
-                                                <CheckCircle className="w-3.5 h-3.5" /> CONFIRM BOOKING
-                                            </button>
-                                            <button
-                                                onClick={() => handleStatusUpdate(res.id, 'CANCELLED')}
-                                                className="flex-1 bg-white text-red-500 border-2 border-red-500/20 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-2"
-                                            >
-                                                <XCircle className="w-3.5 h-3.5" /> CANCEL
-                                            </button>
+                                            {res.status === 'PENDING' && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleStatusUpdate(res.id, 'CONFIRMED')}
+                                                        className="flex-1 bg-green-500 text-white py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-md hover:bg-green-600 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                                    >
+                                                        <CheckCircle className="w-3.5 h-3.5" /> CONFIRM BOOKING
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleStatusUpdate(res.id, 'CANCELLED')}
+                                                        className="flex-1 bg-white text-red-500 border-2 border-red-500/20 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                                    >
+                                                        <XCircle className="w-3.5 h-3.5" /> CANCEL
+                                                    </button>
+                                                </>
+                                            )}
+                                            {res.status === 'CONFIRMED' && (
+                                                <button
+                                                    onClick={() => handleStatusUpdate(res.id, 'COMPLETED')}
+                                                    className="flex-1 bg-primary text-white py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-md hover:bg-primary-dark transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    <CheckCircle className="w-3.5 h-3.5" /> MARK COMPLETED
+                                                </button>
+                                            )}
+                                            {(res.status === 'CANCELLED' || res.status === 'COMPLETED') && (
+                                                <div className="w-full text-center py-2 text-[10px] font-black text-charcoal/20 uppercase tracking-widest">
+                                                    This reservation has been finalized.
+                                                </div>
+                                            )}
                                         </>
-                                    )}
-                                    {res.status === 'CONFIRMED' && (
-                                        <button
-                                            onClick={() => handleStatusUpdate(res.id, 'COMPLETED')}
-                                            className="flex-1 bg-primary text-white py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-md hover:bg-primary-dark transition-all flex items-center justify-center gap-2"
-                                        >
-                                            <CheckCircle className="w-3.5 h-3.5" /> MARK COMPLETED
-                                        </button>
-                                    )}
-                                    {(res.status === 'CANCELLED' || res.status === 'COMPLETED') && (
+                                    ) : (
                                         <div className="w-full text-center py-2 text-[10px] font-black text-charcoal/20 uppercase tracking-widest">
-                                            This reservation has been finalized.
+                                            View only — contact an admin to update this booking.
                                         </div>
                                     )}
                                 </div>

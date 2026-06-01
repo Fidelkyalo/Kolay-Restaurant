@@ -4,8 +4,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { OrderService, InventoryService } from '../services/api';
+import { isAdmin } from '../hooks/useRole';
 
 function Dashboard() {
+    const adminMode = isAdmin();
     const [viewMode, setViewMode] = useState('Weekly');
     const [reportScope, setReportScope] = useState('Day');
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -443,6 +445,7 @@ function Dashboard() {
                         <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">Welcome back, Fidel</h1>
                         <p className="text-charcoal/70 text-lg">Here's what's happening at Kolay Restaurant today.</p>
                     </div>
+                    {adminMode && (
                     <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-primary/5 shadow-premium">
                         <div className="flex bg-bg-cream p-1 rounded-xl">
                             {['Day', 'Month', 'Year'].map((s) => (
@@ -468,8 +471,10 @@ function Dashboard() {
                             <Printer className="w-4 h-4" /> GENERATE REPORT
                         </button>
                     </div>
+                    )}
                 </header>
 
+                {adminMode && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                     {[
                         { label: 'Total Revenue', value: `KES ${totalRevenue.toLocaleString()}`, icon: <DollarSign className="w-6 h-6 text-secondary" />, trend: 'Live', color: 'border-l-secondary', path: '/dashboard', bg: 'bg-orange-50/50' },
@@ -491,6 +496,7 @@ function Dashboard() {
                         </Link>
                     ))}
                 </div>
+                )}
 
                 <section className="bg-white rounded-3xl border border-primary/5 shadow-premium overflow-hidden mb-12">
                     <div className="p-4 md:p-8 border-b border-primary/5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -622,6 +628,7 @@ function Dashboard() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-8">
+                        {adminMode && (
                         <div className="bg-white p-8 rounded-3xl border border-cream shadow-sm relative overflow-hidden">
                             <div className="flex justify-between items-center mb-8">
                                 <div>
@@ -710,6 +717,7 @@ function Dashboard() {
                                 </div>
                             </div>
                         </div>
+                        )} {/* end adminMode statistics */}
                     </div>
 
                     {/* Side Module: Quick Actions */}
@@ -790,8 +798,8 @@ function Dashboard() {
                 </div>
             </footer>
 
-            {/* Report Preview Modal */}
-            {showReportPreview && previewData && (
+            {/* Report Preview Modal — admin only */}
+            {adminMode && showReportPreview && previewData && (
                 <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                     <div className="bg-white rounded-[2.5rem] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border border-primary/10">
                         <div className="p-8 border-b border-primary/5 flex justify-between items-center bg-bg-cream/30">

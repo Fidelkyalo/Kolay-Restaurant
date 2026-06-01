@@ -3,8 +3,10 @@ import { Search, ShoppingCart, Plus, Minus, X, CreditCard, User, ClipboardList, 
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { MenuService, OrderService } from '../services/api';
+import { isAdmin } from '../hooks/useRole';
 
 const POS = () => {
+    const adminMode = isAdmin();
     const [activeCategory, setActiveCategory] = useState('All');
     const [cart, setCart] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -476,6 +478,7 @@ const POS = () => {
                                 {cat}
                             </button>
                         ))}
+                        {adminMode && (
                         <button
                             onClick={() => setIsManageMode(!isManageMode)}
                             className={`px-6 py-2.5 rounded-full font-bold border transition-all flex items-center gap-2 ${isManageMode ? 'bg-primary text-white border-primary shadow-lg' : 'bg-primary/5 hover:bg-primary text-primary hover:text-white border-primary/20'
@@ -483,7 +486,8 @@ const POS = () => {
                         >
                             <Settings className="w-4 h-4" /> Edit Menu
                         </button>
-                        {isManageMode && (
+                        )}
+                        {adminMode && isManageMode && (
                             <button
                                 onClick={() => {
                                     setEditingDishId(null);
