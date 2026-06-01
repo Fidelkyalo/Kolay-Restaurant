@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Settings, RefreshCw, Shield, Menu, X, Home, LayoutGrid, Monitor, Package, ChevronRight, LogOut, Calendar } from 'lucide-react';
+import { Settings, RefreshCw, Shield, Menu, X, Home, LayoutGrid, Monitor, Package, ChevronRight, LogOut, Calendar, ExternalLink } from 'lucide-react';
 
 const Navbar = () => {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -29,7 +29,7 @@ const Navbar = () => {
         { name: 'Menu', path: '/pos', icon: <LayoutGrid className="w-4 h-4" /> },
         { name: 'KDS', path: '/kds', icon: <Monitor className="w-4 h-4" /> },
         { name: 'Inventory', path: '/inventory', icon: <Package className="w-4 h-4" /> },
-        { name: 'Manage Bookings', path: '/admin/reservations', icon: <Calendar className="w-4 h-4" /> }
+        { name: 'Manage Bookings', path: '/admin/reservations', icon: <Calendar className="w-4 h-4" /> },
     ];
 
     const isActive = (path) => location.pathname === path;
@@ -67,6 +67,12 @@ const Navbar = () => {
                         )}
                     </Link>
                 ))}
+                <Link
+                    to="/"
+                    className="flex items-center gap-1.5 text-white/70 hover:text-secondary transition-all duration-300 relative py-1"
+                >
+                    Client View <ExternalLink className="w-3.5 h-3.5" />
+                </Link>
             </div>
 
             {/* Right Side Actions */}
@@ -157,6 +163,16 @@ const Navbar = () => {
                                     <ChevronRight className={`w-4 h-4 ${isActive(link.path) ? 'opacity-100' : 'opacity-0'}`} />
                                 </Link>
                             ))}
+                            <Link
+                                to="/"
+                                onClick={() => setIsMenuOpen(false)}
+                                className="flex items-center justify-between p-4 rounded-2xl text-white/60 hover:bg-white/5 hover:text-secondary transition-all"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <ExternalLink className="w-4 h-4" />
+                                    <span>Client View</span>
+                                </div>
+                            </Link>
                             <div className="pt-6 mt-6 border-t border-white/10 space-y-4">
                                 <Link
                                     to="/admin"
