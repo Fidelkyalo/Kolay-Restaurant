@@ -38,12 +38,14 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (roleRepository.count() == 0) {
-            for (Role.RoleName roleName : Role.RoleName.values()) {
+        // Ensure every role in the enum exists — safe to run on every startup
+        for (Role.RoleName roleName : Role.RoleName.values()) {
+            if (roleRepository.findByName(roleName).isEmpty()) {
                 roleRepository.save(Role.builder().name(roleName).build());
+                System.out.println("Seeded missing role: " + roleName);
             }
-            System.out.println("Finished seeding roles.");
         }
+        System.out.println("Role seeding check complete.");
 
         if (categoryRepository.count() == 0) {
             Category burgers = Category.builder().name("Burgers").description("Juicy handcrafted burgers").build();
