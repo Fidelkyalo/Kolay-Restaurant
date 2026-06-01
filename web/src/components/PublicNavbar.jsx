@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, UserPlus, LogIn, ChevronRight } from 'lucide-react';
+import { Menu, X, UserPlus, LogIn, ChevronRight, Star } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const PublicNavbar = () => {
@@ -8,18 +8,16 @@ const PublicNavbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const isLoggedIn = (() => {
-        try {
-            const u = JSON.parse(localStorage.getItem('kolay_auth_user'));
-            return !!(u && (u.accessToken || u.username));
-        } catch { return false; }
+    // Any logged-in user (customer or staff)
+    const authUser = (() => {
+        try { return JSON.parse(localStorage.getItem('kolay_auth_user')) || null; }
+        catch { return null; }
     })();
 
-    const loggedInUsername = (() => {
-        try {
-            return JSON.parse(localStorage.getItem('kolay_auth_user'))?.username || null;
-        } catch { return null; }
-    })();
+    // Customer = registered via backend (has accessToken); staff/admin do not
+    const isCustomer = !!(authUser?.accessToken && authUser?.username);
+    const isLoggedIn = !!(authUser?.username);
+    const loggedInUsername = authUser?.username || null;
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -48,7 +46,23 @@ const PublicNavbar = () => {
         }
     };
 
-    // Logo click — scroll to hero if already on home, else navigate to home then scroll
+    // Scroll to ratings section (on home page) or navigate home then scroll
+    const handleRateUs = (e) => {
+        e.preventDefault();
+        setIsMobileMenuOpen(false);
+        const scrollToRatings = () => {
+            const el = document.getElementById('ratings');
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        };
+        if (location.pathname === '/') {
+            scrollToRatings();
+        } else {
+            navigate('/');
+            setTimeout(scrollToRatings, 300);
+        }
+    };
+
+    // Logo click — scroll to hero if already on home, else navigate home
     const handleLogoClick = (e) => {
         e.preventDefault();
         setIsMobileMenuOpen(false);
@@ -58,7 +72,6 @@ const PublicNavbar = () => {
             else window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
             navigate('/');
-            // After navigation, scroll to top (hero is at top of home page)
             setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 100);
         }
     };
@@ -85,7 +98,7 @@ const PublicNavbar = () => {
             <div className="max-w-7xl mx-auto px-6 md:px-10">
                 <div className="flex items-center justify-between h-16 md:h-18 gap-8">
 
-                    {/* ── LEFT: Logo — clicking scrolls to hero / navigates home ── */}
+                    {/* ── LEFT: Logo ── */}
                     <a href="/" onClick={handleLogoClick} className="flex items-center gap-3 shrink-0 group cursor-pointer" aria-label="Go to Home">
                         <img
                             src="/Logo.png"
@@ -97,15 +110,34 @@ const PublicNavbar = () => {
                         </span>
                     </a>
 
-                    {/* ── CENTRE: Nav links — shifted slightly right ── */}
+                    {/* ── CENTRE: Nav links ── */}
                     <div className="hidden lg:flex items-center gap-8 flex-1 justify-end pr-10">
                         {navLinks.map(link => renderLink(link))}
                     </div>
 
                     {/* ── RIGHT: Actions ── */}
                     <div className="hidden md:flex items-center gap-3 shrink-0">
-                        {isLoggedIn ? (
-                            /* Logged-in avatar pill */
+                        {isCustomer ? (
+                            /* Customer logged in — show avatar + Rate Us button */
+                            <>
+                                <div className="flex items-center gap-2 bg-white/8 border border-white/15 rounded-full pl-1.5 pr-4 py-1.5">
+                                    <span className="w-7 h-7 bg-[#E67E22] rounded-full flex items-center justify-center text-[11px] font-black text-white shrink-0">
+                                        {loggedInUsername?.[0]?.toUpperCase() || '?'}
+                                    </span>
+                                    <span className="text-white/80 text-xs font-bold truncate max-w-[80px]">
+                                        {loggedInUsername}
+                                    </span>
+                                </div>
+                                <a
+                                    href="#ratings"
+                                    onClick={handleRateUs}
+                                    className="flex items-center gap-1.5 bg-[#E67E22] hover:bg-[#cf6d17] text-white text-[11px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full transition-all duration-200 shadow-md hover:shadow-[#E67E22]/40 hover:shadow-lg active:scale-95 cursor-pointer"
+                                >
+                                    <Star className="w-3.5 h-3.5" /> Rate Us
+                                </a>
+                            </>
+                        ) : isLoggedIn ? (
+                            /* Staff/admin logged in — just show avatar pill */
                             <div className="flex items-center gap-2 bg-white/8 border border-white/15 rounded-full pl-1.5 pr-4 py-1.5">
                                 <span className="w-7 h-7 bg-[#E67E22] rounded-full flex items-center justify-center text-[11px] font-black text-white shrink-0">
                                     {loggedInUsername?.[0]?.toUpperCase() || '?'}
@@ -115,6 +147,7 @@ const PublicNavbar = () => {
                                 </span>
                             </div>
                         ) : (
+                            /* Not logged in — Sign In + Create Account */
                             <>
                                 <Link
                                     to="/staff"
@@ -172,16 +205,32 @@ const PublicNavbar = () => {
                         )}
 
                         {/* Mobile action buttons */}
-                        <div className="pt-4 mt-2 border-t border-white/8 grid grid-cols-2 gap-3">
-                            {isLoggedIn ? (
-                                <div className="col-span-2 flex items-center gap-3 bg-white/5 rounded-2xl px-4 py-3">
+                        <div className="pt-4 mt-2 border-t border-white/8 space-y-3">
+                            {isCustomer ? (
+                                <>
+                                    <div className="flex items-center gap-3 bg-white/5 rounded-2xl px-4 py-3">
+                                        <span className="w-8 h-8 bg-[#E67E22] rounded-full flex items-center justify-center text-sm font-black text-white shrink-0">
+                                            {loggedInUsername?.[0]?.toUpperCase() || '?'}
+                                        </span>
+                                        <span className="text-white font-bold text-sm">{loggedInUsername}</span>
+                                    </div>
+                                    <a
+                                        href="#ratings"
+                                        onClick={handleRateUs}
+                                        className="flex items-center justify-center gap-2 bg-[#E67E22] hover:bg-[#cf6d17] text-white font-black text-sm py-3.5 rounded-2xl transition-all shadow-lg w-full"
+                                    >
+                                        <Star className="w-4 h-4" /> Rate Us
+                                    </a>
+                                </>
+                            ) : isLoggedIn ? (
+                                <div className="flex items-center gap-3 bg-white/5 rounded-2xl px-4 py-3">
                                     <span className="w-8 h-8 bg-[#E67E22] rounded-full flex items-center justify-center text-sm font-black text-white shrink-0">
                                         {loggedInUsername?.[0]?.toUpperCase() || '?'}
                                     </span>
                                     <span className="text-white font-bold text-sm">{loggedInUsername}</span>
                                 </div>
                             ) : (
-                                <>
+                                <div className="grid grid-cols-2 gap-3">
                                     <Link
                                         to="/staff"
                                         onClick={() => setIsMobileMenuOpen(false)}
@@ -192,11 +241,11 @@ const PublicNavbar = () => {
                                     <Link
                                         to="/register"
                                         onClick={() => setIsMobileMenuOpen(false)}
-                                        className="col-span-1 flex items-center justify-center gap-2 bg-[#E67E22] hover:bg-[#cf6d17] text-white font-bold text-sm py-3 rounded-2xl transition-all shadow-lg"
+                                        className="flex items-center justify-center gap-2 bg-[#E67E22] hover:bg-[#cf6d17] text-white font-bold text-sm py-3 rounded-2xl transition-all shadow-lg"
                                     >
                                         <UserPlus className="w-4 h-4" /> Create Account
                                     </Link>
-                                </>
+                                </div>
                             )}
                         </div>
                     </div>

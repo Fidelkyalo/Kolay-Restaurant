@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Utensils, Star, Clock, MapPin, Phone, Camera, MessageCircle,
     Send, ArrowRight, Calendar, ChevronDown, Check, ChefHat,
-    Award, Users, TrendingUp, Bike, ShoppingBag, Gift, Tag, Repeat, Mail
+    Award, Users, TrendingUp, Bike, ShoppingBag, Gift, Tag, Repeat, Mail, UserPlus
 } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
 import { Link } from 'react-router-dom';
@@ -828,16 +828,17 @@ const Home = () => {
                         </div>
                     )}
 
-                    {/* Not logged in prompt */}
+                    {/* Not logged in — show prompt but reviews still visible below */}
                     {!customer && (
                         <div className="bg-white/3 border border-white/8 rounded-3xl p-8 mb-12 text-center">
                             <Star className="w-8 h-8 text-white/20 mx-auto mb-3" />
-                            <p className="text-white/60 font-semibold mb-4">Members can rate their experience.</p>
+                            <p className="text-white/60 font-semibold mb-1">Want to share your experience?</p>
+                            <p className="text-white/30 text-xs mb-5">Create a free account to leave a rating.</p>
                             <Link
                                 to="/register"
                                 className="inline-flex items-center gap-2 bg-[#E67E22] hover:bg-[#cf6d17] text-white font-black uppercase tracking-widest text-xs px-6 py-3 rounded-full transition-all"
                             >
-                                Create an Account
+                                <UserPlus className="w-3.5 h-3.5" /> Create an Account
                             </Link>
                         </div>
                     )}
