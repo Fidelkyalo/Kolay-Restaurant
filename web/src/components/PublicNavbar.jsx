@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Utensils, Calendar, MapPin, Phone, Camera, MessageCircle, UserPlus, LogIn } from 'lucide-react';
+import { Menu, X, UserPlus, LogIn, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const PublicNavbar = () => {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // Check if user is already logged in
     const isLoggedIn = (() => {
         try {
             const u = JSON.parse(localStorage.getItem('kolay_auth_user'));
@@ -16,155 +15,191 @@ const PublicNavbar = () => {
 
     const loggedInUsername = (() => {
         try {
-            const u = JSON.parse(localStorage.getItem('kolay_auth_user'));
-            return u?.username || null;
+            return JSON.parse(localStorage.getItem('kolay_auth_user'))?.username || null;
         } catch { return null; }
     })();
 
     useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 50);
-        };
+        const handleScroll = () => setIsScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     const navLinks = [
-        { name: 'About', href: '/#about' },
-        { name: 'Menu', href: '/#menu' },
+        { name: 'About',        href: '/#about' },
+        { name: 'Menu',         href: '/#menu' },
         { name: 'Reservations', href: '/reservations' },
-        { name: 'Gallery', href: '/#gallery' },
-        { name: 'Contact', href: '/#contact' },
-        { name: 'Careers', href: '/careers' },
+        { name: 'Gallery',      href: '/#gallery' },
+        { name: 'Contact',      href: '/#contact' },
+        { name: 'Careers',      href: '/careers' },
     ];
 
+    // Smooth-scroll for hash links on the same page
+    const handleHashLink = (e, href) => {
+        if (href.startsWith('/#')) {
+            e.preventDefault();
+            setIsMobileMenuOpen(false);
+            const id = href.replace('/#', '');
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+            else window.location.href = href;
+        }
+    };
+
+    const linkCls = "text-white/75 hover:text-white font-semibold text-[11px] uppercase tracking-widest transition-colors duration-200 relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[2px] after:bg-[#E67E22] hover:after:w-full after:transition-all after:duration-300 py-1";
+
+    const renderLink = (link, onClick) =>
+        link.href.startsWith('/#') ? (
+            <a key={link.name} href={link.href} onClick={(e) => { handleHashLink(e, link.href); onClick?.(); }} className={linkCls}>
+                {link.name}
+            </a>
+        ) : (
+            <Link key={link.name} to={link.href} onClick={onClick} className={linkCls}>
+                {link.name}
+            </Link>
+        );
+
     return (
-        <nav className={`fixed w-full z-[100] transition-all duration-500 ${isScrolled ? 'bg-primary/95 backdrop-blur-md py-4 shadow-2xl' : 'bg-transparent py-6'}`}>
-            <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
-                {/* Logo */}
-                <Link to="/" className="flex items-center gap-3 group cursor-pointer">
-                    <img src="/Logo.png" alt="Kolay Logo" className="h-10 w-auto rounded group-hover:rotate-12 transition-transform duration-300 shadow-glow" />
-                    <span className="text-white text-2xl font-display font-black tracking-tighter uppercase">Kolay</span>
-                </Link>
+        <nav className={`fixed w-full z-[100] transition-all duration-500 ${
+            isScrolled
+                ? 'bg-[#1a0e08]/97 backdrop-blur-md shadow-2xl border-b border-white/5'
+                : 'bg-gradient-to-b from-black/60 to-transparent'
+        }`}>
+            <div className="max-w-7xl mx-auto px-6 md:px-10">
+                <div className="flex items-center justify-between h-16 md:h-18 gap-8">
 
-                <div className="hidden md:flex items-center gap-8">
-                    {navLinks.map((link) => (
-                        link.href.startsWith('/#') ? (
-                            <a
-                                key={link.name}
-                                href={link.href}
-                                className="text-white/80 hover:text-accent font-black text-[10px] uppercase tracking-widest transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-accent hover:after:w-full after:transition-all after:duration-300"
-                            >
-                                {link.name}
-                            </a>
+                    {/* ── LEFT: Logo — clicking goes to Home ── */}
+                    <Link to="/" className="flex items-center gap-3 shrink-0 group" aria-label="Go to Home">
+                        <img
+                            src="/Logo.png"
+                            alt="Kolay"
+                            className="h-10 w-auto rounded-lg shadow-md group-hover:scale-105 transition-transform duration-300"
+                        />
+                        <span className="text-white font-display font-black text-xl tracking-tight uppercase leading-none hidden sm:block">
+                            Kolay
+                        </span>
+                    </Link>
+
+                    {/* ── CENTRE: Nav links (no Home — logo handles it) ── */}
+                    <div className="hidden lg:flex items-center gap-8 flex-1 justify-center">
+                        {navLinks.map(link => renderLink(link))}
+                    </div>
+
+                    {/* ── RIGHT: Actions ── */}
+                    <div className="hidden md:flex items-center gap-3 shrink-0">
+                        {isLoggedIn ? (
+                            /* Logged-in avatar pill */
+                            <div className="flex items-center gap-2 bg-white/8 border border-white/15 rounded-full pl-1.5 pr-4 py-1.5">
+                                <span className="w-7 h-7 bg-[#E67E22] rounded-full flex items-center justify-center text-[11px] font-black text-white shrink-0">
+                                    {loggedInUsername?.[0]?.toUpperCase() || '?'}
+                                </span>
+                                <span className="text-white/80 text-xs font-bold truncate max-w-[80px]">
+                                    {loggedInUsername}
+                                </span>
+                            </div>
                         ) : (
-                            <Link
-                                key={link.name}
-                                to={link.href}
-                                className="text-white/80 hover:text-accent font-black text-[10px] uppercase tracking-widest transition-colors relative after:content-[''] after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-0.5 after:bg-accent hover:after:w-full after:transition-all after:duration-300"
-                            >
-                                {link.name}
-                            </Link>
-                        )
-                    ))}
+                            <>
+                                <Link
+                                    to="/staff"
+                                    className="flex items-center gap-1.5 text-white/75 hover:text-white text-[11px] font-bold uppercase tracking-widest px-4 py-2 rounded-full border border-white/15 hover:border-white/30 hover:bg-white/8 transition-all duration-200"
+                                >
+                                    <LogIn className="w-3.5 h-3.5" /> Sign In
+                                </Link>
+                                <Link
+                                    to="/register"
+                                    className="flex items-center gap-1.5 bg-[#E67E22] hover:bg-[#cf6d17] text-white text-[11px] font-black uppercase tracking-widest px-4 py-2 rounded-full transition-all duration-200 shadow-md hover:shadow-[#E67E22]/40 hover:shadow-lg active:scale-95"
+                                >
+                                    <UserPlus className="w-3.5 h-3.5" /> Create Account
+                                </Link>
+                            </>
+                        )}
 
-                    {/* Auth buttons */}
-                    {isLoggedIn ? (
+                        {/* Divider */}
+                        <div className="w-px h-5 bg-white/15" />
+
                         <Link
                             to="/order"
-                            className="flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white px-4 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-all"
+                            className="flex items-center gap-1.5 bg-[#D4A017] hover:bg-[#b8891a] text-white text-[11px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full transition-all duration-200 shadow-md hover:shadow-[#D4A017]/40 hover:shadow-lg active:scale-95"
                         >
-                            <span className="w-5 h-5 bg-secondary rounded-full flex items-center justify-center text-[9px] font-black">
-                                {loggedInUsername?.[0]?.toUpperCase() || '?'}
-                            </span>
-                            {loggedInUsername}
+                            Order Online
                         </Link>
-                    ) : (
-                        <div className="flex items-center gap-2">
-                            <Link
-                                to="/staff"
-                                className="flex items-center gap-1.5 text-white/70 hover:text-white font-black text-[10px] uppercase tracking-widest transition-colors px-3 py-2 rounded-full hover:bg-white/10"
-                            >
-                                <LogIn className="w-3.5 h-3.5" /> Sign In
-                            </Link>
-                            <Link
-                                to="/register"
-                                className="flex items-center gap-1.5 bg-secondary hover:bg-orange-500 text-white px-4 py-2 rounded-full font-black text-[10px] uppercase tracking-widest transition-all shadow-lg hover:scale-105 active:scale-95"
-                            >
-                                <UserPlus className="w-3.5 h-3.5" /> Create Account
-                            </Link>
-                        </div>
-                    )}
+                    </div>
 
-                    <Link
-                        to="/order"
-                        className="bg-accent hover:bg-white text-primary px-6 py-2.5 rounded-full font-black text-[10px] uppercase tracking-widest transition-all shadow-glow hover:scale-105 active:scale-95"
+                    {/* ── MOBILE: Hamburger ── */}
+                    <button
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        className="lg:hidden p-2 text-white hover:bg-white/10 rounded-xl transition-colors"
+                        aria-label="Toggle menu"
                     >
-                        Order Online
-                    </Link>
+                        {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                    </button>
                 </div>
-
-                {/* Mobile Toggle */}
-                <button
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                    className="md:hidden text-white p-2"
-                >
-                    {isMobileMenuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
-                </button>
             </div>
 
-            {/* Mobile Menu */}
+            {/* ── MOBILE DRAWER ── */}
             {isMobileMenuOpen && (
-                <div className="md:hidden absolute top-full left-0 w-full bg-primary p-8 space-y-6 animate-in slide-in-from-top duration-300 shadow-2xl border-t border-white/5">
-                    {navLinks.map((link) => (
-                        link.href.startsWith('/#') ? (
-                            <a
-                                key={link.name}
-                                href={link.href}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="block text-2xl font-black text-white hover:text-accent transition-colors"
-                            >
-                                {link.name}
-                            </a>
-                        ) : (
-                            <Link
-                                key={link.name}
-                                to={link.href}
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="block text-2xl font-black text-white hover:text-accent transition-colors"
-                            >
-                                {link.name}
-                            </Link>
-                        )
-                    ))}
+                <div className="lg:hidden absolute top-full left-0 w-full bg-[#1a0e08]/98 backdrop-blur-md border-t border-white/8 shadow-2xl animate-in slide-in-from-top-2 duration-200">
+                    <div className="max-w-7xl mx-auto px-6 py-5 space-y-1">
+                        {navLinks.map(link =>
+                            link.href.startsWith('/#') ? (
+                                <a
+                                    key={link.name}
+                                    href={link.href}
+                                    onClick={(e) => handleHashLink(e, link.href)}
+                                    className="flex items-center justify-between py-3 px-4 rounded-xl text-white/70 hover:text-white hover:bg-white/5 font-semibold text-sm uppercase tracking-widest transition-all"
+                                >
+                                    {link.name}
+                                    <ChevronRight className="w-4 h-4 opacity-30" />
+                                </a>
+                            ) : (
+                                <Link
+                                    key={link.name}
+                                    to={link.href}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="flex items-center justify-between py-3 px-4 rounded-xl text-white/70 hover:text-white hover:bg-white/5 font-semibold text-sm uppercase tracking-widest transition-all"
+                                >
+                                    {link.name}
+                                    <ChevronRight className="w-4 h-4 opacity-30" />
+                                </Link>
+                            )
+                        )}
 
-                    {/* Mobile auth buttons */}
-                    {!isLoggedIn && (
-                        <div className="flex gap-3 pt-2 border-t border-white/10">
+                        {/* Mobile action buttons */}
+                        <div className="pt-4 mt-2 border-t border-white/8 grid grid-cols-2 gap-3">
+                            {isLoggedIn ? (
+                                <div className="col-span-2 flex items-center gap-3 bg-white/5 rounded-2xl px-4 py-3">
+                                    <span className="w-8 h-8 bg-[#E67E22] rounded-full flex items-center justify-center text-sm font-black text-white shrink-0">
+                                        {loggedInUsername?.[0]?.toUpperCase() || '?'}
+                                    </span>
+                                    <span className="text-white font-bold text-sm">{loggedInUsername}</span>
+                                </div>
+                            ) : (
+                                <>
+                                    <Link
+                                        to="/staff"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-2 bg-white/8 hover:bg-white/12 border border-white/15 text-white font-bold text-sm py-3 rounded-2xl transition-all"
+                                    >
+                                        <LogIn className="w-4 h-4" /> Sign In
+                                    </Link>
+                                    <Link
+                                        to="/register"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-2 bg-[#E67E22] hover:bg-[#cf6d17] text-white font-bold text-sm py-3 rounded-2xl transition-all shadow-lg"
+                                    >
+                                        <UserPlus className="w-4 h-4" /> Register
+                                    </Link>
+                                </>
+                            )}
                             <Link
-                                to="/staff"
+                                to="/order"
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex-1 flex items-center justify-center gap-2 bg-white/10 text-white p-4 rounded-2xl font-black text-sm"
+                                className="col-span-2 flex items-center justify-center gap-2 bg-[#D4A017] hover:bg-[#b8891a] text-white font-black text-sm py-4 rounded-2xl transition-all shadow-lg"
                             >
-                                <LogIn className="w-4 h-4" /> Sign In
-                            </Link>
-                            <Link
-                                to="/register"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex-1 flex items-center justify-center gap-2 bg-secondary text-white p-4 rounded-2xl font-black text-sm shadow-lg"
-                            >
-                                <UserPlus className="w-4 h-4" /> Create Account
+                                Order Online
                             </Link>
                         </div>
-                    )}
-
-                    <Link
-                        to="/order"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="block bg-secondary text-white p-4 rounded-2xl font-black text-center text-xl shadow-lg"
-                    >
-                        Order Online
-                    </Link>
+                    </div>
                 </div>
             )}
         </nav>
