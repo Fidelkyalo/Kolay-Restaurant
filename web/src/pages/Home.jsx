@@ -34,7 +34,52 @@ const Home = () => {
         return () => window.removeEventListener('storage', handler);
     }, []);
 
-    const featuredMeals = [
+    // ── RATINGS ─────────────────────────────────────────────────────────────
+    const getLoggedInCustomer = () => {
+        try {
+            const u = JSON.parse(localStorage.getItem('kolay_auth_user'));
+            // Customers have an accessToken (registered via backend); staff/admin do not
+            if (u && u.accessToken && u.username) return u;
+            return null;
+        } catch { return null; }
+    };
+
+    const loadRatings = () => {
+        try { return JSON.parse(localStorage.getItem('kolay_ratings') || '[]'); }
+        catch { return []; }
+    };
+
+    const [ratings, setRatings] = useState(loadRatings);
+    const [ratingHover, setRatingHover] = useState(0);
+    const [ratingValue, setRatingValue] = useState(0);
+    const [ratingComment, setRatingComment] = useState('');
+    const [ratingSubmitted, setRatingSubmitted] = useState(false);
+    const [ratingError, setRatingError] = useState('');
+
+    const customer = getLoggedInCustomer();
+    const alreadyRated = customer ? ratings.some(r => r.username === customer.username) : false;
+
+    const avgRating = ratings.length
+        ? (ratings.reduce((s, r) => s + r.stars, 0) / ratings.length).toFixed(1)
+        : null;
+
+    const handleRatingSubmit = (e) => {
+        e.preventDefault();
+        if (!ratingValue) { setRatingError('Please select a star rating.'); return; }
+        const newRating = {
+            username: customer.username,
+            stars: ratingValue,
+            comment: ratingComment.trim(),
+            date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+        };
+        const updated = [newRating, ...ratings];
+        setRatings(updated);
+        localStorage.setItem('kolay_ratings', JSON.stringify(updated));
+        setRatingSubmitted(true);
+        setRatingComment('');
+        setRatingValue(0);
+        setRatingError('');
+    };
         { id: 1, name: 'Gourmet Beef Burger', price: 1200, desc: 'Aged wagyu beef, truffle aioli, melted brie on brioche.', tag: 'Best Seller', image: '/assets/burger.png' },
         { id: 2, name: 'Herb-Crusted Salmon', price: 2100, desc: 'Fresh Atlantic salmon with sesame glaze & greens.', tag: 'Chef\'s Pick', image: '/assets/salmon.png' },
         { id: 3, name: 'Signature Ribeye', price: 3500, desc: 'Prime ribeye, garlic herb butter & truffle fries.', tag: 'Premium', image: '/assets/steak.png' },
@@ -699,6 +744,132 @@ const Home = () => {
                             </form>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            {/* ── RATINGS ─────────────────────────────── */}
+            <section id="ratings" className="py-24 px-6 md:px-12 bg-[#0D0A07]">
+                <div className="max-w-4xl mx-auto">
+                    {/* Header */}
+                    <div className="text-center mb-14">
+                        <span className="text-[#E67E22] text-xs font-black uppercase tracking-[0.3em]">Our Guests</span>
+                        <h2 className="text-4xl md:text-5xl font-display font-black text-white mt-3 mb-4">
+                            Rate Your Experience
+                        </h2>
+                        {avgRating && (
+                            <div className="flex items-center justify-center gap-3 mt-4">
+                                <div className="flex items-center gap-1">
+                                    {[1,2,3,4,5].map(i => (
+                                        <Star key={i} className={`w-5 h-5 ${i <= Math.round(avgRating) ? 'fill-[#E67E22] text-[#E67E22]' : 'text-white/20'}`} />
+                                    ))}
+                                </div>
+                                <span className="text-white font-black text-xl">{avgRating}</span>
+                                <span className="text-white/30 text-sm">({ratings.length} {ratings.length === 1 ? 'review' : 'reviews'})</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Submit form — only for logged-in customers */}
+                    {customer && !alreadyRated && !ratingSubmitted && (
+                        <form onSubmit={handleRatingSubmit} className="bg-white/5 border border-white/8 rounded-3xl p-8 mb-12 backdrop-blur-sm">
+                            <p className="text-white font-black text-lg mb-6">
+                                Hi <span className="text-[#E67E22]">{customer.username}</span>, how was your experience?
+                            </p>
+
+                            {/* Star picker */}
+                            <div className="flex items-center gap-2 mb-6">
+                                {[1,2,3,4,5].map(i => (
+                                    <button
+                                        key={i}
+                                        type="button"
+                                        onMouseEnter={() => setRatingHover(i)}
+                                        onMouseLeave={() => setRatingHover(0)}
+                                        onClick={() => { setRatingValue(i); setRatingError(''); }}
+                                        className="transition-transform hover:scale-125 focus:outline-none"
+                                        aria-label={`Rate ${i} star${i > 1 ? 's' : ''}`}
+                                    >
+                                        <Star className={`w-9 h-9 transition-colors ${i <= (ratingHover || ratingValue) ? 'fill-[#E67E22] text-[#E67E22]' : 'text-white/20'}`} />
+                                    </button>
+                                ))}
+                                {ratingValue > 0 && (
+                                    <span className="ml-3 text-white/50 text-sm font-semibold">
+                                        {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'][ratingValue]}
+                                    </span>
+                                )}
+                            </div>
+
+                            {ratingError && <p className="text-red-400 text-sm font-semibold mb-4">{ratingError}</p>}
+
+                            {/* Comment */}
+                            <textarea
+                                rows={3}
+                                placeholder="Share your experience (optional)..."
+                                value={ratingComment}
+                                onChange={e => setRatingComment(e.target.value)}
+                                maxLength={300}
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white placeholder-white/20 text-sm font-semibold outline-none focus:border-[#E67E22]/50 focus:ring-1 focus:ring-[#E67E22]/30 transition-all resize-none mb-6"
+                            />
+
+                            <button
+                                type="submit"
+                                className="bg-[#E67E22] hover:bg-[#cf6d17] text-white font-black uppercase tracking-widest text-sm px-8 py-3.5 rounded-full transition-all shadow-lg hover:shadow-[#E67E22]/30 active:scale-95"
+                            >
+                                Submit Rating
+                            </button>
+                        </form>
+                    )}
+
+                    {/* Success message */}
+                    {(ratingSubmitted || (customer && alreadyRated)) && (
+                        <div className="bg-[#E67E22]/10 border border-[#E67E22]/20 rounded-3xl p-6 mb-12 text-center">
+                            <Star className="w-8 h-8 fill-[#E67E22] text-[#E67E22] mx-auto mb-3" />
+                            <p className="text-white font-black text-lg">Thank you for your rating!</p>
+                            <p className="text-white/40 text-sm mt-1">Your review has been saved.</p>
+                        </div>
+                    )}
+
+                    {/* Not logged in prompt */}
+                    {!customer && (
+                        <div className="bg-white/3 border border-white/8 rounded-3xl p-8 mb-12 text-center">
+                            <Star className="w-8 h-8 text-white/20 mx-auto mb-3" />
+                            <p className="text-white/60 font-semibold mb-4">Members can rate their experience.</p>
+                            <Link
+                                to="/register"
+                                className="inline-flex items-center gap-2 bg-[#E67E22] hover:bg-[#cf6d17] text-white font-black uppercase tracking-widest text-xs px-6 py-3 rounded-full transition-all"
+                            >
+                                Create an Account
+                            </Link>
+                        </div>
+                    )}
+
+                    {/* Reviews list */}
+                    {ratings.length > 0 && (
+                        <div className="space-y-4">
+                            {ratings.map((r, idx) => (
+                                <div key={idx} className="bg-white/4 border border-white/8 rounded-2xl px-6 py-5 flex gap-5 items-start">
+                                    <div className="w-10 h-10 rounded-full bg-[#E67E22] flex items-center justify-center text-white font-black text-sm shrink-0">
+                                        {r.username[0].toUpperCase()}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+                                            <span className="text-white font-black text-sm">{r.username}</span>
+                                            <span className="text-white/25 text-xs">{r.date}</span>
+                                        </div>
+                                        <div className="flex items-center gap-0.5 mb-2">
+                                            {[1,2,3,4,5].map(i => (
+                                                <Star key={i} className={`w-3.5 h-3.5 ${i <= r.stars ? 'fill-[#E67E22] text-[#E67E22]' : 'text-white/15'}`} />
+                                            ))}
+                                        </div>
+                                        {r.comment && <p className="text-white/50 text-sm leading-relaxed">{r.comment}</p>}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {ratings.length === 0 && (
+                        <p className="text-center text-white/20 text-sm font-semibold">No reviews yet. Be the first to rate us!</p>
+                    )}
                 </div>
             </section>
 
