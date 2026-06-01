@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Plus, Trash2, Edit3, X, Check, Calendar, Tag, Star } from 'lucide-react';
+import { Sparkles, Plus, Trash2, Edit3, X, Check, Calendar, Tag, Star, ChevronDown } from 'lucide-react';
 import Navbar from '../components/Navbar';
 
 const EMPTY_FORM = {
@@ -7,15 +7,14 @@ const EMPTY_FORM = {
     name: '',
     description: '',
     originalPrice: '',
-    season: '',        // e.g. "Tonight", "Christmas", "Eid", "Valentine's"
+    season: '',
     startDate: '',
     endDate: '',
     image: '',
 };
 
-const DISCOUNT_RATE = 10; // 10% fixed discount for all specialties
+const DISCOUNT_RATE = 10;
 
-// Helper: is a specialty currently active?
 const isActive = (sp) => {
     const now = new Date();
     const start = sp.startDate ? new Date(sp.startDate) : null;
@@ -26,9 +25,8 @@ const isActive = (sp) => {
 };
 
 const getSpecialties = () => {
-    try {
-        return JSON.parse(localStorage.getItem('kolay_specialties') || '[]');
-    } catch { return []; }
+    try { return JSON.parse(localStorage.getItem('kolay_specialties') || '[]'); }
+    catch { return []; }
 };
 
 const saveSpecialties = (list) => {
@@ -36,15 +34,41 @@ const saveSpecialties = (list) => {
     window.dispatchEvent(new Event('storage'));
 };
 
+// Load all dishes from localStorage (same source as POS / GuestMenu)
+const getMenuDishes = () => {
+    try {
+        const saved = JSON.parse(localStorage.getItem('kolay_dishes') || '[]');
+        if (saved.length > 0) return saved;
+    } catch { /* ignore */ }
+    // Fallback defaults
+    return [
+        { id: 1,  name: 'Gourmet Beef Burger', price: 1200, category: 'Main Dish',  image: '/assets/burger.png',  desc: 'Aged wagyu beef, truffle aioli.' },
+        { id: 2,  name: 'Signature Ribeye',     price: 3500, category: 'Main Dish',  image: '/assets/steak.png',   desc: 'Prime ribeye, garlic herb butter.' },
+        { id: 3,  name: 'Herb-Crusted Salmon',  price: 2100, category: 'Main Dish',  image: '/assets/salmon.png',  desc: 'Fresh salmon with sesame glaze.' },
+        { id: 4,  name: 'Crispy Calamari',      price: 850,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600', desc: 'Golden fried with spicy marinara.' },
+        { id: 5,  name: 'Bruschetta',           price: 650,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600', desc: 'Fresh tomatoes, garlic, hand-torn basil.' },
+        { id: 6,  name: 'Chocolate Fondant',    price: 700,  category: 'Desserts',   image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600', desc: 'Warm dark chocolate lava cake.' },
+        { id: 7,  name: 'Iced Latte',           price: 450,  category: 'Beverages',  image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600', desc: 'Chilled espresso over milk.' },
+        { id: 8,  name: 'Margherita Pizza',     price: 1100, category: 'Main Dish',  image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&q=80&w=600', desc: 'Fresh mozzarella, basil, tomato sauce.' },
+        { id: 9,  name: 'French Fries',         price: 300,  category: 'Side Dish',  image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&q=80&w=600', desc: 'Crispy golden fries with sea salt.' },
+        { id: 10, name: 'Pancakes',             price: 550,  category: 'BreakFast',  image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&q=80&w=600', desc: 'Fluffy stack with maple syrup.' },
+    ];
+};
+
 export default function Specialties() {
     const [specialties, setSpecialties] = useState(getSpecialties);
+    const [menuDishes, setMenuDishes] = useState(getMenuDishes);
     const [form, setForm] = useState(EMPTY_FORM);
     const [showForm, setShowForm] = useState(false);
     const [editingId, setEditingId] = useState(null);
+    // 'menu' = pick from existing menu | 'custom' = type manually
+    const [dishSource, setDishSource] = useState('menu');
 
-    // Keep in sync across tabs
     useEffect(() => {
-        const handler = () => setSpecialties(getSpecialties());
+        const handler = () => {
+            setSpecialties(getSpecialties());
+            setMenuDishes(getMenuDishes());
+        };
         window.addEventListener('storage', handler);
         return () => window.removeEventListener('storage', handler);
     }, []);
@@ -53,6 +77,23 @@ export default function Specialties() {
         const p = parseFloat(original);
         if (isNaN(p)) return 0;
         return Math.round(p * (1 - DISCOUNT_RATE / 100));
+    };
+
+    // When staff picks a dish from the dropdown, auto-fill the form fields
+    const handleMenuPick = (dishId) => {
+        if (!dishId) {
+            setForm({ ...form, name: '', originalPrice: '', image: '', description: '' });
+            return;
+        }
+        const dish = menuDishes.find(d => String(d.id) === String(dishId));
+        if (!dish) return;
+        setForm(prev => ({
+            ...prev,
+            name: dish.name,
+            originalPrice: String(dish.price),
+            image: dish.image || '',
+            description: dish.desc || dish.description || '',
+        }));
     };
 
     const handleSubmit = (e) => {
@@ -67,23 +108,22 @@ export default function Specialties() {
             discount: DISCOUNT_RATE,
         };
 
-        let updated;
-        if (editingId) {
-            updated = specialties.map(s => s.id === editingId ? entry : s);
-        } else {
-            updated = [...specialties, entry];
-        }
+        const updated = editingId
+            ? specialties.map(s => s.id === editingId ? entry : s)
+            : [...specialties, entry];
 
         setSpecialties(updated);
         saveSpecialties(updated);
         setForm(EMPTY_FORM);
         setEditingId(null);
         setShowForm(false);
+        setDishSource('menu');
     };
 
     const handleEdit = (sp) => {
-        setForm({ ...sp });
+        setForm({ ...sp, originalPrice: String(sp.originalPrice) });
         setEditingId(sp.id);
+        setDishSource('custom'); // when editing, show manual fields directly
         setShowForm(true);
     };
 
@@ -98,7 +138,16 @@ export default function Specialties() {
         setForm(EMPTY_FORM);
         setEditingId(null);
         setShowForm(false);
+        setDishSource('menu');
     };
+
+    // Group dishes by category for the dropdown
+    const dishesByCategory = menuDishes.reduce((acc, d) => {
+        const cat = d.category || 'Other';
+        if (!acc[cat]) acc[cat] = [];
+        acc[cat].push(d);
+        return acc;
+    }, {});
 
     return (
         <div className="min-h-screen bg-bg-cream text-charcoal font-body">
@@ -134,17 +183,74 @@ export default function Specialties() {
                         </h2>
                         <form onSubmit={handleSubmit} className="space-y-5">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                {/* Dish Name */}
-                                <div>
-                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Dish Name *</label>
-                                    <input
-                                        required
-                                        type="text"
-                                        placeholder="e.g. Signature Ribeye"
-                                        className="w-full bg-bg-cream border border-primary/10 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20 font-semibold"
-                                        value={form.name}
-                                        onChange={e => setForm({ ...form, name: e.target.value })}
-                                    />
+
+                                {/* ── Dish Source Toggle + Picker ── */}
+                                <div className="md:col-span-2">
+                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Dish *</label>
+
+                                    {/* Toggle tabs */}
+                                    <div className="flex bg-bg-cream p-1 rounded-xl border border-primary/10 w-fit mb-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => { setDishSource('menu'); setForm({ ...form, name: '', originalPrice: '', image: '', description: '' }); }}
+                                            className={`px-5 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${dishSource === 'menu' ? 'bg-secondary text-white shadow' : 'text-charcoal/40 hover:text-primary'}`}
+                                        >
+                                            Pick from Menu
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setDishSource('custom')}
+                                            className={`px-5 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${dishSource === 'custom' ? 'bg-secondary text-white shadow' : 'text-charcoal/40 hover:text-primary'}`}
+                                        >
+                                            Enter Manually
+                                        </button>
+                                    </div>
+
+                                    {dishSource === 'menu' ? (
+                                        /* Grouped dropdown of all menu dishes */
+                                        <div className="relative">
+                                            <select
+                                                className="w-full bg-bg-cream border border-primary/10 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20 font-semibold appearance-none pr-10"
+                                                value={menuDishes.find(d => d.name === form.name)?.id || ''}
+                                                onChange={e => handleMenuPick(e.target.value)}
+                                            >
+                                                <option value="">— Select a dish from the menu —</option>
+                                                {Object.entries(dishesByCategory).map(([cat, dishes]) => (
+                                                    <optgroup key={cat} label={cat}>
+                                                        {dishes.map(d => (
+                                                            <option key={d.id} value={d.id}>
+                                                                {d.name} — KES {Number(d.price).toLocaleString()}
+                                                            </option>
+                                                        ))}
+                                                    </optgroup>
+                                                ))}
+                                            </select>
+                                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal/40 pointer-events-none" />
+                                        </div>
+                                    ) : (
+                                        /* Manual text input */
+                                        <input
+                                            required
+                                            type="text"
+                                            placeholder="e.g. Signature Ribeye"
+                                            className="w-full bg-bg-cream border border-primary/10 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20 font-semibold"
+                                            value={form.name}
+                                            onChange={e => setForm({ ...form, name: e.target.value })}
+                                        />
+                                    )}
+
+                                    {/* Preview of selected menu dish */}
+                                    {dishSource === 'menu' && form.name && (
+                                        <div className="mt-3 flex items-center gap-3 bg-secondary/5 border border-secondary/20 rounded-xl px-4 py-3">
+                                            {form.image && (
+                                                <img src={form.image} alt={form.name} className="w-12 h-12 rounded-lg object-cover shrink-0" onError={e => { e.target.style.display = 'none'; }} />
+                                            )}
+                                            <div>
+                                                <p className="font-black text-primary text-sm">{form.name}</p>
+                                                <p className="text-charcoal/40 text-xs">{form.description}</p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Season / Occasion */}
@@ -179,17 +285,19 @@ export default function Specialties() {
                                     )}
                                 </div>
 
-                                {/* Image URL */}
-                                <div>
-                                    <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Image URL</label>
-                                    <input
-                                        type="text"
-                                        placeholder="https://... or /assets/..."
-                                        className="w-full bg-bg-cream border border-primary/10 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20 font-semibold"
-                                        value={form.image}
-                                        onChange={e => setForm({ ...form, image: e.target.value })}
-                                    />
-                                </div>
+                                {/* Image URL — only shown in manual mode (menu pick auto-fills it) */}
+                                {dishSource === 'custom' && (
+                                    <div>
+                                        <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Image URL</label>
+                                        <input
+                                            type="text"
+                                            placeholder="https://... or /assets/..."
+                                            className="w-full bg-bg-cream border border-primary/10 px-4 py-3 rounded-xl outline-none focus:ring-2 focus:ring-secondary/20 font-semibold"
+                                            value={form.image}
+                                            onChange={e => setForm({ ...form, image: e.target.value })}
+                                        />
+                                    </div>
+                                )}
 
                                 {/* Start Date */}
                                 <div>
