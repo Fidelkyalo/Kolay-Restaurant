@@ -708,8 +708,10 @@ const Home = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                         <div className="space-y-5 lg:col-span-1">
                             <div className="flex items-center gap-2">
-                                <img src="/Logo.png" alt="Kolay Logo" className="w-10 h-10 rounded shadow-sm" />
-                                <span className="text-xl font-display font-black text-white uppercase tracking-tight italic">Kolay Restaurant</span>
+                                <a href="#home" onClick={(e) => { e.preventDefault(); document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' }); }} className="flex items-center gap-2 group cursor-pointer" aria-label="Go to top">
+                                    <img src="/Logo.png" alt="Kolay Logo" className="w-10 h-10 rounded shadow-sm group-hover:scale-105 transition-transform duration-300" />
+                                    <span className="text-xl font-display font-black text-white uppercase tracking-tight italic">Kolay Restaurant</span>
+                                </a>
                             </div>
                             <p className="text-white/30 text-sm leading-relaxed">
                                 Artisan culinary experiences crafted for those who appreciate the finer things in life.
