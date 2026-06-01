@@ -5,8 +5,8 @@ import { setRole } from '../hooks/useRole';
 
 // Hardcoded credentials — in production these would come from the backend
 const CREDENTIALS = {
-    admin: { username: 'admin', password: 'admin123' },
-    staff: { username: 'staff', password: 'staff123' },
+    admin: { username: 'Admin', password: 'Kolay_admin' },
+    staff: { username: 'Staff', password: 'staff123' },
 };
 
 const Login = () => {
@@ -138,8 +138,8 @@ const Login = () => {
                     {/* Hint for demo */}
                     <div className="mt-5 p-4 bg-bg-cream rounded-2xl border border-primary/5">
                         <p className="text-[10px] font-black uppercase text-charcoal/30 tracking-widest mb-2">Demo Credentials</p>
-                        <p className="text-xs text-charcoal/50 font-semibold">Admin: <span className="font-black text-primary">admin / admin123</span></p>
-                        <p className="text-xs text-charcoal/50 font-semibold mt-1">Staff: <span className="font-black text-secondary">staff / staff123</span></p>
+                        <p className="text-xs text-charcoal/50 font-semibold">Admin: <span className="font-black text-primary">Admin / Kolay_admin</span></p>
+                        <p className="text-xs text-charcoal/50 font-semibold mt-1">Staff: <span className="font-black text-secondary">Staff / staff123</span></p>
                     </div>
                 </div>
 
