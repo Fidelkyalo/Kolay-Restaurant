@@ -21,6 +21,7 @@ const PublicNavbar = () => {
         { name: 'Reservations', href: '/reservations' },
         { name: 'Gallery', href: '/#gallery' },
         { name: 'Contact', href: '/#contact' },
+        { name: 'Careers', href: '/careers' },
     ];
 
     return (

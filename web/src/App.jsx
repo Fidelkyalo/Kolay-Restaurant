@@ -11,6 +11,8 @@ import GuestMenu from './pages/GuestMenu';
 import Reservations from './pages/Reservations';
 import ManageReservations from './pages/ManageReservations';
 import Specialties from './pages/Specialties';
+import Careers from './pages/Careers';
+import AdminCareers from './pages/AdminCareers';
 import './index.css';
 
 function App() {
@@ -28,6 +30,8 @@ function App() {
         <Route path="/inventory" element={<Inventory />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/specialties" element={<Specialties />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/admin/careers" element={<AdminCareers />} />
       </Routes>
     </Router>
   );

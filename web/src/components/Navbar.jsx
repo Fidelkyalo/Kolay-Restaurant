@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Settings, RefreshCw, Shield, Menu, X, Home, LayoutGrid, Monitor, Package, ChevronRight, LogOut, Calendar, ExternalLink, Sparkles } from 'lucide-react';
+import { Settings, RefreshCw, Shield, Menu, X, Home, LayoutGrid, Monitor, Package, ChevronRight, LogOut, Calendar, ExternalLink, Sparkles, Briefcase } from 'lucide-react';
 
 const Navbar = () => {
     const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -31,6 +31,7 @@ const Navbar = () => {
         { name: 'Inventory', path: '/inventory', icon: <Package className="w-4 h-4" /> },
         { name: 'Manage Bookings', path: '/admin/reservations', icon: <Calendar className="w-4 h-4" /> },
         { name: 'Specialties', path: '/specialties', icon: <Sparkles className="w-4 h-4" /> },
+        { name: 'Careers', path: '/admin/careers', icon: <Briefcase className="w-4 h-4" /> },
     ];
 
     const isActive = (path) => location.pathname === path;
