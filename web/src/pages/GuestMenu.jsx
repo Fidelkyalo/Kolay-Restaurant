@@ -101,16 +101,19 @@ const GuestMenu = () => {
     }, []);
 
     const CATEGORY_ORDER = ['All', 'BreakFast', 'Starters', 'Main Dish', 'Side Dish', 'Desserts', 'Beverages', 'Specialties'];
-    const categories = [...new Set(dishes.map(d => d.category))]
-        .sort((a, b) => {
-            const ai = CATEGORY_ORDER.indexOf(a);
-            const bi = CATEGORY_ORDER.indexOf(b);
-            // Known categories follow the fixed order; unknown ones go to the end
-            if (ai === -1 && bi === -1) return a.localeCompare(b);
-            if (ai === -1) return 1;
-            if (bi === -1) return -1;
-            return ai - bi;
-        });
+
+    // Always show all fixed categories + any extra ones from the data; Specialties always present
+    const dishCategories = [...new Set(dishes.map(d => d.category))];
+    const categories = [
+        ...CATEGORY_ORDER.filter(c => c !== 'All' && (dishCategories.includes(c) || c === 'Specialties')),
+    ].sort((a, b) => {
+        const ai = CATEGORY_ORDER.indexOf(a);
+        const bi = CATEGORY_ORDER.indexOf(b);
+        if (ai === -1 && bi === -1) return a.localeCompare(b);
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+        return ai - bi;
+    });
 
     const addToCart = (dish) => {
         const existing = cart.find(item => item.id === dish.id);
@@ -273,7 +276,16 @@ const GuestMenu = () => {
 
                 {/* Dishes Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {dishes.filter(d => !selectedCategory || d.category === selectedCategory).map(dish => (
+                    {selectedCategory === 'Specialties' && dishes.filter(d => d.category === 'Specialties').length === 0 ? (
+                        <div className="col-span-full flex flex-col items-center justify-center py-24 text-center">
+                            <div className="w-20 h-20 bg-[#E67E22]/10 border border-[#E67E22]/20 rounded-3xl flex items-center justify-center mb-6">
+                                <span className="text-3xl">✦</span>
+                            </div>
+                            <p className="text-white/50 font-black text-lg uppercase tracking-widest mb-2">No Active Specialties</p>
+                            <p className="text-white/20 text-sm">Check back soon — our chef is planning something special.</p>
+                        </div>
+                    ) : (
+                        dishes.filter(d => !selectedCategory || d.category === selectedCategory).map(dish => (
                         <div key={dish.id} className="group relative bg-white/3 border border-white/5 hover:border-[#E67E22]/40 rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-1">
                             {/* Dish image using an img instead of emoji */}
                             <div className="relative h-56 overflow-hidden">
@@ -318,7 +330,8 @@ const GuestMenu = () => {
                             {/* Bottom accent */}
                             <div className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-[#E67E22] to-[#D4A017] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                         </div>
-                    ))}
+                    ))
+                    )}
                 </div>
             </main>
 
