@@ -107,8 +107,12 @@ const Register = () => {
                     <div className="inline-flex items-center justify-center p-3 bg-white/20 rounded-2xl shadow-lg mb-4">
                         <ChefHat className="w-8 h-8 text-white" />
                     </div>
-                    <h1 className="text-3xl font-display font-bold text-white tracking-tight">Kolay Restaurant</h1>
-                    <p className="text-white/80 text-sm mt-1 font-semibold italic">Where Every Meal Feels Right.</p>
+                    <h1 className="text-3xl font-display font-bold text-white tracking-tight">
+                        Kolay Restaurant
+                    </h1>
+                    <p className="text-white/80 text-sm mt-1 font-semibold italic">
+                        Where Every Meal Feels Right.
+                    </p>
                 </div>
 
                 <div className="p-8">
