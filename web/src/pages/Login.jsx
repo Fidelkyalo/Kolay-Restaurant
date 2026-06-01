@@ -5,8 +5,8 @@ import { setRole } from '../hooks/useRole';
 
 // Hardcoded credentials — in production these would come from the backend
 const CREDENTIALS = {
-    admin: { username: 'Admin', password: 'Kolay_admin' },
-    staff: { username: 'Staff', password: 'staff123' },
+    admin: { username: 'Kolay Admin', password: 'Kolayadmin@123' },
+    staff: { username: 'Kolay Staff', password: 'Staff_123' },
 };
 
 const Login = () => {

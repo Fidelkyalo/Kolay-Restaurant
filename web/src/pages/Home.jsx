@@ -772,7 +772,6 @@ const Home = () => {
                             <span className="cursor-pointer hover:text-white/50 transition-colors">Privacy Policy</span>
                             <span className="cursor-pointer hover:text-white/50 transition-colors">Terms of Use</span>
                             <Link to="/staff" className="cursor-pointer hover:text-[#E67E22] transition-colors">Staff Portal</Link>
-                            <Link to="/admin-portal" className="cursor-pointer hover:text-[#E67E22] transition-colors">Admin Portal</Link>
                         </div>
                     </div>
                 </div>
