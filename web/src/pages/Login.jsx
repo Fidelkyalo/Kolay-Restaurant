@@ -25,7 +25,7 @@ const Login = () => {
         setTimeout(() => {
             const creds = CREDENTIALS[portal];
             if (
-                formData.username.trim().toLowerCase() === creds.username &&
+                formData.username.trim() === creds.username &&
                 formData.password === creds.password
             ) {
                 setRole(portal);
