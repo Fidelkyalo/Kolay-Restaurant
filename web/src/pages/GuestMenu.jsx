@@ -65,7 +65,17 @@ const GuestMenu = () => {
         refreshFromApi();
     }, []);
 
-    const categories = [...new Set(dishes.map(d => d.category))];
+    const CATEGORY_ORDER = ['All', 'BreakFast', 'Starters', 'Main Dish', 'Side Dish', 'Desserts', 'Beverages'];
+    const categories = [...new Set(dishes.map(d => d.category))]
+        .sort((a, b) => {
+            const ai = CATEGORY_ORDER.indexOf(a);
+            const bi = CATEGORY_ORDER.indexOf(b);
+            // Known categories follow the fixed order; unknown ones go to the end
+            if (ai === -1 && bi === -1) return a.localeCompare(b);
+            if (ai === -1) return 1;
+            if (bi === -1) return -1;
+            return ai - bi;
+        });
 
     const addToCart = (dish) => {
         const existing = cart.find(item => item.id === dish.id);
