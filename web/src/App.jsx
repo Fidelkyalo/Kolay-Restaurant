@@ -13,6 +13,7 @@ import ManageReservations from './pages/ManageReservations';
 import Specialties from './pages/Specialties';
 import Careers from './pages/Careers';
 import AdminCareers from './pages/AdminCareers';
+import Employees from './pages/Employees';
 import './index.css';
 
 function App() {
@@ -32,6 +33,7 @@ function App() {
         <Route path="/specialties" element={<Specialties />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/admin/careers" element={<AdminCareers />} />
+        <Route path="/employees" element={<Employees />} />
       </Routes>
     </Router>
   );
