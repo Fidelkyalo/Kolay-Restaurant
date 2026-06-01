@@ -99,7 +99,7 @@ const Login = () => {
                                 required
                                 autoComplete="username"
                                 className="w-full px-4 py-3 bg-bg-cream/50 border border-cream rounded-xl focus:ring-2 focus:ring-secondary focus:border-transparent transition-all outline-none font-semibold"
-                                placeholder={portal === 'admin' ? 'admin' : 'staff'}
+                                placeholder="Username"
                                 value={formData.username}
                                 onChange={e => setFormData({ ...formData, username: e.target.value })}
                             />
@@ -135,12 +135,7 @@ const Login = () => {
                         </button>
                     </form>
 
-                    {/* Hint for demo */}
-                    <div className="mt-5 p-4 bg-bg-cream rounded-2xl border border-primary/5">
-                        <p className="text-[10px] font-black uppercase text-charcoal/30 tracking-widest mb-2">Demo Credentials</p>
-                        <p className="text-xs text-charcoal/50 font-semibold">Admin: <span className="font-black text-primary">Admin / Kolay_admin</span></p>
-                        <p className="text-xs text-charcoal/50 font-semibold mt-1">Staff: <span className="font-black text-secondary">Staff / staff123</span></p>
-                    </div>
+                    {/* Demo credentials hint removed */}
                 </div>
 
                 <div className="p-6 bg-bg-cream/30 border-t border-cream flex justify-center">
