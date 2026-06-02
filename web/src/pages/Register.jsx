@@ -37,48 +37,54 @@ const Register = () => {
 
         setIsLoading(true);
         try {
-            // Register the account (defaults to CUSTOMER role)
+            // Step 1: Register the account (defaults to CUSTOMER role)
             await AuthService.signup({
                 username: form.username.trim(),
                 email: form.email.trim(),
                 password: form.password,
             });
 
-            // Auto sign-in after registration
-            const loginRes = await AuthService.login({
-                username: form.username.trim(),
-                password: form.password,
-            });
+            // Step 2: Auto sign-in — handle separately so a login failure
+            // doesn't mask the successful registration
+            try {
+                const loginRes = await AuthService.login({
+                    username: form.username.trim(),
+                    password: form.password,
+                });
 
-            const userData = loginRes.data;
-            // Normalize: backend returns "token", but our interceptor expects "accessToken"
-            const normalizedUser = {
-                ...userData,
-                accessToken: userData.token || userData.accessToken,
-            };
-            localStorage.setItem('kolay_auth_user', JSON.stringify(normalizedUser));
-            localStorage.setItem('kolay_staff_name', userData.username);
+                const userData = loginRes.data;
+                // Normalize: backend returns "token", but our interceptor expects "accessToken"
+                const normalizedUser = {
+                    ...userData,
+                    accessToken: userData.token || userData.accessToken,
+                };
+                localStorage.setItem('kolay_auth_user', JSON.stringify(normalizedUser));
+                localStorage.setItem('kolay_staff_name', userData.username);
 
-            // Set role based on what the backend returned
-            const isAdmin = userData.roles?.includes('ROLE_ADMIN');
-            setRole(isAdmin ? 'admin' : 'staff');
+                // Set role based on what the backend returned
+                const isAdmin = userData.roles?.includes('ROLE_ADMIN');
+                setRole(isAdmin ? 'admin' : 'staff');
+            } catch (loginErr) {
+                // Auto-login failed — account was still created successfully.
+                // User can sign in manually via /customer-login
+                console.warn('Auto-login after registration failed:', loginErr?.message);
+            }
 
+            // Show success and redirect regardless of auto-login result
             setSuccess(true);
             setTimeout(() => navigate('/order'), 1800);
+
         } catch (err) {
             console.error('Registration error:', err);
-            console.error('Error response:', err?.response);
             const isTimeout = err.code === 'ECONNABORTED' || err.message?.includes('timeout');
             const serverMsg = err?.response?.data?.message;
             const status = err?.response?.status;
-            
+
             let msg;
             if (isTimeout) {
                 msg = 'The server is taking too long to respond. Please try again in a moment.';
             } else if (status === 400 && serverMsg) {
-                // Show specific validation errors from backend (username/email taken, etc.)
                 msg = serverMsg;
-                // If account already exists, suggest sign in
                 if (serverMsg.includes('already taken') || serverMsg.includes('already in use')) {
                     msg += ' Try signing in instead.';
                 }
