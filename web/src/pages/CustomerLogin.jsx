@@ -94,6 +94,10 @@ const CustomerLogin = () => {
                     <p className="text-white/80 text-sm mt-1 font-semibold italic">
                         Where Every Meal Feels Right.
                     </p>
+                    {/* Customer badge — makes it clear this is NOT the staff portal */}
+                    <span className="inline-flex items-center gap-1.5 mt-3 bg-white/20 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
+                        <span className="w-1.5 h-1.5 bg-white rounded-full" /> Customer Sign In
+                    </span>
                 </div>
 
                 <div className="p-8">
