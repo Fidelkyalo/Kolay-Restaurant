@@ -66,11 +66,27 @@ const Register = () => {
             setSuccess(true);
             setTimeout(() => navigate('/order'), 1800);
         } catch (err) {
+            console.error('Registration error:', err);
+            console.error('Error response:', err?.response);
             const isTimeout = err.code === 'ECONNABORTED' || err.message?.includes('timeout');
             const serverMsg = err?.response?.data?.message;
-            const msg = isTimeout
-                ? 'The server is taking too long to respond. Please try again in a moment.'
-                : serverMsg || 'Registration failed. Please try again.';
+            const status = err?.response?.status;
+            
+            let msg;
+            if (isTimeout) {
+                msg = 'The server is taking too long to respond. Please try again in a moment.';
+            } else if (status === 400 && serverMsg) {
+                // Show specific validation errors from backend (username/email taken, etc.)
+                msg = serverMsg;
+                // If account already exists, suggest sign in
+                if (serverMsg.includes('already taken') || serverMsg.includes('already in use')) {
+                    msg += ' Try signing in instead.';
+                }
+            } else if (!err.response) {
+                msg = 'Cannot connect to server. Please check your internet connection.';
+            } else {
+                msg = serverMsg || 'Registration failed. Please try again.';
+            }
             setError(msg);
         } finally {
             setIsLoading(false);
@@ -240,7 +256,7 @@ const Register = () => {
                     <div className="mt-6 text-center">
                         <p className="text-sm text-charcoal/50">
                             Already have an account?{' '}
-                            <Link to="/login" className="text-secondary font-bold hover:underline">
+                            <Link to="/customer-login" className="text-secondary font-bold hover:underline">
                                 Sign in
                             </Link>
                         </p>

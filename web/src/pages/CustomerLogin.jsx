@@ -45,6 +45,8 @@ const CustomerLogin = () => {
             // Redirect back to the menu
             navigate('/order');
         } catch (err) {
+            console.error('Login error:', err);
+            console.error('Error response:', err?.response);
             const isTimeout = err.code === 'ECONNABORTED' || err.message?.includes('timeout');
             const serverMsg = err?.response?.data?.message;
             const status = err?.response?.status;
@@ -54,6 +56,8 @@ const CustomerLogin = () => {
                 msg = 'The server is taking too long to respond. Please try again in a moment.';
             } else if (status === 401 || status === 400) {
                 msg = 'Invalid username or password.';
+            } else if (!err.response) {
+                msg = 'Cannot connect to server. Please check your internet connection.';
             } else {
                 msg = serverMsg || 'Sign in failed. Please try again.';
             }
