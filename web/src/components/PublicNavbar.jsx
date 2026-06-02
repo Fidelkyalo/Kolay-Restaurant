@@ -150,7 +150,7 @@ const PublicNavbar = () => {
                             /* Not logged in — Sign In + Create Account */
                             <>
                                 <Link
-                                    to="/staff"
+                                    to="/customer-login"
                                     className="flex items-center gap-1.5 text-white/75 hover:text-white text-[11px] font-bold uppercase tracking-widest px-4 py-2 rounded-full border border-white/15 hover:border-white/30 hover:bg-white/8 transition-all duration-200"
                                 >
                                     <LogIn className="w-3.5 h-3.5" /> Sign In
@@ -232,7 +232,7 @@ const PublicNavbar = () => {
                             ) : (
                                 <div className="grid grid-cols-2 gap-3">
                                     <Link
-                                        to="/staff"
+                                        to="/customer-login"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         className="flex items-center justify-center gap-2 bg-white/8 hover:bg-white/12 border border-white/15 text-white font-bold text-sm py-3 rounded-2xl transition-all"
                                     >

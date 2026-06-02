@@ -588,7 +588,7 @@ const GuestMenu = () => {
                                 <UserPlus className="w-4 h-4" /> Create Free Account
                             </Link>
                             <Link
-                                to="/staff"
+                                to="/customer-login"
                                 className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black py-3.5 rounded-xl text-sm uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2"
                             >
                                 <LogIn className="w-4 h-4" /> Sign In
