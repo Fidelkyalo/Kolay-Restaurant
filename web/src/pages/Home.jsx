@@ -80,6 +80,8 @@ const Home = () => {
         setRatingValue(0);
         setRatingError('');
     };
+
+    const featuredMeals = [
         { id: 1, name: 'Gourmet Beef Burger', price: 1200, desc: 'Aged wagyu beef, truffle aioli, melted brie on brioche.', tag: 'Best Seller', image: '/assets/burger.png' },
         { id: 2, name: 'Herb-Crusted Salmon', price: 2100, desc: 'Fresh Atlantic salmon with sesame glaze & greens.', tag: 'Chef\'s Pick', image: '/assets/salmon.png' },
         { id: 3, name: 'Signature Ribeye', price: 3500, desc: 'Prime ribeye, garlic herb butter & truffle fries.', tag: 'Premium', image: '/assets/steak.png' },
