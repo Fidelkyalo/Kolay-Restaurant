@@ -15,6 +15,7 @@ import AdminCareers from './pages/AdminCareers';
 import Employees from './pages/Employees';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import CustomerLogin from './pages/CustomerLogin';
 import './index.css';
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
         <Route path="/admin-portal" element={<Login defaultPortal="admin" />} />
         <Route path="/login" element={<Login defaultPortal="staff" />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/customer-login" element={<CustomerLogin />} />
       </Routes>
     </Router>
   );

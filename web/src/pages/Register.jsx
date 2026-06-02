@@ -51,7 +51,12 @@ const Register = () => {
             });
 
             const userData = loginRes.data;
-            localStorage.setItem('kolay_auth_user', JSON.stringify(userData));
+            // Normalize: backend returns "token", but our interceptor expects "accessToken"
+            const normalizedUser = {
+                ...userData,
+                accessToken: userData.token || userData.accessToken,
+            };
+            localStorage.setItem('kolay_auth_user', JSON.stringify(normalizedUser));
             localStorage.setItem('kolay_staff_name', userData.username);
 
             // Set role based on what the backend returned

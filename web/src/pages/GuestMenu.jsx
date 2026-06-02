@@ -239,7 +239,7 @@ const GuestMenu = () => {
                         {!isLoggedIn && (
                             <div className="hidden sm:flex items-center gap-2">
                                 <Link
-                                    to="/staff"
+                                    to="/customer-login"
                                     className="flex items-center gap-1.5 text-white/50 hover:text-white font-black text-[10px] uppercase tracking-widest transition-colors px-3 py-2 rounded-xl hover:bg-white/5 border border-white/10"
                                 >
                                     <LogIn className="w-3.5 h-3.5" /> Sign In
@@ -321,7 +321,7 @@ const GuestMenu = () => {
                                 <Lock className="w-4 h-4 text-white/40 shrink-0" />
                                 <p className="text-white/50 text-xs font-bold">
                                     You need an account to order specialties.{' '}
-                                    <Link to="/staff" className="text-[#E67E22] hover:underline font-black">Sign in here</Link>
+                                    <Link to="/customer-login" className="text-[#E67E22] hover:underline font-black">Sign in here</Link>
                                 </p>
                             </div>
                         )}
