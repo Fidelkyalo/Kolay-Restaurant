@@ -203,15 +203,15 @@ function Dashboard() {
                             ${(order.items || []).map(item => `
                                 <tr>
                                     <td class="qty">${item.quantity || 1}</td>
-                                    <td>${item.name || 'Item'}</td>
-                                    <td class="price">${((item.price || 0) * (item.quantity || 1)).toLocaleString()}</td>
+                                    <td>${item.name || 'Item'}${item.isSpecialty ? ' <span style="color:#E67E22;font-size:9px;font-weight:bold;">★ SPECIAL</span>' : ''}</td>
+                                    <td class="price">KES ${((item.price || 0) * (item.quantity || 1)).toLocaleString()}</td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
                     <div class="totals">
-                        <div class="total-row"><span>Subtotal</span> <span>KES ${order.total.replace('KES ', '')}</span></div>
-                        <div class="total-row"><span>Tax (VAT 16%)</span> <span>Incl.</span></div>
+                        <div class="total-row"><span>Subtotal</span> <span>KES ${(order.subtotal || 0).toLocaleString()}</span></div>
+                        <div class="total-row"><span>Tax (VAT 16%)</span> <span>KES ${(order.tax || 0).toLocaleString()}</span></div>
                         <div class="total-row grand"><span>TOTAL</span> <span>${order.total}</span></div>
                         <div class="total-row payment"><span>STATUS:</span> <span>${order.paymentStatus || 'UNPAID'}</span></div>
                     </div>

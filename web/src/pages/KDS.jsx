@@ -18,6 +18,7 @@ const KDS = () => {
             }
         };
         loadOrders();
+        // Listen for both cross-tab storage events AND same-tab dispatch events
         window.addEventListener('storage', loadOrders);
         return () => window.removeEventListener('storage', loadOrders);
     }, []);
@@ -27,6 +28,7 @@ const KDS = () => {
             order.id === id ? { ...order, status: newStatus } : order
         );
         localStorage.setItem('kolay_orders', JSON.stringify(updated));
+        window.dispatchEvent(new Event('storage'));
         setAllOrders(updated);
     };
 

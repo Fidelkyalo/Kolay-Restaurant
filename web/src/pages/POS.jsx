@@ -130,10 +130,9 @@ const POS = () => {
                         </tbody>
                     </table>
                     <div class="totals">
-                        <div class="total-row"><span>Tax (VAT 16%)</span> <span>Incl.</span></div>
-                        <div class="total-row grand"><span>TOTAL</span> <span>${lastPlacedOrder.total}</span></div>
-                        <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 16px; font-weight: bold;">
-                            <span>STATUS:</span> <span>${lastPlacedOrder.paymentStatus || 'PAID'}</span>
+                        <div class="total-row payment" style="margin-top:10px; border-top: 1px solid #eee; padding-top: 10px;">
+                            <span style="font-size:16px; font-weight:bold;">PAYMENT STATUS:</span>
+                            <span style="font-size:16px; font-weight:bold;">${lastPlacedOrder.paymentStatus || 'UNPAID'}</span>
                         </div>
                     </div>
                     <div class="footer">
@@ -334,6 +333,9 @@ const POS = () => {
         // Permanent Archive for history/review
         const archive = JSON.parse(localStorage.getItem('kolay_archive') || '[]');
         localStorage.setItem('kolay_archive', JSON.stringify([newOrder, ...archive]));
+
+        // Notify KDS and Dashboard on the same tab
+        window.dispatchEvent(new Event('storage'));
 
         setLastPlacedOrder(newOrder);
         setCart([]);
