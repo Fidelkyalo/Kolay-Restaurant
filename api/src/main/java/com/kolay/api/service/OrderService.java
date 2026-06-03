@@ -71,7 +71,12 @@ public class OrderService {
     }
 
     public List<Order> getActiveOrders() {
-        return orderRepository.findByStatus(Order.OrderStatus.PENDING);
+        List<Order> pending = orderRepository.findByStatus(Order.OrderStatus.PENDING);
+        List<Order> preparing = orderRepository.findByStatus(Order.OrderStatus.PREPARING);
+        List<Order> all = new ArrayList<>();
+        all.addAll(pending);
+        all.addAll(preparing);
+        return all;
     }
 
     @Transactional

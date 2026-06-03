@@ -2,25 +2,77 @@ import React, { useState, useEffect } from 'react';
 import { Clock, CheckCircle2, AlertCircle, ChefHat, Timer, ArrowRight, History, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { OrderService } from '../services/api';
 
 const KDS = () => {
     const [allOrders, setAllOrders] = useState([]);
     const activeOrders = allOrders.filter(o => o.status === 'PENDING' || o.status === 'PREPARING');
     const completedToday = allOrders.filter(o => o.status === 'READY' || o.status === 'SERVED').length;
 
-    useEffect(() => {
-        const loadOrders = () => {
-            const saved = localStorage.getItem('kolay_orders');
-            if (saved) {
-                setAllOrders(JSON.parse(saved));
-            } else {
-                setAllOrders([]);
+    const loadOrders = () => {
+        // Merge backend orders with local orders (local takes precedence for status)
+        const localOrders = (() => {
+            try { return JSON.parse(localStorage.getItem('kolay_orders') || '[]'); }
+            catch { return []; }
+        })();
+        setAllOrders(localOrders);
+    };
+
+    const fetchFromBackend = async () => {
+        try {
+            const res = await OrderService.getActiveOrders();
+            if (res.data && res.data.length > 0) {
+                // Merge backend orders into local storage so they appear in KDS
+                const localOrders = (() => {
+                    try { return JSON.parse(localStorage.getItem('kolay_orders') || '[]'); }
+                    catch { return []; }
+                })();
+                const localIds = new Set(localOrders.map(o => String(o.id)));
+                // Add any backend orders not already in local
+                const newOrders = res.data
+                    .filter(o => !localIds.has(String(o.id)))
+                    .map(o => ({
+                        id: o.id,
+                        table: o.tableNumber || o.table || 'Online Order',
+                        items: (o.items || []).map(i => ({
+                            name: i.productName || i.name || 'Item',
+                            quantity: i.quantity || 1,
+                            price: i.price || 0,
+                        })),
+                        total: `KES ${(o.totalAmount || 0).toLocaleString()}`,
+                        subtotal: o.subtotal || o.totalAmount || 0,
+                        tax: o.tax || 0,
+                        totalAmount: o.totalAmount || 0,
+                        status: o.status || 'PENDING',
+                        paymentStatus: o.paymentStatus || 'UNPAID',
+                        timestamp: o.createdAt || new Date().toISOString(),
+                        guestName: o.guestName,
+                        guestPhone: o.guestPhone,
+                        source: 'online',
+                    }));
+                if (newOrders.length > 0) {
+                    const merged = [...newOrders, ...localOrders];
+                    localStorage.setItem('kolay_orders', JSON.stringify(merged));
+                    setAllOrders(merged);
+                    window.dispatchEvent(new Event('storage'));
+                }
             }
-        };
+        } catch (err) {
+            // Backend unavailable — fall back to local only
+        }
+    };
+
+    useEffect(() => {
         loadOrders();
-        // Listen for both cross-tab storage events AND same-tab dispatch events
+        fetchFromBackend();
+        // Poll backend every 15 seconds for new online orders
+        const pollInterval = setInterval(fetchFromBackend, 15000);
+        // Listen for same-tab and cross-tab storage updates
         window.addEventListener('storage', loadOrders);
-        return () => window.removeEventListener('storage', loadOrders);
+        return () => {
+            clearInterval(pollInterval);
+            window.removeEventListener('storage', loadOrders);
+        };
     }, []);
 
     const updateStatus = (id, newStatus) => {
@@ -74,6 +126,12 @@ const KDS = () => {
                                 <div>
                                     <span className="text-xs font-bold opacity-60 uppercase tracking-widest">{order.status}</span>
                                     <h2 className="text-2xl font-bold">{order.table}</h2>
+                                    {order.source === 'online' && (
+                                        <span className="text-[10px] font-black bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full uppercase tracking-widest mt-1 inline-block">🌐 Online Order</span>
+                                    )}
+                                    {order.guestName && (
+                                        <p className="text-xs opacity-60 mt-0.5">👤 {order.guestName}</p>
+                                    )}
                                 </div>
                                 <div className="text-right text-xs font-bold opacity-60">
                                     <p>{order.id}</p>

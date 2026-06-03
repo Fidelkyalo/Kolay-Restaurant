@@ -62,6 +62,7 @@ public class WebSecurityConfig {
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/menu/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/orders").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/reservations").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/applications").permitAll()
                         .anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());

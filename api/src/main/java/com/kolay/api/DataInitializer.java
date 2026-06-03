@@ -60,6 +60,7 @@ public class DataInitializer implements CommandLineRunner {
                     .price(new BigDecimal("850"))
                     .category(burgers)
                     .available(true)
+                    .imageUrl("/assets/burger.png")
                     .build());
 
             productRepository.save(Product.builder()
@@ -68,6 +69,7 @@ public class DataInitializer implements CommandLineRunner {
                     .price(new BigDecimal("1200"))
                     .category(pizza)
                     .available(true)
+                    .imageUrl("/assets/burger.png")
                     .build());
 
             productRepository.save(Product.builder()
@@ -76,9 +78,25 @@ public class DataInitializer implements CommandLineRunner {
                     .price(new BigDecimal("250"))
                     .category(drinks)
                     .available(true)
+                    .imageUrl("https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600")
                     .build());
 
             System.out.println("Finished seeding menu data.");
+        } else {
+            // Update existing products that have null imageUrl
+            productRepository.findAll().forEach(product -> {
+                if (product.getImageUrl() == null) {
+                    String lower = product.getName().toLowerCase();
+                    if (lower.contains("burger")) product.setImageUrl("/assets/burger.png");
+                    else if (lower.contains("pizza")) product.setImageUrl("https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&q=80&w=600");
+                    else if (lower.contains("tea") || lower.contains("drink") || lower.contains("latte") || lower.contains("beverage"))
+                        product.setImageUrl("https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600");
+                    else if (lower.contains("salmon")) product.setImageUrl("/assets/salmon.png");
+                    else if (lower.contains("steak") || lower.contains("ribeye")) product.setImageUrl("/assets/steak.png");
+                    else product.setImageUrl("https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600");
+                    productRepository.save(product);
+                }
+            });
         }
 
         // Always ensure the admin user exists with the correct credentials

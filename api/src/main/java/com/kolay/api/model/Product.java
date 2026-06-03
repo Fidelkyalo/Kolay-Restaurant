@@ -147,4 +147,9 @@ public class Product {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    // Alias for frontend compatibility — frontend expects "image" field
+    public String getImage() {
+        return imageUrl;
+    }
 }

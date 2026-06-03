@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Briefcase, MapPin, Clock, ChevronDown, ChevronUp, ArrowRight, Check, X, User, RefreshCw, Upload, Camera } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
+import { ApplicationService } from '../services/api';
 
 const getJobs = () => {
     try { return JSON.parse(localStorage.getItem('kolay_jobs') || '[]').filter(j => j.isOpen); }
@@ -117,7 +118,7 @@ export default function Careers() {
     };
 
     // ── Submit application ────────────────────────────────────────────────────
-    const handleSubmitApplication = (e) => {
+    const handleSubmitApplication = async (e) => {
         e.preventDefault();
         // Profile image is required for new hire applications
         if (flowType === 'new' && !profileImage) {
@@ -125,21 +126,33 @@ export default function Careers() {
             return;
         }
         setImageError('');
-        const apps = JSON.parse(localStorage.getItem('kolay_applications') || '[]');
         const newApp = {
             id: Date.now(),
             type: flowType,
             jobId: selectedJob?.id || null,
+            jobTitle: selectedJob?.title || null,
             fullName: account.name,
             email: account.email,
             phone: account.phone,
             profileImage: profileImage || '',
-            answers,
+            answers: JSON.stringify(answers),
             status: 'Pending',
             submittedAt: new Date().toISOString(),
         };
-        localStorage.setItem('kolay_applications', JSON.stringify([...apps, newApp]));
+
+        // Save to backend (cross-browser persistence)
+        try {
+            await ApplicationService.submit(newApp);
+        } catch (err) {
+            console.warn('Backend application save failed, saving locally only:', err?.message);
+        }
+
+        // Also save to localStorage so admin sees it even if offline
+        const apps = JSON.parse(localStorage.getItem('kolay_applications') || '[]');
+        const localApp = { ...newApp, answers };
+        localStorage.setItem('kolay_applications', JSON.stringify([...apps, localApp]));
         window.dispatchEvent(new Event('storage'));
+
         setSubmitted(true);
         setFlow('done');
     };

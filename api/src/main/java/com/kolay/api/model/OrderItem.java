@@ -14,7 +14,7 @@ public class OrderItem {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
     private Product product;
 
@@ -105,5 +105,14 @@ public class OrderItem {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    // Convenience getters for frontend serialization
+    public String getProductName() {
+        return product != null ? product.getName() : null;
+    }
+
+    public String getName() {
+        return getProductName();
     }
 }

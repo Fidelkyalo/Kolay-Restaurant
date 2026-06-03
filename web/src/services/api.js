@@ -58,4 +58,10 @@ export const ReservationService = {
     assign: (id, staffName) => api.patch(`/reservations/${id}/assign`, null, { params: { staffName } }),
 };
 
+export const ApplicationService = {
+    submit: (applicationData) => api.post('/applications', applicationData),
+    getAll: () => api.get('/applications'),
+    updateStatus: (id, status) => api.patch(`/applications/${id}/status`, { status }),
+};
+
 export default api;

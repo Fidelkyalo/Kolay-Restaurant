@@ -27,13 +27,13 @@ public class OrderController {
     }
 
     @GetMapping("/active")
-    @PreAuthorize("hasRole('CHEF') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CHEF') or hasRole('ADMIN') or hasRole('MANAGER') or hasRole('WAITER') or hasRole('CASHIER')")
     public ResponseEntity<List<Order>> getActiveOrders() {
         return ResponseEntity.ok(orderService.getActiveOrders());
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasRole('CHEF') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('CHEF') or hasRole('ADMIN') or hasRole('MANAGER') or hasRole('WAITER')")
     public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestParam Order.OrderStatus status) {
         orderService.updateOrderStatus(id, status);
         return ResponseEntity.ok(new MessageResponse("Order status updated to " + status));

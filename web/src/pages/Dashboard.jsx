@@ -58,16 +58,50 @@ function Dashboard() {
                     OrderService.getActiveOrders(),
                     InventoryService.getAll()
                 ]);
-                if (ordersRes.data) setOrders(ordersRes.data);
+                if (ordersRes.data && ordersRes.data.length > 0) {
+                    // Merge backend orders with local orders
+                    const localOrders = (() => {
+                        try { return JSON.parse(localStorage.getItem('kolay_orders') || '[]'); }
+                        catch { return []; }
+                    })();
+                    const localIds = new Set(localOrders.map(o => String(o.id)));
+                    const backendNewOrders = ordersRes.data
+                        .filter(o => !localIds.has(String(o.id)))
+                        .map(o => ({
+                            id: o.id,
+                            table: o.tableNumber || o.table || 'Online Order',
+                            items: (o.items || []).map(i => ({
+                                name: i.productName || i.name || 'Item',
+                                quantity: i.quantity || 1,
+                                price: i.price || 0,
+                            })),
+                            total: `KES ${(o.totalAmount || 0).toLocaleString()}`,
+                            subtotal: o.subtotal || o.totalAmount || 0,
+                            tax: o.tax || 0,
+                            totalAmount: o.totalAmount || 0,
+                            status: o.status || 'PENDING',
+                            paymentStatus: o.paymentStatus || 'UNPAID',
+                            timestamp: o.createdAt || new Date().toISOString(),
+                            guestName: o.guestName,
+                            guestPhone: o.guestPhone,
+                            source: 'online',
+                        }));
+                    const merged = [...backendNewOrders, ...localOrders];
+                    if (backendNewOrders.length > 0) {
+                        localStorage.setItem('kolay_orders', JSON.stringify(merged));
+                        window.dispatchEvent(new Event('storage'));
+                    }
+                    setOrders(merged);
+                } else {
+                    const savedOrders = localStorage.getItem('kolay_orders');
+                    if (savedOrders) setOrders(JSON.parse(savedOrders));
+                }
                 if (invRes.data) setInventory(invRes.data);
             } catch (error) {
                 console.error("Dashboard data fetch failed, using fallback:", error);
-
-                // Fallback to local
                 const savedOrders = localStorage.getItem('kolay_orders');
                 const savedInv = localStorage.getItem('kolay_inventory');
                 const savedArc = localStorage.getItem('kolay_archive');
-
                 if (savedOrders) setOrders(JSON.parse(savedOrders));
                 if (savedInv) setInventory(JSON.parse(savedInv));
                 if (savedArc) setArchive(JSON.parse(savedArc));

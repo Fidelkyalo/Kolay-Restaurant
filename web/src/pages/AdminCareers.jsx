@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Plus, Trash2, Edit3, Check, X, Users, FileText, Clock, ChevronDown, ChevronUp, Eye, UserPlus } from 'lucide-react';
+import { Briefcase, Plus, Trash2, Edit3, Check, X, Users, FileText, Clock, ChevronDown, ChevronUp, Eye, UserPlus, RefreshCw } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import { ApplicationService } from '../services/api';
 
 const EMPTY_JOB = {
     id: null,
@@ -39,6 +40,38 @@ export default function AdminCareers() {
     const [editingId, setEditingId] = useState(null);
     const [activeTab, setActiveTab] = useState('jobs');   // 'jobs' | 'applications'
     const [expandedApp, setExpandedApp] = useState(null);
+    const [isFetchingApps, setIsFetchingApps] = useState(false);
+
+    const fetchApplications = async () => {
+        setIsFetchingApps(true);
+        try {
+            const res = await ApplicationService.getAll();
+            if (res.data && res.data.length > 0) {
+                // Merge backend apps with local ones (backend takes precedence)
+                const backendApps = res.data.map(app => ({
+                    ...app,
+                    // Parse answers JSON string back to object for display
+                    answers: (() => {
+                        try { return typeof app.answers === 'string' ? JSON.parse(app.answers) : app.answers; }
+                        catch { return {}; }
+                    })(),
+                }));
+                // Also merge in any local-only apps not yet on backend
+                const localApps = getApplications();
+                const backendIds = new Set(backendApps.map(a => String(a.id)));
+                const localOnly = localApps.filter(a => !backendIds.has(String(a.id)));
+                setApplications([...backendApps, ...localOnly]);
+                localStorage.setItem('kolay_applications', JSON.stringify([...backendApps, ...localOnly]));
+            } else {
+                setApplications(getApplications());
+            }
+        } catch (err) {
+            console.warn('Could not fetch applications from backend:', err?.message);
+            setApplications(getApplications());
+        } finally {
+            setIsFetchingApps(false);
+        }
+    };
 
     useEffect(() => {
         const handler = () => {
@@ -46,6 +79,7 @@ export default function AdminCareers() {
             setApplications(getApplications());
         };
         window.addEventListener('storage', handler);
+        fetchApplications(); // Load from backend on mount
         return () => window.removeEventListener('storage', handler);
     }, []);
 
@@ -82,10 +116,13 @@ export default function AdminCareers() {
         saveJobs(updated);
     };
 
-    const updateAppStatus = (appId, status) => {
+    const updateAppStatus = async (appId, status) => {
         const updated = applications.map(a => a.id === appId ? { ...a, status } : a);
         setApplications(updated);
         localStorage.setItem('kolay_applications', JSON.stringify(updated));
+        // Sync to backend
+        try { await ApplicationService.updateStatus(appId, status); }
+        catch (err) { console.warn('Backend status update failed:', err?.message); }
     };
 
     // Hire applicant: create employee record pre-filled from application data
@@ -317,7 +354,8 @@ export default function AdminCareers() {
                 {activeTab === 'applications' && (
                     <div className="space-y-6">
                         {/* Summary */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-1">
                             {[
                                 { label: 'Total Applications', value: applications.length, color: 'bg-primary text-white' },
                                 { label: 'New Hires', value: newHires.length, color: 'bg-secondary text-white' },
@@ -328,6 +366,12 @@ export default function AdminCareers() {
                                     <p className="text-sm opacity-70 font-bold mt-1">{s.label}</p>
                                 </div>
                             ))}
+                            </div>
+                            <button onClick={fetchApplications} disabled={isFetchingApps}
+                                className="ml-4 p-3 bg-white border border-primary/10 hover:bg-secondary/10 rounded-2xl transition-colors shadow-sm shrink-0"
+                                title="Refresh from server">
+                                <RefreshCw className={`w-5 h-5 text-secondary ${isFetchingApps ? 'animate-spin' : ''}`} />
+                            </button>
                         </div>
 
                         {applications.length === 0 ? (
