@@ -2,40 +2,71 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChefHat, Lock, User, Eye, EyeOff, Loader2, Shield, Users } from 'lucide-react';
 import { setRole } from '../hooks/useRole';
+import { AuthService } from '../services/api';
 
-// Hardcoded credentials — in production these would come from the backend
+// Hardcoded credentials for the staff/admin portal UI
 const CREDENTIALS = {
-    admin: { username: 'Kolay Admin', password: 'Kolayadmin@123' },
+    admin: { username: 'Admin', password: 'Admin123' },
     staff: { username: 'Kolay Staff', password: 'Staff_123' },
 };
 
 const Login = ({ defaultPortal = 'staff' }) => {
-    const [portal, setPortal] = useState(defaultPortal); // 'admin' | 'staff'
+    const [portal, setPortal] = useState(defaultPortal);
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({ username: '', password: '' });
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
 
-        setTimeout(() => {
-            const creds = CREDENTIALS[portal];
-            if (
-                formData.username.trim() === creds.username &&
-                formData.password === creds.password
-            ) {
-                setRole(portal);
-                localStorage.setItem('kolay_auth_user', JSON.stringify({ username: formData.username, role: portal }));
-                navigate('/dashboard');
-            } else {
-                setError('Invalid username or password.');
-            }
+        const creds = CREDENTIALS[portal];
+        const enteredUsername = formData.username.trim();
+        const enteredPassword = formData.password;
+
+        // Check hardcoded credentials first
+        if (
+            enteredUsername !== creds.username ||
+            enteredPassword !== creds.password
+        ) {
+            setError('Invalid username or password.');
             setIsLoading(false);
-        }, 600);
+            return;
+        }
+
+        // Credentials match — now get a real JWT from the backend
+        // so that API calls (KDS, Dashboard, etc.) work properly
+        try {
+            const res = await AuthService.login({
+                username: enteredUsername,
+                password: enteredPassword,
+            });
+            const userData = res.data;
+            // Normalize token field
+            const normalizedUser = {
+                ...userData,
+                accessToken: userData.token || userData.accessToken,
+            };
+            localStorage.setItem('kolay_auth_user', JSON.stringify(normalizedUser));
+            localStorage.setItem('kolay_staff_name', enteredUsername);
+        } catch (err) {
+            // Backend login failed (e.g. staff user not in DB yet) — store minimal session
+            // Staff can still use the portal but API calls requiring auth may fail
+            console.warn('Backend JWT fetch failed for staff portal, using local session:', err?.message);
+            localStorage.setItem('kolay_auth_user', JSON.stringify({
+                username: enteredUsername,
+                role: portal,
+                accessToken: null,
+            }));
+            localStorage.setItem('kolay_staff_name', enteredUsername);
+        }
+
+        setRole(portal);
+        navigate('/dashboard');
+        setIsLoading(false);
     };
 
     const portalConfig = {
@@ -134,8 +165,6 @@ const Login = ({ defaultPortal = 'staff' }) => {
                             {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Sign in to ${active.label}`}
                         </button>
                     </form>
-
-                    {/* Demo credentials hint removed */}
                 </div>
 
                 <div className="p-6 bg-bg-cream/30 border-t border-cream flex justify-center">
