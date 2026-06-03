@@ -182,7 +182,7 @@ function ImagePicker({ value, onChange, applicationImage }) {
 }
 
 // ── Employee Profile Modal ────────────────────────────────────────────────────
-function EmployeeProfileModal({ emp, onClose, onEdit }) {
+function EmployeeProfileModal({ emp, onClose, onEdit, isAdmin }) {
     const cs = contractStatus(emp.contractEnd);
     const initials = `${emp.firstName?.[0] || ''}${emp.lastName?.[0] || ''}`.toUpperCase();
 
@@ -215,7 +215,7 @@ function EmployeeProfileModal({ emp, onClose, onEdit }) {
                             {emp.status}
                         </span>
                         <span className={`text-[10px] font-black px-3 py-1 rounded-full bg-white/10 text-white/70`}>{cs.label}</span>
-                        {emp.salary && <span className="text-[10px] font-black px-3 py-1 rounded-full bg-secondary/30 text-white">KES {Number(emp.salary).toLocaleString()} / mo</span>}
+                        {isAdmin && emp.salary && <span className="text-[10px] font-black px-3 py-1 rounded-full bg-secondary/30 text-white">KES {Number(emp.salary).toLocaleString()} / mo</span>}
                     </div>
                 </div>
 
@@ -294,10 +294,12 @@ function EmployeeProfileModal({ emp, onClose, onEdit }) {
                         <button onClick={onClose} className="flex-1 py-3 font-bold text-charcoal/40 hover:text-primary border border-primary/10 rounded-xl transition-colors text-sm">
                             Close
                         </button>
+                        {isAdmin && (
                         <button onClick={() => { onClose(); onEdit(emp); }}
                             className="flex-1 bg-secondary text-white font-bold py-3 rounded-xl shadow-lg hover:bg-orange-600 transition-all flex items-center justify-center gap-2 text-sm">
                             <Edit3 className="w-4 h-4" /> Edit Profile
                         </button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -315,6 +317,12 @@ export default function Employees() {
     const [editingId, setEditingId] = useState(null);
     const [form, setForm] = useState(EMPTY_FORM);
     const [profileEmp, setProfileEmp] = useState(null); // employee to show in profile modal
+
+    // Role check — only admin can edit/add/delete or see salary
+    const isAdmin = (() => {
+        try { return localStorage.getItem('kolay_portal_role') === 'admin'; }
+        catch { return false; }
+    })();
 
     useEffect(() => { persist(employees); }, [employees]);
 
@@ -400,10 +408,12 @@ export default function Employees() {
                             {expired > 0 && <span className="text-red-500 font-bold">{expired} expired</span>}
                         </p>
                     </div>
+                    {isAdmin && (
                     <button onClick={openAdd}
                         className="flex items-center gap-2 bg-secondary text-white px-7 py-3 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg hover:bg-orange-600 transition-all active:scale-95">
                         <Plus className="w-4 h-4" /> Add Employee
                     </button>
+                    )}
                 </div>
 
                 {/* Stats */}
@@ -447,15 +457,19 @@ export default function Employees() {
                         <Users className="w-12 h-12 text-charcoal/20 mx-auto mb-4" />
                         <p className="text-charcoal/40 font-bold text-lg">No employees found</p>
                         <p className="text-charcoal/30 text-sm mt-1">Try adjusting your search or filters, or add a new employee.</p>
+                        {isAdmin && (
                         <button onClick={openAdd} className="mt-6 flex items-center gap-2 bg-secondary text-white px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg hover:bg-orange-600 transition-all mx-auto">
                             <Plus className="w-4 h-4" /> Add Employee
                         </button>
+                        )}
                     </div>
                 ) : (
                     <div className="bg-white rounded-3xl border border-primary/5 shadow-sm overflow-hidden">
-                        <div className="grid grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4 bg-bg-cream border-b border-primary/5 text-[10px] font-black uppercase text-charcoal/40 tracking-widest">
+                        <div className={`grid gap-4 px-6 py-4 bg-bg-cream border-b border-primary/5 text-[10px] font-black uppercase text-charcoal/40 tracking-widest ${isAdmin ? 'grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_1fr_auto]' : 'grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_auto]'}`}>
                             <span>Employee</span><span>Role / Dept</span><span>Contract</span>
-                            <span>Time Served</span><span>Status</span><span>Salary (KES)</span><span></span>
+                            <span>Time Served</span><span>Status</span>
+                            {isAdmin && <span>Salary (KES)</span>}
+                            <span></span>
                         </div>
 
                         {filtered.map(emp => {
@@ -463,7 +477,7 @@ export default function Employees() {
                             const initials = `${emp.firstName?.[0] || ''}${emp.lastName?.[0] || ''}`.toUpperCase();
                             return (
                                 <div key={emp.id} className="border-b border-primary/5 last:border-0">
-                                    <div className="grid grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_1fr_auto] gap-4 px-6 py-4 items-center hover:bg-bg-cream/40 transition-colors cursor-pointer"
+                                    <div className={`grid gap-4 px-6 py-4 items-center hover:bg-bg-cream/40 transition-colors cursor-pointer ${isAdmin ? 'grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_1fr_auto]' : 'grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_auto]'}`}
                                         onClick={() => setProfileEmp(emp)}>
                                         {/* Avatar + name */}
                                         <div className="flex items-center gap-3">
@@ -495,17 +509,23 @@ export default function Employees() {
                                             </span>
                                             <span className={`text-[10px] font-black px-2.5 py-1 rounded-full w-fit ${cs.color}`}>{cs.label}</span>
                                         </div>
-                                        <p className="text-sm font-black text-secondary">{emp.salary ? Number(emp.salary).toLocaleString() : '—'}</p>
+                                        {isAdmin && (
+                                            <p className="text-sm font-black text-secondary">{emp.salary ? Number(emp.salary).toLocaleString() : '—'}</p>
+                                        )}
                                         <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                                             <button onClick={() => setProfileEmp(emp)} className="p-2 bg-bg-cream hover:bg-secondary/10 text-primary rounded-xl transition-colors" title="View Profile">
                                                 <Eye className="w-4 h-4" />
                                             </button>
+                                            {isAdmin && (
                                             <button onClick={() => openEdit(emp)} className="p-2 bg-bg-cream hover:bg-secondary/10 text-primary rounded-xl transition-colors" title="Edit">
                                                 <Edit3 className="w-4 h-4" />
                                             </button>
+                                            )}
+                                            {isAdmin && (
                                             <button onClick={() => handleDelete(emp.id)} className="p-2 bg-bg-cream hover:bg-red-50 text-red-400 rounded-xl transition-colors" title="Delete">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -514,7 +534,7 @@ export default function Employees() {
                     </div>
                 )}
 
-                {filtered.length > 0 && (
+                {filtered.length > 0 && isAdmin && (
                     <div className="flex justify-center mt-6">
                         <button onClick={openAdd}
                             className="flex items-center gap-2 bg-secondary text-white px-7 py-3 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg hover:bg-orange-600 transition-all active:scale-95">
@@ -660,6 +680,7 @@ export default function Employees() {
                         emp={profileEmp}
                         onClose={() => setProfileEmp(null)}
                         onEdit={openEdit}
+                        isAdmin={isAdmin}
                     />
                 )}
             </main>
