@@ -221,58 +221,66 @@ const POS = () => {
     const saveDish = async () => {
         if (!newDish.name.trim() || !newDish.price) return;
 
-        try {
-            const dishData = {
-                ...newDish,
-                price: parseFloat(newDish.price)
-            };
+        const dishData = {
+            name:        newDish.name.trim(),
+            desc:        newDish.desc || '',
+            description: newDish.desc || '',
+            price:       parseFloat(newDish.price),
+            category:    newDish.category || 'Main Dish',
+            image:       newDish.image || '',
+            imageUrl:    newDish.image || '',
+            available:   true,
+        };
 
-            let response;
-            if (editingDishId) {
-                // In a real app, we'd use PUT /products/:id
-                // For now, we'll just save it to local and let the UI refresh
-                // But we could attempt to sync if we had the endpoint
-            } else {
-                response = await MenuService.createProduct(dishData);
-                if (response.data) {
-                    setProducts([...products, response.data]);
-                }
-            }
-        } catch (error) {
-            console.error("Backend dish save failed:", error);
-        }
-
-        // Keep local storage in sync for fallback
         let updated;
+
         if (editingDishId) {
-            updated = products.map(p => p.id === editingDishId ? {
-                ...newDish,
-                id: editingDishId,
-                price: parseFloat(newDish.price)
-            } : p);
+            // ── EDIT ──
+            try {
+                await MenuService.updateProduct(editingDishId, dishData);
+            } catch (err) {
+                console.warn('Backend update failed, updating locally only:', err?.message);
+            }
+            updated = products.map(p => p.id === editingDishId
+                ? { ...p, ...dishData, id: editingDishId }
+                : p);
         } else {
-            const dishToAdd = {
-                id: Date.now(),
-                ...newDish,
-                price: parseFloat(newDish.price)
-            };
-            updated = [...products, dishToAdd];
+            // ── ADD ──
+            let newId = Date.now();
+            try {
+                const res = await MenuService.createProduct(dishData);
+                if (res.data?.id) newId = res.data.id;
+            } catch (err) {
+                console.warn('Backend create failed, adding locally only:', err?.message);
+            }
+            updated = [...products, { ...dishData, id: newId }];
         }
 
+        // Save to localStorage and notify GuestMenu
         setProducts(updated);
         localStorage.setItem('kolay_dishes', JSON.stringify(updated));
+        window.dispatchEvent(new Event('storage'));
+
         setNewDish({ name: '', price: '', category: 'Main Dish', image: '', desc: '' });
         setEditingDishId(null);
         setShowDishModal(false);
     };
 
-    const deleteDish = (id, e) => {
+    const deleteDish = async (id, e) => {
         e.stopPropagation();
-        if (window.confirm('Are you sure you want to delete this dish entirely?')) {
-            const updated = products.filter(p => p.id !== id);
-            setProducts(updated);
-            localStorage.setItem('kolay_dishes', JSON.stringify(updated));
+        if (!window.confirm('Are you sure you want to delete this dish entirely?')) return;
+
+        // Call backend first
+        try {
+            await MenuService.deleteProduct(id);
+        } catch (err) {
+            console.warn('Backend delete failed, removing locally only:', err?.message);
         }
+
+        const updated = products.filter(p => p.id !== id);
+        setProducts(updated);
+        localStorage.setItem('kolay_dishes', JSON.stringify(updated));
+        window.dispatchEvent(new Event('storage'));
     };
 
     const categories = ['All', 'BreakFast', 'Starters', 'Main Dish', 'Side Dish', 'Desserts', 'Beverages'];

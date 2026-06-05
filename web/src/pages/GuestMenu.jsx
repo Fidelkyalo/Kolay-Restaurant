@@ -100,12 +100,11 @@ const GuestMenu = () => {
         };
         refreshFromApi();
 
-        // Re-merge specialties when admin updates them
+        // Re-merge specialties and reload dishes when admin updates menu or specialties
         const handleStorage = () => {
-            setDishes(prev => {
-                const nonSpecialty = prev.filter(d => !d.isSpecialty);
-                return [...nonSpecialty, ...getActiveSpecialties()];
-            });
+            // Reload full dish list from localStorage (updated by POS)
+            const freshDishes = getLocalDishes();
+            setDishes([...freshDishes.filter(d => !d.isSpecialty), ...getActiveSpecialties()]);
         };
         window.addEventListener('storage', handleStorage);
         return () => window.removeEventListener('storage', handleStorage);

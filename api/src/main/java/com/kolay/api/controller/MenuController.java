@@ -47,20 +47,47 @@ public class MenuController {
 
     @PostMapping("/products")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+    public ResponseEntity<Product> createProduct(@RequestBody java.util.Map<String, Object> body) {
+        String name        = (String) body.getOrDefault("name", "");
+        String description = (String) body.getOrDefault("desc", body.getOrDefault("description", ""));
+        String categoryName= (String) body.getOrDefault("category", "Main Dish");
+        String imageUrl    = (String) body.getOrDefault("image",    body.getOrDefault("imageUrl", ""));
+        double price       = body.get("price") instanceof Number
+                ? ((Number) body.get("price")).doubleValue() : 0.0;
+
+        // Find or create category by name
+        Category category = categoryRepository.findByName(categoryName)
+                .orElseGet(() -> categoryRepository.save(
+                        Category.builder().name(categoryName).description(categoryName).build()));
+
+        Product product = new Product();
+        product.setName(name);
+        product.setDescription(description);
+        product.setPrice(java.math.BigDecimal.valueOf(price));
+        product.setCategory(category);
+        product.setAvailable(true);
+        product.setImageUrl(imageUrl);
+
         return ResponseEntity.ok(productRepository.save(product));
     }
 
     @PutMapping("/products/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product updated) {
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id,
+                                                  @RequestBody java.util.Map<String, Object> body) {
         return productRepository.findById(id)
                 .map(product -> {
-                    product.setName(updated.getName());
-                    product.setDescription(updated.getDescription());
-                    product.setPrice(updated.getPrice());
-                    product.setAvailable(updated.getAvailable());
-                    if (updated.getImageUrl() != null) product.setImageUrl(updated.getImageUrl());
+                    if (body.containsKey("name"))        product.setName((String) body.get("name"));
+                    if (body.containsKey("description")) product.setDescription((String) body.get("description"));
+                    if (body.containsKey("desc"))        product.setDescription((String) body.get("desc"));
+                    if (body.containsKey("price"))       product.setPrice(java.math.BigDecimal.valueOf(((Number) body.get("price")).doubleValue()));
+                    if (body.containsKey("imageUrl"))    product.setImageUrl((String) body.get("imageUrl"));
+                    if (body.containsKey("image"))       product.setImageUrl((String) body.get("image"));
+                    if (body.containsKey("available"))   product.setAvailable((Boolean) body.get("available"));
+                    if (body.containsKey("category")) {
+                        String catName = (String) body.get("category");
+                        categoryRepository.findByName(catName).ifPresent(product::setCategory);
+                    }
                     return ResponseEntity.ok(productRepository.save(product));
                 })
                 .orElse(ResponseEntity.notFound().build());
