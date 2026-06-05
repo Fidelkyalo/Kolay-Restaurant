@@ -39,6 +39,8 @@ public class Reservation {
 
     private String specialRequests;
 
+    private String assignedTo;
+
     @Enumerated(EnumType.STRING)
     private ReservationStatus status = ReservationStatus.PENDING;
 
@@ -181,6 +183,14 @@ public class Reservation {
 
     public void setSpecialRequests(String specialRequests) {
         this.specialRequests = specialRequests;
+    }
+
+    public String getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(String assignedTo) {
+        this.assignedTo = assignedTo;
     }
 
     public ReservationStatus getStatus() {

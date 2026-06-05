@@ -36,13 +36,26 @@ public class ReservationController {
     }
 
     @PatchMapping("/{id}/status")
-    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN') or hasRole('STAFF')")
     public ResponseEntity<Reservation> updateReservationStatus(
             @PathVariable Long id,
             @RequestParam Reservation.ReservationStatus status) {
         return reservationRepository.findById(id)
                 .map(reservation -> {
                     reservation.setStatus(status);
+                    return ResponseEntity.ok(reservationRepository.save(reservation));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PatchMapping("/{id}/assign")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN') or hasRole('STAFF')")
+    public ResponseEntity<Reservation> assignReservation(
+            @PathVariable Long id,
+            @RequestParam String staffName) {
+        return reservationRepository.findById(id)
+                .map(reservation -> {
+                    reservation.setAssignedTo(staffName);
                     return ResponseEntity.ok(reservationRepository.save(reservation));
                 })
                 .orElse(ResponseEntity.notFound().build());
