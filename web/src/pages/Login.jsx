@@ -6,8 +6,14 @@ import { AuthService } from '../services/api';
 
 // Hardcoded credentials for the staff/admin portal UI
 const CREDENTIALS = {
-    admin: { username: 'Admin', password: 'Admin123' },
+    admin: { username: 'Kolay Admin', password: 'Kolayadmin@123' },
     staff: { username: 'Kolay Staff', password: 'Staff_123' },
+};
+
+// Map portal credentials to backend account credentials
+const BACKEND_CREDENTIALS = {
+    admin: { username: 'Admin', password: 'Admin123' },
+    staff: { username: 'Admin', password: 'Admin123' }, // Staff uses same backend account
 };
 
 const Login = ({ defaultPortal = 'staff' }) => {
@@ -40,9 +46,10 @@ const Login = ({ defaultPortal = 'staff' }) => {
         // Credentials match — now get a real JWT from the backend
         // so that API calls (KDS, Dashboard, etc.) work properly
         try {
+            const backendCreds = BACKEND_CREDENTIALS[portal];
             const res = await AuthService.login({
-                username: enteredUsername,
-                password: enteredPassword,
+                username: backendCreds.username,
+                password: backendCreds.password,
             });
             const userData = res.data;
             // Normalize token field
