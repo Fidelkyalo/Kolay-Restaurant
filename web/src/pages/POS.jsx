@@ -201,13 +201,19 @@ const POS = () => {
     const [products, setProducts] = useState(getLocalProducts);
 
     React.useEffect(() => {
-        // Silently refresh from API — products already visible from local data
+        // Always fetch fresh from API on load — clears stale localStorage cache
         const refreshFromApi = async () => {
             try {
                 const response = await MenuService.getProducts();
                 if (response.data && response.data.length > 0) {
-                    setProducts(response.data);
-                    localStorage.setItem('kolay_dishes', JSON.stringify(response.data));
+                    // Normalize image field for all products
+                    const fresh = response.data.map(p => ({
+                        ...p,
+                        image: p.imageUrl || p.image || '',
+                    }));
+                    setProducts(fresh);
+                    localStorage.setItem('kolay_dishes', JSON.stringify(fresh));
+                    window.dispatchEvent(new Event('storage'));
                 }
             } catch (error) {
                 console.warn("POS menu API unavailable, showing cached data:", error.message);
@@ -261,6 +267,19 @@ const POS = () => {
         localStorage.setItem('kolay_dishes', JSON.stringify(updated));
         window.dispatchEvent(new Event('storage'));
 
+        // Re-fetch from API to ensure all browsers/tabs get the latest menu
+        try {
+            const res = await MenuService.getProducts();
+            if (res.data && res.data.length > 0) {
+                const fresh = res.data.map(p => ({ ...p, image: p.imageUrl || p.image || '' }));
+                setProducts(fresh);
+                localStorage.setItem('kolay_dishes', JSON.stringify(fresh));
+                window.dispatchEvent(new Event('storage'));
+            }
+        } catch (err) {
+            // Fallback already in localStorage — that's fine
+        }
+
         setNewDish({ name: '', price: '', category: 'Main Dish', image: '', desc: '' });
         setEditingDishId(null);
         setShowDishModal(false);
@@ -275,6 +294,20 @@ const POS = () => {
             await MenuService.deleteProduct(id);
         } catch (err) {
             console.warn('Backend delete failed, removing locally only:', err?.message);
+        }
+
+        // Re-fetch from API to get authoritative list
+        try {
+            const res = await MenuService.getProducts();
+            if (res.data && res.data.length > 0) {
+                const fresh = res.data.map(p => ({ ...p, image: p.imageUrl || p.image || '' }));
+                setProducts(fresh);
+                localStorage.setItem('kolay_dishes', JSON.stringify(fresh));
+                window.dispatchEvent(new Event('storage'));
+                return;
+            }
+        } catch (err) {
+            // Fall through to local removal
         }
 
         const updated = products.filter(p => p.id !== id);

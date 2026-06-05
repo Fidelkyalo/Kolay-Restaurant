@@ -88,10 +88,16 @@ const GuestMenu = () => {
             try {
                 const response = await MenuService.getProducts();
                 if (response.data && response.data.length > 0) {
-                    localStorage.setItem('kolay_dishes', JSON.stringify(response.data));
-                    setDishes([...response.data, ...getActiveSpecialties()]);
+                    // Normalize image field — API returns imageUrl, frontend uses image
+                    const fresh = response.data.map(p => ({
+                        ...p,
+                        image: p.imageUrl || p.image || '',
+                        desc: p.description || p.desc || '',
+                    }));
+                    localStorage.setItem('kolay_dishes', JSON.stringify(fresh));
+                    setDishes([...fresh, ...getActiveSpecialties()]);
                     if (!viewAll && !selectedCategory) {
-                        setSelectedCategory(response.data[0]?.category || '');
+                        setSelectedCategory(fresh[0]?.category || '');
                     }
                 }
             } catch (error) {
