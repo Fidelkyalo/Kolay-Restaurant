@@ -20,11 +20,13 @@ const MENU_DEFAULTS = [
 const getLocalDishes = () => {
     try {
         const saved = JSON.parse(localStorage.getItem('kolay_dishes'));
-        if (saved && saved.length > 0 && saved[0].image &&
+        if (saved && saved.length >= 10 && saved[0].image &&
             (saved[0].image.startsWith('http') || saved[0].image.startsWith('/'))) {
             return saved;
         }
     } catch (e) { /* ignore */ }
+    // Clear stale cache so fresh API data is saved on next load
+    localStorage.removeItem('kolay_dishes');
     return MENU_DEFAULTS;
 };
 
