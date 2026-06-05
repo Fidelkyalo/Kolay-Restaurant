@@ -45,22 +45,36 @@ const Reservations = () => {
         window.dispatchEvent(new CustomEvent('kolay_new_reservation', { detail: localReservation }));
         window.dispatchEvent(new Event('storage'));
 
-        // 2. Attempt backend sync — replace the local record's id with the real one
-        try {
-            const res = await ReservationService.create(formData);
-            if (res.data?.id) {
-                // Replace temp id with real backend id so future status updates work
-                const updated = JSON.parse(localStorage.getItem('kolay_reservations_local') || '[]')
-                    .map(r => r.id === localReservation.id
-                        ? { ...r, id: res.data.id }
-                        : r
-                    );
-                localStorage.setItem('kolay_reservations_local', JSON.stringify(updated));
-                window.dispatchEvent(new Event('storage'));
+        // 2. Attempt backend sync with retries (handles Railway cold starts)
+        let synced = false;
+        for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+                const res = await ReservationService.create(formData);
+                if (res.data?.id) {
+                    // Replace temp id with real backend id so future status updates work
+                    const updated = JSON.parse(localStorage.getItem('kolay_reservations_local') || '[]')
+                        .map(r => r.id === localReservation.id
+                            ? { ...r, id: res.data.id, synced: true }
+                            : r
+                        );
+                    localStorage.setItem('kolay_reservations_local', JSON.stringify(updated));
+                    window.dispatchEvent(new Event('storage'));
+                }
+                synced = true;
+                break;
+            } catch (error) {
+                console.warn(`Backend sync attempt ${attempt}/3 failed:`, error?.message);
+                if (attempt < 3) {
+                    // Wait before retrying: 2s, then 4s
+                    await new Promise(r => setTimeout(r, attempt * 2000));
+                }
             }
-        } catch (error) {
-            // Backend unavailable — local save is sufficient, admin will see it
-            console.warn('Backend sync failed, reservation saved locally:', error?.message);
+        }
+        if (!synced) {
+            // Mark as unsynced so ManageReservations can show it needs attention
+            const updated = JSON.parse(localStorage.getItem('kolay_reservations_local') || '[]')
+                .map(r => r.id === localReservation.id ? { ...r, synced: false } : r);
+            localStorage.setItem('kolay_reservations_local', JSON.stringify(updated));
         }
 
         setShowSuccess(true);

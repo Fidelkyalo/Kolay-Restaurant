@@ -51,6 +51,7 @@ const ManageReservations = () => {
 
     const [reservations, setReservations] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [apiOnline, setApiOnline] = useState(true);   // tracks whether API responded
     const [filterStatus, setFilterStatus] = useState('ALL');
     const [searchQuery, setSearchQuery] = useState('');
     const [staffList, setStaffList] = useState(getStaffList);
@@ -65,19 +66,30 @@ const ManageReservations = () => {
 
     const fetchReservations = async () => {
         setLoading(true);
+        const local = loadLocalReservations();
+
         try {
             const response = await ReservationService.getAll();
-            // Merge API list with local list so locally-saved bookings
-            // (made when backend was offline) also appear
-            const local = loadLocalReservations();
+            setApiOnline(true);
+
+            // Merge: API is authoritative; append any local-only bookings
             const apiIds = new Set(response.data.map(r => String(r.id)));
             const localOnly = local.filter(r => !apiIds.has(String(r.id)));
             const merged = [...mergeWithLocal(response.data), ...localOnly];
+
+            // Sort newest first
+            merged.sort((a, b) =>
+                new Date(b.createdAt || b.reservationDate) - new Date(a.createdAt || a.reservationDate)
+            );
             setReservations(merged);
         } catch (error) {
-            console.error("Failed to fetch reservations:", error);
-            // Fallback: show all local reservations
-            setReservations(loadLocalReservations());
+            console.error('Failed to fetch reservations from API:', error);
+            setApiOnline(false);
+            // Fallback: show everything from localStorage so no booking is invisible
+            const sorted = [...local].sort((a, b) =>
+                new Date(b.createdAt || b.reservationDate) - new Date(a.createdAt || a.reservationDate)
+            );
+            setReservations(sorted);
         } finally {
             setLoading(false);
         }
@@ -223,6 +235,20 @@ const ManageReservations = () => {
                     )}
                 </header>
 
+                {/* API offline banner */}
+                {!apiOnline && (
+                    <div className="mb-6 flex items-start gap-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl px-5 py-4 text-sm font-bold">
+                        <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 text-amber-500" />
+                        <div>
+                            <p className="font-black">Server offline — showing locally cached bookings</p>
+                            <p className="font-semibold text-amber-700/80 text-xs mt-1">
+                                The Railway backend is sleeping. Bookings made while it was offline are shown below.
+                                Hit Refresh to retry — it may take ~30 seconds to wake up.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
                 {/* Filters & Search — admin only */}
                 {adminMode && (
                     <div className="bg-white p-6 rounded-3xl shadow-premium border border-primary/5 mb-8 flex flex-col md:flex-row gap-6 justify-between items-center">
@@ -286,6 +312,11 @@ const ManageReservations = () => {
                                             }`}>
                                                 {res.status}
                                             </span>
+                                            {res.synced === false && (
+                                                <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter bg-orange-100 text-orange-600 border border-orange-200">
+                                                    ⚠ Local only
+                                                </span>
+                                            )}
                                         </div>
                                         <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-charcoal/50 uppercase tracking-tighter">
                                             <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {res.phone}</span>
