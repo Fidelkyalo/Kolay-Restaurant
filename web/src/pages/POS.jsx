@@ -176,19 +176,20 @@ const POS = () => {
         { id: 2,  name: 'Signature Ribeye',      price: 3500, category: 'Main Dish',  image: '/assets/steak.png',   desc: 'Prime ribeye, garlic herb butter & truffle fries.' },
         { id: 3,  name: 'Herb-Crusted Salmon',   price: 2100, category: 'Main Dish',  image: '/assets/salmon.png',  desc: 'Fresh Atlantic salmon with sesame glaze & greens.' },
         { id: 4,  name: 'Margherita Pizza',      price: 1100, category: 'Main Dish',  image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&q=80&w=600', desc: 'Fresh mozzarella, basil, tomato sauce.' },
-        { id: 5,  name: 'Crispy Calamari',       price: 850,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600', desc: 'Golden fried with spicy marinara.' },
-        { id: 6,  name: 'Bruschetta',            price: 650,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600', desc: 'Fresh tomatoes, garlic, hand-torn basil.' },
-        { id: 7,  name: 'French Fries',          price: 300,  category: 'Side Dish',  image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&q=80&w=600', desc: 'Crispy golden fries with sea salt.' },
-        { id: 8,  name: 'Chocolate Fondant',     price: 700,  category: 'Desserts',   image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600', desc: 'Warm dark chocolate lava cake.' },
-        { id: 9,  name: 'Iced Latte',            price: 450,  category: 'Beverages',  image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600', desc: 'Chilled espresso over milk.' },
-        { id: 10, name: 'Pancakes',              price: 550,  category: 'BreakFast',  image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&q=80&w=600', desc: 'Fluffy stack with maple syrup.' },
+        { id: 5,  name: 'Chicken Wings',         price: 950,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?auto=format&fit=crop&q=80&w=600', desc: 'Crispy golden wings tossed in house hot sauce & blue cheese.' },
+        { id: 6,  name: 'Crispy Calamari',       price: 850,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600', desc: 'Golden fried with spicy marinara.' },
+        { id: 7,  name: 'Bruschetta',            price: 650,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600', desc: 'Fresh tomatoes, garlic, hand-torn basil.' },
+        { id: 8,  name: 'French Fries',          price: 300,  category: 'Side Dish',  image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&q=80&w=600', desc: 'Crispy golden fries with sea salt.' },
+        { id: 9,  name: 'Chocolate Fondant',     price: 700,  category: 'Desserts',   image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600', desc: 'Warm dark chocolate lava cake.' },
+        { id: 10, name: 'Iced Latte',            price: 450,  category: 'Beverages',  image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600', desc: 'Chilled espresso over milk.' },
+        { id: 11, name: 'Pancakes',              price: 550,  category: 'BreakFast',  image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&q=80&w=600', desc: 'Fluffy stack with maple syrup.' },
     ];
 
     const getLocalProducts = () => {
         try {
             const saved = JSON.parse(localStorage.getItem('kolay_dishes'));
-            // Only use cache if it has all 10 meals with valid images
-            if (saved && saved.length >= 10 && saved[0].image &&
+            // Only use cache if it has items with valid images
+            if (saved && saved.length > 0 && saved[0].image &&
                 (saved[0].image.startsWith('http') || saved[0].image.startsWith('/'))) {
                 return saved;
             }

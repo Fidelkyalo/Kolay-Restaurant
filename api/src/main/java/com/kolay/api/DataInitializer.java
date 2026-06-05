@@ -25,13 +25,14 @@ public class DataInitializer implements CommandLineRunner {
     @Autowired private UserRepository userRepository;
     @Autowired private PasswordEncoder passwordEncoder;
 
-    // The canonical 10 meals that must exist in both the website and POS
+    // The canonical meals that must exist in both the website and POS
     private static final Object[][] MENU = {
         // { name, description, price, categoryName, imageUrl }
         { "Gourmet Beef Burger",  "Aged wagyu beef, truffle aioli, melted brie on brioche.",      "1200", "Main Dish",  "/assets/burger.png" },
         { "Signature Ribeye",     "Prime ribeye, garlic herb butter & truffle fries.",             "3500", "Main Dish",  "/assets/steak.png" },
         { "Herb-Crusted Salmon",  "Fresh Atlantic salmon with sesame glaze & greens.",             "2100", "Main Dish",  "/assets/salmon.png" },
         { "Margherita Pizza",     "Fresh mozzarella, basil, tomato sauce.",                       "1100", "Main Dish",  "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&q=80&w=600" },
+        { "Chicken Wings",        "Crispy golden wings tossed in house hot sauce & blue cheese.", "950",  "Starters",   "https://images.unsplash.com/photo-1527477396000-e27163b481c2?auto=format&fit=crop&q=80&w=600" },
         { "Crispy Calamari",      "Golden fried with spicy marinara.",                             "850",  "Starters",   "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600" },
         { "Bruschetta",           "Fresh tomatoes, garlic, hand-torn basil on grilled sourdough.","650",  "Starters",   "https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600" },
         { "French Fries",         "Crispy golden fries with sea salt.",                            "300",  "Side Dish",  "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&q=80&w=600" },
@@ -113,6 +114,7 @@ public class DataInitializer implements CommandLineRunner {
                 else if (lower.contains("ribeye") || lower.contains("steak")) product.setImageUrl("/assets/steak.png");
                 else if (lower.contains("salmon"))                        product.setImageUrl("/assets/salmon.png");
                 else if (lower.contains("pizza"))                         product.setImageUrl("https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&q=80&w=600");
+                else if (lower.contains("wings") || lower.contains("chicken"))  product.setImageUrl("https://images.unsplash.com/photo-1527477396000-e27163b481c2?auto=format&fit=crop&q=80&w=600");
                 else if (lower.contains("calamari"))                      product.setImageUrl("https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600");
                 else if (lower.contains("bruschetta"))                    product.setImageUrl("https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600");
                 else if (lower.contains("fries"))                         product.setImageUrl("https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&q=80&w=600");

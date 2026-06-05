@@ -7,13 +7,14 @@ const MENU_DEFAULTS = [
     { id: 1,  name: 'Gourmet Beef Burger',    price: 1200, category: 'Main Dish',  image: '/assets/burger.png',  desc: 'Aged wagyu beef, truffle aioli.' },
     { id: 2,  name: 'Signature Ribeye',        price: 3500, category: 'Main Dish',  image: '/assets/steak.png',   desc: 'Prime ribeye, garlic herb butter.' },
     { id: 3,  name: 'Herb-Crusted Salmon',     price: 2100, category: 'Main Dish',  image: '/assets/salmon.png',  desc: 'Fresh salmon with sesame glaze.' },
-    { id: 4,  name: 'Crispy Calamari',         price: 850,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600', desc: 'Golden fried with spicy marinara.' },
-    { id: 5,  name: 'Bruschetta',              price: 650,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600', desc: 'Fresh tomatoes, garlic, hand-torn basil.' },
-    { id: 6,  name: 'Chocolate Fondant',       price: 700,  category: 'Desserts',   image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600', desc: 'Warm dark chocolate lava cake.' },
-    { id: 7,  name: 'Iced Latte',              price: 450,  category: 'Beverages',  image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600', desc: 'Chilled espresso over milk.' },
-    { id: 8,  name: 'Margherita Pizza',        price: 1100, category: 'Main Dish',  image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&q=80&w=600', desc: 'Fresh mozzarella, basil, tomato sauce.' },
-    { id: 9,  name: 'French Fries',            price: 300,  category: 'Side Dish',  image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&q=80&w=600', desc: 'Crispy golden fries with sea salt.' },
-    { id: 10, name: 'Pancakes',                price: 550,  category: 'BreakFast',  image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&q=80&w=600', desc: 'Fluffy stack with maple syrup.' },
+    { id: 4,  name: 'Margherita Pizza',        price: 1100, category: 'Main Dish',  image: 'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&q=80&w=600', desc: 'Fresh mozzarella, basil, tomato sauce.' },
+    { id: 5,  name: 'Chicken Wings',           price: 950,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1527477396000-e27163b481c2?auto=format&fit=crop&q=80&w=600', desc: 'Crispy golden wings tossed in house hot sauce & blue cheese.' },
+    { id: 6,  name: 'Crispy Calamari',         price: 850,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600', desc: 'Golden fried with spicy marinara.' },
+    { id: 7,  name: 'Bruschetta',              price: 650,  category: 'Starters',   image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600', desc: 'Fresh tomatoes, garlic, hand-torn basil.' },
+    { id: 8,  name: 'French Fries',            price: 300,  category: 'Side Dish',  image: 'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&q=80&w=600', desc: 'Crispy golden fries with sea salt.' },
+    { id: 9,  name: 'Chocolate Fondant',       price: 700,  category: 'Desserts',   image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600', desc: 'Warm dark chocolate lava cake.' },
+    { id: 10, name: 'Iced Latte',              price: 450,  category: 'Beverages',  image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&q=80&w=600', desc: 'Chilled espresso over milk.' },
+    { id: 11, name: 'Pancakes',                price: 550,  category: 'BreakFast',  image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?auto=format&fit=crop&q=80&w=600', desc: 'Fluffy stack with maple syrup.' },
 ];
 
 // Load the best available local data synchronously so the menu renders immediately
@@ -106,9 +107,24 @@ const GuestMenu = () => {
         };
         refreshFromApi();
 
-        // Re-merge specialties and reload dishes when admin updates menu or specialties
-        const handleStorage = () => {
-            // Reload full dish list from localStorage (updated by POS)
+        // Re-fetch from API when admin updates menu (add/edit/delete/price change)
+        // and also re-merge specialties from localStorage
+        const handleStorage = async () => {
+            try {
+                const response = await MenuService.getProducts();
+                if (response.data && response.data.length > 0) {
+                    const fresh = response.data.map(p => ({
+                        ...p,
+                        image: p.imageUrl || p.image || '',
+                        desc: p.description || p.desc || '',
+                    }));
+                    localStorage.setItem('kolay_dishes', JSON.stringify(fresh));
+                    setDishes([...fresh, ...getActiveSpecialties()]);
+                    return;
+                }
+            } catch {
+                // API unavailable — fall back to localStorage
+            }
             const freshDishes = getLocalDishes();
             setDishes([...freshDishes.filter(d => !d.isSpecialty), ...getActiveSpecialties()]);
         };
