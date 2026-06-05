@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, UserPlus, LogIn, ChevronRight, Star } from 'lucide-react';
+import { Menu, X, UserPlus, LogIn, ChevronRight, Star, BookOpen } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const PublicNavbar = () => {
@@ -118,8 +118,14 @@ const PublicNavbar = () => {
                     {/* ── RIGHT: Actions ── */}
                     <div className="hidden md:flex items-center gap-3 shrink-0">
                         {isCustomer ? (
-                            /* Customer logged in — show avatar + Rate Us button */
+                            /* Customer logged in — show My Bookings + avatar + Rate Us */
                             <>
+                                <Link
+                                    to="/my-bookings"
+                                    className="flex items-center gap-1.5 text-white/75 hover:text-white text-[11px] font-bold uppercase tracking-widest px-4 py-2 rounded-full border border-white/15 hover:border-white/30 hover:bg-white/8 transition-all duration-200"
+                                >
+                                    <BookOpen className="w-3.5 h-3.5" /> My Bookings
+                                </Link>
                                 <div className="flex items-center gap-2 bg-white/8 border border-white/15 rounded-full pl-1.5 pr-4 py-1.5">
                                     <span className="w-7 h-7 bg-[#E67E22] rounded-full flex items-center justify-center text-[11px] font-black text-white shrink-0">
                                         {loggedInUsername?.[0]?.toUpperCase() || '?'}
@@ -214,6 +220,13 @@ const PublicNavbar = () => {
                                         </span>
                                         <span className="text-white font-bold text-sm">{loggedInUsername}</span>
                                     </div>
+                                    <Link
+                                        to="/my-bookings"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-2 bg-white/8 hover:bg-white/12 border border-white/15 text-white font-bold text-sm py-3 rounded-2xl transition-all"
+                                    >
+                                        <BookOpen className="w-4 h-4" /> My Bookings
+                                    </Link>
                                     <a
                                         href="#ratings"
                                         onClick={handleRateUs}

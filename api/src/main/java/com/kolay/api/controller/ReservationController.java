@@ -39,10 +39,14 @@ public class ReservationController {
     @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN') or hasRole('STAFF')")
     public ResponseEntity<Reservation> updateReservationStatus(
             @PathVariable Long id,
-            @RequestParam Reservation.ReservationStatus status) {
+            @RequestParam Reservation.ReservationStatus status,
+            @RequestParam(required = false) String reason) {
         return reservationRepository.findById(id)
                 .map(reservation -> {
                     reservation.setStatus(status);
+                    if (reason != null && !reason.isBlank()) {
+                        reservation.setCancellationReason(reason);
+                    }
                     return ResponseEntity.ok(reservationRepository.save(reservation));
                 })
                 .orElse(ResponseEntity.notFound().build());

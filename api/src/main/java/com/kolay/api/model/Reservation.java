@@ -41,6 +41,9 @@ public class Reservation {
 
     private String assignedTo;
 
+    @Column(length = 500)
+    private String cancellationReason;
+
     @Enumerated(EnumType.STRING)
     private ReservationStatus status = ReservationStatus.PENDING;
 
@@ -191,6 +194,14 @@ public class Reservation {
 
     public void setAssignedTo(String assignedTo) {
         this.assignedTo = assignedTo;
+    }
+
+    public String getCancellationReason() {
+        return cancellationReason;
+    }
+
+    public void setCancellationReason(String cancellationReason) {
+        this.cancellationReason = cancellationReason;
     }
 
     public ReservationStatus getStatus() {

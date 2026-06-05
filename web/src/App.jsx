@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import GuestMenu from './pages/GuestMenu';
 import Reservations from './pages/Reservations';
 import ManageReservations from './pages/ManageReservations';
+import MyBookings from './pages/MyBookings';
 import Specialties from './pages/Specialties';
 import Careers from './pages/Careers';
 import AdminCareers from './pages/AdminCareers';
@@ -26,6 +27,7 @@ function App() {
         <Route path="/order" element={<GuestMenu />} />
         <Route path="/reservations" element={<Reservations />} />
         <Route path="/admin/reservations" element={<ManageReservations />} />
+        <Route path="/my-bookings" element={<MyBookings />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/pos" element={<POS />} />
         <Route path="/kds" element={<KDS />} />

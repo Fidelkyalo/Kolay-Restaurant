@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     Calendar, Clock, Users, Phone, Mail, CheckCircle, XCircle,
-    Search, RefreshCw, MessageSquare, UserCheck, ChevronDown, X
+    Search, RefreshCw, MessageSquare, UserCheck, ChevronDown, X, AlertTriangle
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { ReservationService } from '../services/api';
@@ -54,18 +54,29 @@ const ManageReservations = () => {
     const [filterStatus, setFilterStatus] = useState('ALL');
     const [searchQuery, setSearchQuery] = useState('');
     const [staffList, setStaffList] = useState(getStaffList);
-    const [assigningId, setAssigningId] = useState(null); // reservation id being assigned
+    const [assigningId, setAssigningId] = useState(null);
     const [selectedStaff, setSelectedStaff] = useState('');
-    const [detailRes, setDetailRes] = useState(null); // reservation shown in detail modal
+    const [detailRes, setDetailRes] = useState(null);
+
+    // Admin cancel-with-reason modal
+    const [cancelTarget, setCancelTarget]   = useState(null);  // { id, guestName }
+    const [cancelReason, setCancelReason]   = useState('');
+    const [cancellingId, setCancellingId]   = useState(null);
 
     const fetchReservations = async () => {
         setLoading(true);
         try {
             const response = await ReservationService.getAll();
-            setReservations(mergeWithLocal(response.data));
+            // Merge API list with local list so locally-saved bookings
+            // (made when backend was offline) also appear
+            const local = loadLocalReservations();
+            const apiIds = new Set(response.data.map(r => String(r.id)));
+            const localOnly = local.filter(r => !apiIds.has(String(r.id)));
+            const merged = [...mergeWithLocal(response.data), ...localOnly];
+            setReservations(merged);
         } catch (error) {
             console.error("Failed to fetch reservations:", error);
-            // Fallback: show local reservations
+            // Fallback: show all local reservations
             setReservations(loadLocalReservations());
         } finally {
             setLoading(false);
@@ -77,11 +88,20 @@ const ManageReservations = () => {
         setStaffList(getStaffList());
     }, []);
 
-    // Listen for storage changes (e.g. employee list updated)
+    // Re-fetch when a new reservation is saved locally (from customer booking form)
+    // or when the employee list changes
     useEffect(() => {
-        const handler = () => setStaffList(getStaffList());
+        const handler = () => {
+            setStaffList(getStaffList());
+            // Refresh the list — merges any new locally-saved bookings
+            fetchReservations();
+        };
         window.addEventListener('storage', handler);
-        return () => window.removeEventListener('storage', handler);
+        window.addEventListener('kolay_new_reservation', handler);
+        return () => {
+            window.removeEventListener('storage', handler);
+            window.removeEventListener('kolay_new_reservation', handler);
+        };
     }, []);
 
     const handleStatusUpdate = async (id, newStatus) => {
@@ -92,6 +112,41 @@ const ManageReservations = () => {
             console.error("Status update failed:", error);
             alert("Failed to update status.");
         }
+    };
+
+    // Admin cancel — requires a reason; opens modal instead of direct call
+    const openAdminCancel = (res) => {
+        setCancelTarget({ id: res.id, guestName: res.guestName });
+        setCancelReason('');
+    };
+
+    const confirmAdminCancel = async () => {
+        if (!cancelTarget || !cancelReason.trim()) return;
+        setCancellingId(cancelTarget.id);
+
+        // Optimistic local update
+        setReservations(prev =>
+            prev.map(r => String(r.id) === String(cancelTarget.id)
+                ? { ...r, status: 'CANCELLED', cancellationReason: cancelReason.trim() }
+                : r
+            )
+        );
+        saveLocalReservations(
+            loadLocalReservations().map(r =>
+                String(r.id) === String(cancelTarget.id)
+                    ? { ...r, status: 'CANCELLED', cancellationReason: cancelReason.trim() }
+                    : r
+            )
+        );
+
+        try {
+            await ReservationService.updateStatus(cancelTarget.id, 'CANCELLED', cancelReason.trim());
+        } catch { /* silent — already updated locally */ }
+
+        setCancelTarget(null);
+        setCancelReason('');
+        setCancellingId(null);
+        fetchReservations();
     };
 
     // Assign reservation to a staff member (stored locally)
@@ -271,6 +326,18 @@ const ManageReservations = () => {
                                     </div>
                                 )}
 
+                                {/* Cancellation reason */}
+                                {res.status === 'CANCELLED' && res.cancellationReason && (
+                                    <div className="bg-red-50/50 p-5 rounded-2xl border border-red-200/30 mb-5">
+                                        <p className="text-[9px] font-black text-red-600/60 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                            <XCircle className="w-3 h-3" /> Cancellation Reason
+                                        </p>
+                                        <p className="text-sm font-bold text-red-900/70 leading-relaxed italic">
+                                            "{res.cancellationReason}"
+                                        </p>
+                                    </div>
+                                )}
+
                                 {/* Staff Assignment */}
                                 <div className="mb-5">
                                     {res.assignedTo ? (
@@ -352,7 +419,7 @@ const ManageReservations = () => {
                                                         <CheckCircle className="w-3.5 h-3.5" /> CONFIRM
                                                     </button>
                                                     <button
-                                                        onClick={() => handleStatusUpdate(res.id, 'CANCELLED')}
+                                                        onClick={() => openAdminCancel(res)}
                                                         className="flex-1 bg-white text-red-500 border-2 border-red-500/20 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-2"
                                                     >
                                                         <XCircle className="w-3.5 h-3.5" /> CANCEL
@@ -360,12 +427,20 @@ const ManageReservations = () => {
                                                 </>
                                             )}
                                             {res.status === 'CONFIRMED' && (
-                                                <button
-                                                    onClick={() => handleStatusUpdate(res.id, 'COMPLETED')}
-                                                    className="flex-1 bg-primary text-white py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-md hover:bg-primary-dark transition-all flex items-center justify-center gap-2"
-                                                >
-                                                    <CheckCircle className="w-3.5 h-3.5" /> MARK COMPLETED
-                                                </button>
+                                                <>
+                                                    <button
+                                                        onClick={() => handleStatusUpdate(res.id, 'COMPLETED')}
+                                                        className="flex-1 bg-primary text-white py-3 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-md hover:bg-primary-dark transition-all flex items-center justify-center gap-2"
+                                                    >
+                                                        <CheckCircle className="w-3.5 h-3.5" /> MARK COMPLETED
+                                                    </button>
+                                                    <button
+                                                        onClick={() => openAdminCancel(res)}
+                                                        className="flex-1 bg-white text-red-500 border-2 border-red-500/20 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-red-50 transition-all active:scale-95 flex items-center justify-center gap-2"
+                                                    >
+                                                        <XCircle className="w-3.5 h-3.5" /> CANCEL
+                                                    </button>
+                                                </>
                                             )}
                                             {(res.status === 'CANCELLED' || res.status === 'COMPLETED') && (
                                                 <div className="w-full text-center py-2 text-[10px] font-black text-charcoal/20 uppercase tracking-widest">
@@ -388,6 +463,73 @@ const ManageReservations = () => {
                     )}
                 </div>
             </main>
+
+            {/* Admin: Mandatory Cancel Reason Modal */}
+            {cancelTarget && (
+                <div className="fixed inset-0 z-[300] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-primary/50 backdrop-blur-sm" onClick={() => { setCancelTarget(null); setCancelReason(''); }} />
+                    <div className="relative bg-white rounded-[2rem] w-full max-w-md shadow-2xl p-8 animate-in zoom-in duration-200">
+                        {/* Header */}
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="w-12 h-12 bg-red-50 border border-red-100 rounded-2xl flex items-center justify-center shrink-0">
+                                <AlertTriangle className="w-6 h-6 text-red-500" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-primary">Cancel Reservation</h3>
+                                <p className="text-charcoal/50 text-xs font-bold">{cancelTarget.guestName}</p>
+                            </div>
+                        </div>
+
+                        {/* Mandatory reason */}
+                        <div className="mb-5">
+                            <label className="block text-[10px] font-black uppercase text-charcoal/40 tracking-widest mb-2">
+                                Reason for cancellation <span className="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                rows={3}
+                                placeholder="e.g. Fully booked on requested date, maintenance closure, etc."
+                                value={cancelReason}
+                                onChange={e => setCancelReason(e.target.value)}
+                                className={`w-full bg-bg-cream border rounded-xl px-4 py-3 text-sm font-semibold outline-none resize-none transition-colors ${
+                                    cancelReason.trim()
+                                        ? 'border-primary/20 focus:border-secondary/40'
+                                        : 'border-red-300 focus:border-red-400'
+                                }`}
+                            />
+                            {!cancelReason.trim() && (
+                                <p className="text-red-500 text-[10px] font-bold mt-1.5 flex items-center gap-1">
+                                    <AlertTriangle className="w-3 h-3" /> A reason is required to cancel a reservation.
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Quick reason chips */}
+                        <div className="flex flex-wrap gap-2 mb-6">
+                            {['Fully booked', 'Venue unavailable', 'Customer requested', 'Event cancelled', 'Staff shortage'].map(s => (
+                                <button key={s}
+                                    onClick={() => setCancelReason(cancelReason === s ? '' : s)}
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${cancelReason === s ? 'bg-primary text-white border-primary' : 'bg-bg-cream border-primary/10 text-charcoal/60 hover:border-secondary/40'}`}>
+                                    {s}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button onClick={() => { setCancelTarget(null); setCancelReason(''); }}
+                                className="flex-1 py-3 font-bold text-charcoal/40 hover:text-primary transition-colors">
+                                Go Back
+                            </button>
+                            <button
+                                onClick={confirmAdminCancel}
+                                disabled={!cancelReason.trim() || cancellingId === cancelTarget?.id}
+                                className="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-lg"
+                            >
+                                {cancellingId === cancelTarget?.id ? 'Cancelling…' : 'Confirm Cancel'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Staff: Full Reservation Detail Modal */}
             {detailRes && (

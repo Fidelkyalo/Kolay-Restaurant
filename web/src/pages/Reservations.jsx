@@ -20,26 +20,49 @@ const Reservations = () => {
         e.preventDefault();
         setSubmitting(true);
 
-        // Always save locally first so the booking is never lost
+        // Capture the logged-in customer's username so MyBookings can filter by it
+        const authUser = (() => {
+            try { return JSON.parse(localStorage.getItem('kolay_auth_user')); } catch { return null; }
+        })();
+
+        // Build local reservation record — include username for customer-side lookup
         const localReservation = {
             ...formData,
             id: Date.now(),
             status: 'PENDING',
             createdAt: new Date().toISOString(),
+            username: authUser?.username || '',
         };
+
+        // 1. Save locally immediately — admin portal and customer MyBookings will
+        //    see it straight away via the storage event
         const existing = JSON.parse(localStorage.getItem('kolay_reservations_local') || '[]');
-        localStorage.setItem('kolay_reservations_local', JSON.stringify([localReservation, ...existing]));
+        localStorage.setItem(
+            'kolay_reservations_local',
+            JSON.stringify([localReservation, ...existing])
+        );
+        // Fire storage event so ManageReservations refreshes without a page reload
+        window.dispatchEvent(new CustomEvent('kolay_new_reservation', { detail: localReservation }));
         window.dispatchEvent(new Event('storage'));
 
+        // 2. Attempt backend sync — replace the local record's id with the real one
         try {
-            await ReservationService.create(formData);
+            const res = await ReservationService.create(formData);
+            if (res.data?.id) {
+                // Replace temp id with real backend id so future status updates work
+                const updated = JSON.parse(localStorage.getItem('kolay_reservations_local') || '[]')
+                    .map(r => r.id === localReservation.id
+                        ? { ...r, id: res.data.id }
+                        : r
+                    );
+                localStorage.setItem('kolay_reservations_local', JSON.stringify(updated));
+                window.dispatchEvent(new Event('storage'));
+            }
         } catch (error) {
-            // Backend unavailable (cold start / offline) — booking is already
-            // saved locally so we still show success to the guest.
-            console.warn("Backend sync failed, reservation saved locally:", error?.message);
+            // Backend unavailable — local save is sufficient, admin will see it
+            console.warn('Backend sync failed, reservation saved locally:', error?.message);
         }
 
-        // Always show success — local save guarantees staff can see the booking
         setShowSuccess(true);
         setFormData({
             guestName: '',
