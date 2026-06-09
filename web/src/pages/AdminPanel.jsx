@@ -163,28 +163,50 @@ function AdminPanel() {
             available:   true,
         };
 
+        // Track whether the backend persisted the item
+        let apiSuccess = false;
         try {
             if (editingId) {
                 // ── EDIT ──
                 await MenuService.updateProduct(editingId, payload);
+                apiSuccess = true;
             } else {
                 // ── ADD ──
                 const res = await MenuService.createProduct(payload);
                 if (res.data?.id) payload.id = res.data.id;
+                apiSuccess = true;
             }
         } catch {
-            // API unavailable — apply locally so UI still updates
+            // API unavailable — will fall back to local update
         }
 
         // Re-fetch authoritative list from API
         try {
             const res = await MenuService.getProducts();
             if (res.data && res.data.length > 0) {
-                const fresh = res.data.map(p => ({
+                let fresh = res.data.map(p => ({
                     ...p,
                     image: p.imageUrl || p.image || '',
                     desc: p.description || p.desc || '',
                 }));
+
+                // If the API create/update failed, the re-fetch won't contain the
+                // new/edited item — merge it in manually so it still shows up everywhere.
+                if (!apiSuccess) {
+                    if (editingId) {
+                        fresh = fresh.map(p =>
+                            p.id === editingId ? { ...p, ...payload, id: editingId } : p
+                        );
+                    } else {
+                        const alreadyThere = fresh.some(
+                            p => p.name === payload.name && p.price === payload.price
+                        );
+                        if (!alreadyThere) {
+                            fresh = [...fresh, { ...payload, id: payload.id || Date.now() }];
+                        }
+                    }
+                }
+
                 setMenuItems(fresh);
                 syncToCache(fresh);
                 setSaveLoading(false);
@@ -193,14 +215,14 @@ function AdminPanel() {
             }
         } catch { /* fall through to local update */ }
 
-        // Local-only update as fallback
+        // Full local-only fallback (API and re-fetch both unavailable)
         let updated;
         if (editingId) {
             updated = menuItems.map(p =>
                 p.id === editingId ? { ...p, ...payload, id: editingId } : p
             );
         } else {
-            updated = [...menuItems, { ...payload, id: Date.now() }];
+            updated = [...menuItems, { ...payload, id: payload.id || Date.now() }];
         }
         setMenuItems(updated);
         syncToCache(updated);

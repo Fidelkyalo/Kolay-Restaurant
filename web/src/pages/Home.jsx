@@ -149,48 +149,63 @@ const Home = () => {
         { icon: TrendingUp, value: '200+', label: 'Menu Items' },
     ];
 
+    // Category display name mapping: DB value → tab label shown to visitors
+    const CATEGORY_LABEL_MAP = {
+        'BreakFast':  'Breakfast',
+        'Starters':   'Starters',
+        'Main Dish':  'Mains',
+        'Mains':      'Mains',
+        'Side Dish':  'Sides',
+        'Desserts':   'Desserts',
+        'Beverages':  'Beverages',
+    };
+
+    // Build category tabs dynamically from whatever the database returns
     const menuCategories = (() => {
-        const categories = { Starters: [], Mains: [], Desserts: [] };
+        // Preserve insertion order using a Map
+        const catMap = new Map();
+
         dishes.forEach(item => {
-            const cat = item.category || 'Main Dish';
-            const normalizedCat = (cat === 'Main Dish' || cat === 'Mains') ? 'Mains' 
-                                : (cat === 'Starters' ? 'Starters' 
-                                : (cat === 'Desserts' ? 'Desserts' : null));
-            if (normalizedCat) {
-                categories[normalizedCat].push({
-                    name: item.name,
-                    price: Number(item.price),
-                    desc: item.desc || item.description || '',
-                    image: item.image || item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600',
-                });
-            }
+            const raw = item.category || 'Main Dish';
+            const label = CATEGORY_LABEL_MAP[raw] || raw; // unknown categories shown as-is
+            if (!catMap.has(label)) catMap.set(label, []);
+            catMap.get(label).push({
+                name:  item.name,
+                price: Number(item.price),
+                desc:  item.desc || item.description || '',
+                image: item.image || item.imageUrl ||
+                       'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600',
+            });
         });
-        
-        // Fallback defaults if any list is empty
-        if (categories.Starters.length === 0) {
+
+        // Convert to plain object; ensure Starters / Mains / Desserts always exist
+        const categories = Object.fromEntries(catMap);
+
+        if (!categories.Starters || categories.Starters.length === 0) {
             categories.Starters = [
-                { name: 'Bruschetta', price: 650, desc: 'Fresh tomatoes, garlic, hand-torn basil on grilled sourdough.', image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600' },
-                { name: 'Crispy Calamari', price: 850, desc: 'Golden fried with spicy marinara & aioli.', image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600' },
-                { name: 'Caprese Salad', price: 780, desc: 'Buffalo mozzarella, heirloom tomatoes, basil oil.', image: 'https://images.unsplash.com/photo-1580822184713-fc5400e7fe10?auto=format&fit=crop&q=80&w=600' },
-                { name: 'Soup of the Day', price: 550, desc: 'Ask your server for today\'s seasonal selection.', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Bruschetta',     price: 650, desc: 'Fresh tomatoes, garlic, hand-torn basil on grilled sourdough.', image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Crispy Calamari',price: 850, desc: 'Golden fried with spicy marinara & aioli.',                     image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Caprese Salad',  price: 780, desc: 'Buffalo mozzarella, heirloom tomatoes, basil oil.',             image: 'https://images.unsplash.com/photo-1580822184713-fc5400e7fe10?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Soup of the Day',price: 550, desc: "Ask your server for today's seasonal selection.",               image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=600' },
             ];
         }
-        if (categories.Mains.length === 0) {
+        if (!categories.Mains || categories.Mains.length === 0) {
             categories.Mains = [
-                { name: 'Pasta Carbonara', price: 1100, desc: 'Classic Roman style with pancetta & parmesan.', image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&q=80&w=600' },
-                { name: 'Roasted Chicken', price: 1600, desc: 'Half chicken, lemon-thyme jus & seasonal veg.', image: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c7?auto=format&fit=crop&q=80&w=600' },
-                { name: 'Lamb Chops', price: 2800, desc: 'Frenched lamb rack, mint chimichurri & polenta.', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=600' },
-                { name: 'Mushroom Risotto', price: 1350, desc: 'Wild mushroom, aged parmesan, truffle oil.', image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Pasta Carbonara',  price: 1100, desc: 'Classic Roman style with pancetta & parmesan.',      image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Roasted Chicken',  price: 1600, desc: 'Half chicken, lemon-thyme jus & seasonal veg.',      image: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c7?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Lamb Chops',       price: 2800, desc: 'Frenched lamb rack, mint chimichurri & polenta.',    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Mushroom Risotto', price: 1350, desc: 'Wild mushroom, aged parmesan, truffle oil.',         image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&q=80&w=600' },
             ];
         }
-        if (categories.Desserts.length === 0) {
+        if (!categories.Desserts || categories.Desserts.length === 0) {
             categories.Desserts = [
-                { name: 'Chocolate Fondant', price: 700, desc: 'Warm dark chocolate lava cake with vanilla gelato.', image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600' },
-                { name: 'Crème Brûlée', price: 650, desc: 'Classic French custard with a caramelised sugar crust.', image: 'https://images.unsplash.com/photo-1470124182917-cc6e71b22ecc?auto=format&fit=crop&q=80&w=600' },
-                { name: 'Tiramisu', price: 680, desc: 'Espresso-soaked ladyfingers, mascarpone cream.', image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&q=80&w=600' },
-                { name: 'Seasonal Sorbet', price: 420, desc: 'Three scoops of vibrant house-made fruit sorbet.', image: 'https://images.unsplash.com/photo-1488900128323-21503983a07e?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Chocolate Fondant', price: 700, desc: 'Warm dark chocolate lava cake with vanilla gelato.',          image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Crème Brûlée',      price: 650, desc: 'Classic French custard with a caramelised sugar crust.',      image: 'https://images.unsplash.com/photo-1470124182917-cc6e71b22ecc?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Tiramisu',          price: 680, desc: 'Espresso-soaked ladyfingers, mascarpone cream.',              image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Seasonal Sorbet',   price: 420, desc: 'Three scoops of vibrant house-made fruit sorbet.',           image: 'https://images.unsplash.com/photo-1488900128323-21503983a07e?auto=format&fit=crop&q=80&w=600' },
             ];
         }
+
         return categories;
     })();
 
