@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
 import { Link } from 'react-router-dom';
+import { MenuService } from '../services/api';
 
 const Home = () => {
     const [reservationSuccess, setReservationSuccess] = useState(false);
@@ -28,10 +29,55 @@ const Home = () => {
 
     const [activeSpecialty, setActiveSpecialty] = useState(getActiveSpecialty);
 
+    const getLocalDishes = () => {
+        try {
+            const saved = JSON.parse(localStorage.getItem('kolay_dishes'));
+            if (saved && saved.length > 0 && saved[0].image &&
+                (saved[0].image.startsWith('http') || saved[0].image.startsWith('/'))) {
+                return saved;
+            }
+        } catch { /* ignore */ }
+        return [];
+    };
+
+    const [dishes, setDishes] = useState(getLocalDishes);
+
+    const refreshFromApi = async () => {
+        try {
+            const response = await MenuService.getProducts();
+            if (response.data && response.data.length > 0) {
+                const fresh = response.data.map(p => ({
+                    ...p,
+                    image: p.imageUrl || p.image || '',
+                    desc: p.description || p.desc || '',
+                }));
+                localStorage.setItem('kolay_dishes', JSON.stringify(fresh));
+                setDishes(fresh);
+            }
+        } catch (error) {
+            console.warn("Home menu API unavailable:", error.message);
+        }
+    };
+
     useEffect(() => {
         const handler = () => setActiveSpecialty(getActiveSpecialty());
         window.addEventListener('storage', handler);
-        return () => window.removeEventListener('storage', handler);
+
+        refreshFromApi();
+
+        const syncChannel = new BroadcastChannel('kolay_menu_updates');
+        const handleBroadcast = (event) => {
+            if (event.data === 'refresh_menu') {
+                refreshFromApi();
+            }
+        };
+        syncChannel.addEventListener('message', handleBroadcast);
+
+        return () => {
+            window.removeEventListener('storage', handler);
+            syncChannel.removeEventListener('message', handleBroadcast);
+            syncChannel.close();
+        };
     }, []);
 
     // ── RATINGS ─────────────────────────────────────────────────────────────
@@ -81,11 +127,20 @@ const Home = () => {
         setRatingError('');
     };
 
-    const featuredMeals = [
-        { id: 1, name: 'Gourmet Beef Burger', price: 1200, desc: 'Aged wagyu beef, truffle aioli, melted brie on brioche.', tag: 'Best Seller', image: '/assets/burger.png' },
-        { id: 2, name: 'Herb-Crusted Salmon', price: 2100, desc: 'Fresh Atlantic salmon with sesame glaze & greens.', tag: 'Chef\'s Pick', image: '/assets/salmon.png' },
-        { id: 3, name: 'Signature Ribeye', price: 3500, desc: 'Prime ribeye, garlic herb butter & truffle fries.', tag: 'Premium', image: '/assets/steak.png' },
-    ];
+    const featuredMeals = dishes.length >= 3 
+        ? dishes.slice(0, 3).map((d, i) => ({
+            id: d.id,
+            name: d.name,
+            price: Number(d.price),
+            desc: d.desc || d.description || '',
+            tag: i === 0 ? 'Best Seller' : i === 1 ? "Chef's Pick" : 'Premium',
+            image: d.image || d.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600',
+          }))
+        : [
+            { id: 1, name: 'Gourmet Beef Burger', price: 1200, desc: 'Aged wagyu beef, truffle aioli, melted brie on brioche.', tag: 'Best Seller', image: '/assets/burger.png' },
+            { id: 2, name: 'Herb-Crusted Salmon', price: 2100, desc: 'Fresh Atlantic salmon with sesame glaze & greens.', tag: 'Chef\'s Pick', image: '/assets/salmon.png' },
+            { id: 3, name: 'Signature Ribeye', price: 3500, desc: 'Prime ribeye, garlic herb butter & truffle fries.', tag: 'Premium', image: '/assets/steak.png' },
+        ];
 
     const stats = [
         { icon: Award, value: '15+', label: 'Years in Service' },
@@ -94,26 +149,50 @@ const Home = () => {
         { icon: TrendingUp, value: '200+', label: 'Menu Items' },
     ];
 
-    const menuCategories = {
-        Starters: [
-            { name: 'Bruschetta', price: 650, desc: 'Fresh tomatoes, garlic, hand-torn basil on grilled sourdough.', image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600' },
-            { name: 'Crispy Calamari', price: 850, desc: 'Golden fried with spicy marinara & aioli.', image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600' },
-            { name: 'Caprese Salad', price: 780, desc: 'Buffalo mozzarella, heirloom tomatoes, basil oil.', image: 'https://images.unsplash.com/photo-1580822184713-fc5400e7fe10?auto=format&fit=crop&q=80&w=600' },
-            { name: 'Soup of the Day', price: 550, desc: 'Ask your server for today\'s seasonal selection.', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=600' },
-        ],
-        Mains: [
-            { name: 'Pasta Carbonara', price: 1100, desc: 'Classic Roman style with pancetta & parmesan.', image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&q=80&w=600' },
-            { name: 'Roasted Chicken', price: 1600, desc: 'Half chicken, lemon-thyme jus & seasonal veg.', image: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c7?auto=format&fit=crop&q=80&w=600' },
-            { name: 'Lamb Chops', price: 2800, desc: 'Frenched lamb rack, mint chimichurri & polenta.', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=600' },
-            { name: 'Mushroom Risotto', price: 1350, desc: 'Wild mushroom, aged parmesan, truffle oil.', image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&q=80&w=600' },
-        ],
-        Desserts: [
-            { name: 'Chocolate Fondant', price: 700, desc: 'Warm dark chocolate lava cake with vanilla gelato.', image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600' },
-            { name: 'Crème Brûlée', price: 650, desc: 'Classic French custard with a caramelised sugar crust.', image: 'https://images.unsplash.com/photo-1470124182917-cc6e71b22ecc?auto=format&fit=crop&q=80&w=600' },
-            { name: 'Tiramisu', price: 680, desc: 'Espresso-soaked ladyfingers, mascarpone cream.', image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&q=80&w=600' },
-            { name: 'Seasonal Sorbet', price: 420, desc: 'Three scoops of vibrant house-made fruit sorbet.', image: 'https://images.unsplash.com/photo-1488900128323-21503983a07e?auto=format&fit=crop&q=80&w=600' },
-        ],
-    };
+    const menuCategories = (() => {
+        const categories = { Starters: [], Mains: [], Desserts: [] };
+        dishes.forEach(item => {
+            const cat = item.category || 'Main Dish';
+            const normalizedCat = (cat === 'Main Dish' || cat === 'Mains') ? 'Mains' 
+                                : (cat === 'Starters' ? 'Starters' 
+                                : (cat === 'Desserts' ? 'Desserts' : null));
+            if (normalizedCat) {
+                categories[normalizedCat].push({
+                    name: item.name,
+                    price: Number(item.price),
+                    desc: item.desc || item.description || '',
+                    image: item.image || item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600',
+                });
+            }
+        });
+        
+        // Fallback defaults if any list is empty
+        if (categories.Starters.length === 0) {
+            categories.Starters = [
+                { name: 'Bruschetta', price: 650, desc: 'Fresh tomatoes, garlic, hand-torn basil on grilled sourdough.', image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Crispy Calamari', price: 850, desc: 'Golden fried with spicy marinara & aioli.', image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Caprese Salad', price: 780, desc: 'Buffalo mozzarella, heirloom tomatoes, basil oil.', image: 'https://images.unsplash.com/photo-1580822184713-fc5400e7fe10?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Soup of the Day', price: 550, desc: 'Ask your server for today\'s seasonal selection.', image: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&q=80&w=600' },
+            ];
+        }
+        if (categories.Mains.length === 0) {
+            categories.Mains = [
+                { name: 'Pasta Carbonara', price: 1100, desc: 'Classic Roman style with pancetta & parmesan.', image: 'https://images.unsplash.com/photo-1612874742237-6526221588e3?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Roasted Chicken', price: 1600, desc: 'Half chicken, lemon-thyme jus & seasonal veg.', image: 'https://images.unsplash.com/photo-1598103442097-8b74394b95c7?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Lamb Chops', price: 2800, desc: 'Frenched lamb rack, mint chimichurri & polenta.', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Mushroom Risotto', price: 1350, desc: 'Wild mushroom, aged parmesan, truffle oil.', image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&q=80&w=600' },
+            ];
+        }
+        if (categories.Desserts.length === 0) {
+            categories.Desserts = [
+                { name: 'Chocolate Fondant', price: 700, desc: 'Warm dark chocolate lava cake with vanilla gelato.', image: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Crème Brûlée', price: 650, desc: 'Classic French custard with a caramelised sugar crust.', image: 'https://images.unsplash.com/photo-1470124182917-cc6e71b22ecc?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Tiramisu', price: 680, desc: 'Espresso-soaked ladyfingers, mascarpone cream.', image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&q=80&w=600' },
+                { name: 'Seasonal Sorbet', price: 420, desc: 'Three scoops of vibrant house-made fruit sorbet.', image: 'https://images.unsplash.com/photo-1488900128323-21503983a07e?auto=format&fit=crop&q=80&w=600' },
+            ];
+        }
+        return categories;
+    })();
 
     const chefs = [
         { name: 'Chef Amara Osei', role: 'Executive Chef', spec: 'French & Pan-African fusion', image: 'https://images.unsplash.com/photo-1583394293214-5df30a6a1da0?auto=format&fit=crop&q=80&w=400' },

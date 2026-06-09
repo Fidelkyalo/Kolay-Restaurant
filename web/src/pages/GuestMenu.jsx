@@ -107,6 +107,14 @@ const GuestMenu = () => {
         };
         refreshFromApi();
 
+        const syncChannel = new BroadcastChannel('kolay_menu_updates');
+        const handleBroadcast = (event) => {
+            if (event.data === 'refresh_menu') {
+                refreshFromApi();
+            }
+        };
+        syncChannel.addEventListener('message', handleBroadcast);
+
         // Re-fetch from API when admin updates menu (add/edit/delete/price change)
         // and also re-merge specialties from localStorage
         const handleStorage = async () => {
@@ -129,7 +137,12 @@ const GuestMenu = () => {
             setDishes([...freshDishes.filter(d => !d.isSpecialty), ...getActiveSpecialties()]);
         };
         window.addEventListener('storage', handleStorage);
-        return () => window.removeEventListener('storage', handleStorage);
+
+        return () => {
+            syncChannel.removeEventListener('message', handleBroadcast);
+            syncChannel.close();
+            window.removeEventListener('storage', handleStorage);
+        };
     }, []);
 
     const CATEGORY_ORDER = ['All', 'BreakFast', 'Starters', 'Main Dish', 'Side Dish', 'Desserts', 'Beverages', 'Specialties'];

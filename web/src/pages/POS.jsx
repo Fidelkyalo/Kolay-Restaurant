@@ -198,6 +198,17 @@ const POS = () => {
         localStorage.removeItem('kolay_dishes');
         return POS_MENU_DEFAULTS;
     };
+    const syncToCache = (list) => {
+        localStorage.setItem('kolay_dishes', JSON.stringify(list));
+        window.dispatchEvent(new Event('storage'));
+        try {
+            const syncChannel = new BroadcastChannel('kolay_menu_updates');
+            syncChannel.postMessage('refresh_menu');
+            syncChannel.close();
+        } catch (e) {
+            console.warn('Failed to broadcast menu update:', e);
+        }
+    };
 
     const [products, setProducts] = useState(getLocalProducts);
 
@@ -221,6 +232,18 @@ const POS = () => {
             }
         };
         refreshFromApi();
+
+        const syncChannel = new BroadcastChannel('kolay_menu_updates');
+        const handleBroadcast = (event) => {
+            if (event.data === 'refresh_menu') {
+                refreshFromApi();
+            }
+        };
+        syncChannel.addEventListener('message', handleBroadcast);
+        return () => {
+            syncChannel.removeEventListener('message', handleBroadcast);
+            syncChannel.close();
+        };
     }, []);
     const [showDishModal, setShowDishModal] = useState(false);
     const [newDish, setNewDish] = useState({ name: '', price: '', category: 'Main Dish', image: '', desc: '' });
@@ -263,10 +286,9 @@ const POS = () => {
             updated = [...products, { ...dishData, id: newId }];
         }
 
-        // Save to localStorage and notify GuestMenu
+        // Save to localStorage and notify other tabs
         setProducts(updated);
-        localStorage.setItem('kolay_dishes', JSON.stringify(updated));
-        window.dispatchEvent(new Event('storage'));
+        syncToCache(updated);
 
         // Re-fetch from API to ensure all browsers/tabs get the latest menu
         try {
@@ -274,8 +296,7 @@ const POS = () => {
             if (res.data && res.data.length > 0) {
                 const fresh = res.data.map(p => ({ ...p, image: p.imageUrl || p.image || '' }));
                 setProducts(fresh);
-                localStorage.setItem('kolay_dishes', JSON.stringify(fresh));
-                window.dispatchEvent(new Event('storage'));
+                syncToCache(fresh);
             }
         } catch (err) {
             // Fallback already in localStorage — that's fine
@@ -303,8 +324,7 @@ const POS = () => {
             if (res.data && res.data.length > 0) {
                 const fresh = res.data.map(p => ({ ...p, image: p.imageUrl || p.image || '' }));
                 setProducts(fresh);
-                localStorage.setItem('kolay_dishes', JSON.stringify(fresh));
-                window.dispatchEvent(new Event('storage'));
+                syncToCache(fresh);
                 return;
             }
         } catch (err) {
@@ -313,8 +333,7 @@ const POS = () => {
 
         const updated = products.filter(p => p.id !== id);
         setProducts(updated);
-        localStorage.setItem('kolay_dishes', JSON.stringify(updated));
-        window.dispatchEvent(new Event('storage'));
+        syncToCache(updated);
     };
 
     const categories = ['All', 'BreakFast', 'Starters', 'Main Dish', 'Side Dish', 'Desserts', 'Beverages'];

@@ -100,12 +100,31 @@ function AdminPanel() {
 
     useEffect(() => {
         if (activeTab === 'menu') refreshMenu();
+
+        const syncChannel = new BroadcastChannel('kolay_menu_updates');
+        const handleBroadcast = (event) => {
+            if (event.data === 'refresh_menu') {
+                refreshMenu();
+            }
+        };
+        syncChannel.addEventListener('message', handleBroadcast);
+        return () => {
+            syncChannel.removeEventListener('message', handleBroadcast);
+            syncChannel.close();
+        };
     }, [activeTab]);
 
     // Push updated list to localStorage + notify other tabs/pages
     const syncToCache = (list) => {
         localStorage.setItem('kolay_dishes', JSON.stringify(list));
         window.dispatchEvent(new Event('storage'));
+        try {
+            const syncChannel = new BroadcastChannel('kolay_menu_updates');
+            syncChannel.postMessage('refresh_menu');
+            syncChannel.close();
+        } catch (e) {
+            console.warn('Failed to broadcast menu update:', e);
+        }
     };
 
     // ── Open modal for Add ────────────────────────────────────────────────────
