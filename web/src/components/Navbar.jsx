@@ -78,7 +78,7 @@ const Navbar = () => {
 
             {/* Logo + Portal Badge */}
             <div className="flex items-center gap-2 md:gap-3 shrink-0">
-                <img src="/Logo.png" alt="Kolay Logo" className="h-8 md:h-9 w-auto rounded shadow-sm" />
+                <img src="/Logo.png" alt="Kolay Logo" className="h-8 md:h-9 max-h-9 w-auto object-contain rounded shadow-sm" />
                 <div>
                     <span className="text-lg md:text-xl font-display font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent uppercase block leading-tight">{restaurantName}</span>
                     <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${isAdmin ? 'bg-accent/20 text-accent' : 'bg-secondary/30 text-secondary'}`}>

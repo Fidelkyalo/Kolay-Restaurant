@@ -103,7 +103,7 @@ const PublicNavbar = () => {
                         <img
                             src="/Logo.png"
                             alt="Kolay"
-                            className="h-10 w-auto rounded-lg shadow-md group-hover:scale-105 transition-transform duration-300"
+                            className="h-10 max-h-10 w-auto object-contain rounded-lg shadow-md group-hover:scale-105 transition-transform duration-300"
                         />
                         <span className="text-white font-display font-black text-xl tracking-tight uppercase leading-none hidden sm:block">
                             Kolay

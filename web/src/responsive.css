@@ -27,7 +27,6 @@
 /* Adjust images to not exceed container width */
 img {
   max-width: 100%;
-  height: auto;
 }
 /* Global table responsiveness */
 table {
