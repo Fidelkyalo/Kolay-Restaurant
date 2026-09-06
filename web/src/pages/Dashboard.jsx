@@ -502,20 +502,20 @@ function Dashboard() {
     return (
         <div className="min-h-screen bg-bg-cream text-charcoal font-body">
             <Navbar />
-            <main className="max-w-7xl mx-auto px-8 py-12">
-                <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-12">
+                <header className="mb-8 sm:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <h1 className="text-4xl md:text-5xl font-bold text-primary mb-2">Welcome back, Fidel</h1>
-                        <p className="text-charcoal/70 text-lg">Here's what's happening at Kolay Restaurant today.</p>
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary mb-2">Welcome back, Fidel</h1>
+                        <p className="text-charcoal/70 text-sm sm:text-lg">Here's what's happening at Kolay Restaurant today.</p>
                     </div>
                     {adminMode && (
-                    <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-primary/5 shadow-premium">
+                    <div className="flex flex-wrap items-center gap-3 bg-white p-3 rounded-2xl border border-primary/5 shadow-premium w-full md:w-auto">
                         <div className="flex bg-bg-cream p-1 rounded-xl">
                             {['Day', 'Month', 'Year'].map((s) => (
                                 <button
                                     key={s}
                                     onClick={() => setReportScope(s)}
-                                    className={`px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${reportScope === s ? 'bg-primary text-white shadow-lg' : 'text-primary/40 hover:text-primary/70'}`}
+                                    className={`px-3 sm:px-4 py-1.5 rounded-lg text-[10px] font-black transition-all ${reportScope === s ? 'bg-primary text-white shadow-lg' : 'text-primary/40 hover:text-primary/70'}`}
                                 >
                                     {s.toUpperCase()}
                                 </button>
@@ -525,11 +525,11 @@ function Dashboard() {
                             type={reportScope === 'Day' ? 'date' : reportScope === 'Month' ? 'month' : 'number'}
                             value={reportScope === 'Year' ? selectedDate.substring(0, 4) : selectedDate}
                             onChange={(e) => setSelectedDate(e.target.value)}
-                            className="bg-white border border-primary/10 text-primary rounded-xl px-4 py-1.5 text-xs font-bold outline-none focus:ring-2 focus:ring-secondary/50 transition-all w-48"
+                            className="bg-white border border-primary/10 text-primary rounded-xl px-3 sm:px-4 py-1.5 text-xs font-bold outline-none focus:ring-2 focus:ring-secondary/50 transition-all flex-1 sm:w-48"
                         />
                         <button
                             onClick={handleGenerateReport}
-                            className="flex items-center gap-2 bg-secondary text-white px-5 py-1.5 rounded-xl text-xs font-black shadow-lg hover:brightness-110 transition-all active:scale-95"
+                            className="flex items-center justify-center gap-2 bg-secondary text-white px-4 sm:px-5 py-2 rounded-xl text-xs font-black shadow-lg hover:brightness-110 transition-all active:scale-95 w-full sm:w-auto"
                         >
                             <Printer className="w-4 h-4" /> GENERATE REPORT
                         </button>
@@ -538,15 +538,15 @@ function Dashboard() {
                 </header>
 
                 {adminMode && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
                     {[
                         { label: 'Total Revenue', value: `KES ${totalRevenue.toLocaleString()}`, icon: <DollarSign className="w-6 h-6 text-secondary" />, trend: 'Live', color: 'border-l-secondary', path: '/dashboard', bg: 'bg-orange-50/50' },
                         { label: 'Active Orders', value: activeOrders.length.toString(), icon: <Package className="w-6 h-6 text-accent" />, trend: `${activeOrders.length} pending`, color: 'border-l-accent', path: '/pos', bg: 'bg-amber-50/50' },
                         { label: 'Total Customers', value: totalCustomers.toLocaleString(), icon: <TrendingUp className="w-6 h-6 text-primary" />, trend: `${orders.length} orders`, color: 'border-l-primary', path: '/dashboard', bg: 'bg-primary/5' },
                         { label: 'Stock Alerts', value: `${alerts.length} Items`, icon: <AlertTriangle className="w-6 h-6 text-red-500" />, trend: alerts.length > 0 ? 'Refill needed' : 'Healthy', color: 'border-l-red-500', path: '/inventory', bg: 'bg-red-50/50' },
                     ].map((stat, i) => (
-                        <Link key={i} to={stat.path} className={`bg-white p-6 rounded-[2rem] shadow-premium border-l-4 ${stat.color} hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer block ${stat.bg}`}>
-                            <div className="flex justify-between items-start mb-6">
+                        <Link key={i} to={stat.path} className={`bg-white p-5 sm:p-6 rounded-[2rem] shadow-premium border-l-4 ${stat.color} hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer block ${stat.bg}`}>
+                            <div className="flex justify-between items-start mb-4 sm:mb-6">
                                 <div className="p-3 bg-white rounded-2xl shadow-sm border border-primary/5">
                                     {stat.icon}
                                 </div>
@@ -555,24 +555,24 @@ function Dashboard() {
                                 </span>
                             </div>
                             <h3 className="text-[10px] font-black text-charcoal/40 uppercase tracking-widest mb-1">{stat.label}</h3>
-                            <p className="text-3xl font-black text-primary leading-none tracking-tight">{stat.value}</p>
+                            <p className="text-2xl sm:text-3xl font-black text-primary leading-none tracking-tight">{stat.value}</p>
                         </Link>
                     ))}
                 </div>
                 )}
 
-                <section className="bg-white rounded-3xl border border-primary/5 shadow-premium overflow-hidden mb-12">
-                    <div className="p-4 md:p-8 border-b border-primary/5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <section className="bg-white rounded-3xl border border-primary/5 shadow-premium overflow-hidden mb-8 sm:mb-12">
+                    <div className="p-4 sm:p-6 md:p-8 border-b border-primary/5 bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div>
                             <h2 className="text-xl md:text-2xl font-bold text-primary">Live Orders</h2>
-                            <p className="text-sm text-charcoal/50 font-medium">Manage and track active customer tickets</p>
+                            <p className="text-xs sm:text-sm text-charcoal/50 font-medium">Manage and track active customer tickets</p>
                         </div>
                         <div className="flex bg-bg-cream p-1 rounded-xl w-full md:w-auto overflow-x-auto">
                             {['ALL', 'PENDING', 'READY', 'DELIVERED'].map((s) => (
                                 <button
                                     key={s}
                                     onClick={() => setFilterStatus(s)}
-                                    className={`px-4 py-2 rounded-lg text-[10px] whitespace-nowrap font-black transition-all ${filterStatus === s ? 'bg-primary text-white shadow-md' : 'text-primary/40 hover:text-primary'}`}
+                                    className={`px-3 sm:px-4 py-2 rounded-lg text-[10px] whitespace-nowrap font-black transition-all ${filterStatus === s ? 'bg-primary text-white shadow-md' : 'text-primary/40 hover:text-primary'}`}
                                 >
                                     {s}
                                 </button>
@@ -583,18 +583,18 @@ function Dashboard() {
                         <table className="w-full text-left min-w-[800px]">
                             <thead>
                                 <tr className="border-b border-primary/5">
-                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Time</th>
-                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Order Details</th>
-                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Table/Mode</th>
-                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Total &amp; Payment</th>
-                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Status</th>
-                                    <th className="px-8 py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest text-right">Actions</th>
+                                    <th className="px-6 sm:px-8 py-4 sm:py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Time</th>
+                                    <th className="px-6 sm:px-8 py-4 sm:py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Order Details</th>
+                                    <th className="px-6 sm:px-8 py-4 sm:py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Table/Mode</th>
+                                    <th className="px-6 sm:px-8 py-4 sm:py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Total &amp; Payment</th>
+                                    <th className="px-6 sm:px-8 py-4 sm:py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest">Status</th>
+                                    <th className="px-6 sm:px-8 py-4 sm:py-5 text-xs font-black text-charcoal/40 uppercase tracking-widest text-right">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-primary/5">
                                 {orders.filter(o => filterStatus === 'ALL' || o.status === filterStatus).map((order) => (
                                     <tr key={order.id} className="group hover:bg-bg-cream/50 transition-colors">
-                                        <td className="px-8 py-6">
+                                        <td className="px-6 sm:px-8 py-4 sm:py-6">
                                             <div className="flex items-center gap-3">
                                                 <div className="p-2 bg-primary/5 rounded-lg">
                                                     <Clock className="w-4 h-4 text-primary" />
@@ -602,7 +602,7 @@ function Dashboard() {
                                                 <span className="font-bold text-sm text-primary">{new Date(order.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6">
+                                        <td className="px-6 sm:px-8 py-4 sm:py-6">
                                             <div className="flex flex-col gap-1">
                                                 <span className="text-secondary font-black text-xs">#{order.id}</span>
                                                 <span className="text-sm font-bold text-primary truncate max-w-[200px]">
@@ -610,7 +610,7 @@ function Dashboard() {
                                                 </span>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6">
+                                        <td className="px-6 sm:px-8 py-4 sm:py-6">
                                             <div className="flex flex-col gap-2">
                                                 <span className={`px-3 py-1 bg-bg-cream border border-primary/5 rounded-lg text-xs font-bold text-primary flex items-center gap-2 w-fit ${order.table === 'Home Delivery' ? 'bg-[#E67E22]/10 text-[#E67E22] border-[#E67E22]/20' :
                                                     order.table === 'Takeaway' ? 'bg-[#D4A017]/10 text-[#D4A017] border-[#D4A017]/20' : ''
@@ -631,7 +631,7 @@ function Dashboard() {
                                                 )}
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6">
+                                        <td className="px-6 sm:px-8 py-4 sm:py-6">
                                             <div className="flex flex-col gap-2">
                                                 <span className="font-black text-primary text-sm">{order.total}</span>
                                                 <button
@@ -643,7 +643,7 @@ function Dashboard() {
                                                 </button>
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6">
+                                        <td className="px-6 sm:px-8 py-4 sm:py-6">
                                             <span className={`px-4 py-1.5 rounded-full text-[10px] font-black shadow-sm ${order.status === 'READY' ? 'bg-green-500 text-white shadow-green-500/20' :
                                                 order.status === 'PENDING' ? 'bg-amber-500 text-white shadow-amber-500/20' :
                                                     'bg-primary/20 text-primary'
@@ -651,7 +651,7 @@ function Dashboard() {
                                                 {order.status}
                                             </span>
                                         </td>
-                                        <td className="px-8 py-6 text-right">
+                                        <td className="px-6 sm:px-8 py-4 sm:py-6 text-right">
                                             <div className="flex items-center justify-end gap-3 flex-wrap">
                                                 {/* PRINTER BUTTON */}
                                                 <button
@@ -691,19 +691,19 @@ function Dashboard() {
 
                 {/* ── ADMIN: 3-col layout with statistics chart on the left ── */}
                 {adminMode && (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 space-y-8">
-                        <div className="bg-white p-8 rounded-3xl border border-cream shadow-sm relative overflow-hidden">
-                            <div className="flex justify-between items-center mb-8">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+                    <div className="lg:col-span-2 space-y-6 sm:space-y-8">
+                        <div className="bg-white p-5 sm:p-8 rounded-3xl border border-cream shadow-sm relative overflow-hidden">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
                                 <div>
-                                    <h2 className="text-xl font-bold text-primary flex items-center gap-2">
+                                    <h2 className="text-lg sm:text-xl font-bold text-primary flex items-center gap-2">
                                         <TrendingUp className="w-5 h-5 text-secondary" />
                                         System Statistics
                                     </h2>
-                                    <p className="text-charcoal/50 text-sm">Real-time revenue & order trends from archive</p>
+                                    <p className="text-charcoal/50 text-xs sm:text-sm">Real-time revenue & order trends from archive</p>
                                 </div>
-                                <div className="flex gap-2">
-                                    <div className="flex bg-bg-cream p-1 rounded-xl mr-4 shadow-inner">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <div className="flex bg-bg-cream p-1 rounded-xl shadow-inner">
                                         {['Hourly', 'Weekly', 'Monthly'].map((m) => (
                                             <button
                                                 key={m}
