@@ -394,15 +394,15 @@ export default function Employees() {
     return (
         <div className="min-h-screen bg-bg-cream text-charcoal font-body">
             <Navbar />
-            <main className="max-w-7xl mx-auto px-6 md:px-8 py-10">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 sm:py-10">
 
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
                     <div>
-                        <h1 className="text-3xl font-display font-bold text-primary flex items-center gap-3">
+                        <h1 className="text-2xl sm:text-3xl font-display font-bold text-primary flex items-center gap-3">
                             <Users className="text-secondary" /> Employees
                         </h1>
-                        <p className="text-charcoal/50 mt-1 text-sm">
+                        <p className="text-charcoal/50 mt-1 text-xs sm:text-sm">
                             {employees.length} total · {active} active ·{' '}
                             {expiringSoon > 0 && <span className="text-yellow-600 font-bold">{expiringSoon} expiring soon · </span>}
                             {expired > 0 && <span className="text-red-500 font-bold">{expired} expired</span>}
@@ -410,127 +410,131 @@ export default function Employees() {
                     </div>
                     {isAdmin && (
                     <button onClick={openAdd}
-                        className="flex items-center gap-2 bg-secondary text-white px-7 py-3 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg hover:bg-orange-600 transition-all active:scale-95">
+                        className="flex items-center justify-center gap-2 bg-secondary text-white px-6 sm:px-7 py-3 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest shadow-lg hover:bg-orange-600 transition-all active:scale-95 w-full sm:w-auto">
                         <Plus className="w-4 h-4" /> Add Employee
                     </button>
                     )}
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
                     {[
                         { label: 'Total Staff',       value: employees.length, color: 'bg-primary text-white' },
                         { label: 'Active',            value: active,           color: 'bg-green-600 text-white' },
                         { label: 'Expiring Soon',     value: expiringSoon,     color: 'bg-yellow-500 text-white' },
                         { label: 'Expired Contracts', value: expired,          color: 'bg-red-500 text-white' },
                     ].map(s => (
-                        <div key={s.label} className={`${s.color} rounded-2xl p-5 shadow-sm`}>
-                            <p className="text-3xl font-black">{s.value}</p>
-                            <p className="text-sm opacity-75 font-bold mt-1">{s.label}</p>
+                        <div key={s.label} className={`${s.color} rounded-2xl p-4 sm:p-5 shadow-sm`}>
+                            <p className="text-2xl sm:text-3xl font-black">{s.value}</p>
+                            <p className="text-xs sm:text-sm opacity-75 font-bold mt-1">{s.label}</p>
                         </div>
                     ))}
                 </div>
 
                 {/* Search & Filters */}
-                <div className="flex flex-col md:flex-row gap-3 mb-6">
+                <div className="flex flex-col sm:flex-row gap-3 mb-6">
                     <div className="relative flex-1">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal/30" />
                         <input type="text" placeholder="Search by name, employee no., role, department..."
                             className="w-full pl-11 pr-4 py-3 bg-white border border-primary/5 rounded-2xl shadow-sm outline-none focus:ring-2 focus:ring-secondary/20 font-semibold text-sm"
                             value={search} onChange={e => setSearch(e.target.value)} />
                     </div>
-                    <select value={filterDept} onChange={e => setFilterDept(e.target.value)}
-                        className="bg-white border border-primary/5 rounded-2xl px-4 py-3 font-bold text-sm outline-none focus:ring-2 focus:ring-secondary/20 shadow-sm appearance-none min-w-[160px]">
-                        <option value="All">All Departments</option>
-                        {depts.map(d => <option key={d}>{d}</option>)}
-                    </select>
-                    <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-                        className="bg-white border border-primary/5 rounded-2xl px-4 py-3 font-bold text-sm outline-none focus:ring-2 focus:ring-secondary/20 shadow-sm appearance-none min-w-[140px]">
-                        <option value="All">All Statuses</option>
-                        <option>Active</option><option>On Leave</option><option>Terminated</option><option>Suspended</option>
-                    </select>
+                    <div className="flex gap-3">
+                        <select value={filterDept} onChange={e => setFilterDept(e.target.value)}
+                            className="flex-1 sm:flex-none bg-white border border-primary/5 rounded-2xl px-4 py-3 font-bold text-xs sm:text-sm outline-none focus:ring-2 focus:ring-secondary/20 shadow-sm appearance-none sm:min-w-[160px]">
+                            <option value="All">All Departments</option>
+                            {depts.map(d => <option key={d}>{d}</option>)}
+                        </select>
+                        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+                            className="flex-1 sm:flex-none bg-white border border-primary/5 rounded-2xl px-4 py-3 font-bold text-xs sm:text-sm outline-none focus:ring-2 focus:ring-secondary/20 shadow-sm appearance-none sm:min-w-[140px]">
+                            <option value="All">All Statuses</option>
+                            <option>Active</option><option>On Leave</option><option>Terminated</option><option>Suspended</option>
+                        </select>
+                    </div>
                 </div>
 
                 {/* Employee Table */}
                 {filtered.length === 0 ? (
-                    <div className="bg-white rounded-3xl border border-primary/5 p-16 text-center shadow-sm">
+                    <div className="bg-white rounded-3xl border border-primary/5 p-8 sm:p-16 text-center shadow-sm">
                         <Users className="w-12 h-12 text-charcoal/20 mx-auto mb-4" />
-                        <p className="text-charcoal/40 font-bold text-lg">No employees found</p>
-                        <p className="text-charcoal/30 text-sm mt-1">Try adjusting your search or filters, or add a new employee.</p>
+                        <p className="text-charcoal/40 font-bold text-base sm:text-lg">No employees found</p>
+                        <p className="text-charcoal/30 text-xs sm:text-sm mt-1">Try adjusting your search or filters, or add a new employee.</p>
                         {isAdmin && (
-                        <button onClick={openAdd} className="mt-6 flex items-center gap-2 bg-secondary text-white px-6 py-3 rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg hover:bg-orange-600 transition-all mx-auto">
+                        <button onClick={openAdd} className="mt-6 flex items-center gap-2 bg-secondary text-white px-6 py-3 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest shadow-lg hover:bg-orange-600 transition-all mx-auto">
                             <Plus className="w-4 h-4" /> Add Employee
                         </button>
                         )}
                     </div>
                 ) : (
-                    <div className="bg-white rounded-3xl border border-primary/5 shadow-sm overflow-hidden">
-                        <div className={`grid gap-4 px-6 py-4 bg-bg-cream border-b border-primary/5 text-[10px] font-black uppercase text-charcoal/40 tracking-widest ${isAdmin ? 'grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_1fr_auto]' : 'grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_auto]'}`}>
-                            <span>Employee</span><span>Role / Dept</span><span>Contract</span>
-                            <span>Time Served</span><span>Status</span>
-                            {isAdmin && <span>Salary (KES)</span>}
-                            <span></span>
-                        </div>
+                    <div className="bg-white rounded-3xl border border-primary/5 shadow-sm overflow-x-auto">
+                        <div className="min-w-[850px]">
+                            <div className={`grid gap-4 px-6 py-4 bg-bg-cream border-b border-primary/5 text-[10px] font-black uppercase text-charcoal/40 tracking-widest ${isAdmin ? 'grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_1fr_auto]' : 'grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_auto]'}`}>
+                                <span>Employee</span><span>Role / Dept</span><span>Contract</span>
+                                <span>Time Served</span><span>Status</span>
+                                {isAdmin && <span>Salary (KES)</span>}
+                                <span></span>
+                            </div>
 
-                        {filtered.map(emp => {
-                            const cs = contractStatus(emp.contractEnd);
-                            const initials = `${emp.firstName?.[0] || ''}${emp.lastName?.[0] || ''}`.toUpperCase();
-                            return (
-                                <div key={emp.id} className="border-b border-primary/5 last:border-0">
-                                    <div className={`grid gap-4 px-6 py-4 items-center hover:bg-bg-cream/40 transition-colors cursor-pointer ${isAdmin ? 'grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_1fr_auto]' : 'grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_auto]'}`}
-                                        onClick={() => setProfileEmp(emp)}>
-                                        {/* Avatar + name */}
-                                        <div className="flex items-center gap-3">
-                                            {emp.image ? (
-                                                <img src={emp.image} alt={`${emp.firstName} ${emp.lastName}`}
-                                                    className="w-10 h-10 rounded-2xl object-cover border border-primary/10 shrink-0"
-                                                    onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
-                                            ) : null}
-                                            <div className={`w-10 h-10 rounded-2xl bg-primary flex items-center justify-center text-white font-black text-xs shrink-0 ${emp.image ? 'hidden' : 'flex'}`}>
-                                                {initials}
+                            {filtered.map(emp => {
+                                const cs = contractStatus(emp.contractEnd);
+                                const initials = `${emp.firstName?.[0] || ''}${emp.lastName?.[0] || ''}`.toUpperCase();
+                                return (
+                                    <div key={emp.id} className="border-b border-primary/5 last:border-0">
+                                        <div className={`grid gap-4 px-6 py-4 items-center hover:bg-bg-cream/40 transition-colors cursor-pointer ${isAdmin ? 'grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_1fr_auto]' : 'grid-cols-[2fr_1.2fr_1.2fr_1fr_1fr_auto]'}`}
+                                            onClick={() => setProfileEmp(emp)}>
+                                            {/* Avatar + name */}
+                                            <div className="flex items-center gap-3">
+                                                {emp.image ? (
+                                                    <img src={emp.image} alt={`${emp.firstName} ${emp.lastName}`}
+                                                        className="w-10 h-10 rounded-2xl object-cover border border-primary/10 shrink-0"
+                                                        onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }} />
+                                                ) : null}
+                                                <div className={`w-10 h-10 rounded-2xl bg-primary flex items-center justify-center text-white font-black text-xs shrink-0 ${emp.image ? 'hidden' : 'flex'}`}>
+                                                    {initials}
+                                                </div>
+                                                <div>
+                                                    <p className="font-black text-primary text-sm">{emp.firstName} {emp.lastName}</p>
+                                                    <p className="text-[11px] text-charcoal/40 font-bold">{emp.empNo}</p>
+                                                </div>
                                             </div>
                                             <div>
-                                                <p className="font-black text-primary text-sm">{emp.firstName} {emp.lastName}</p>
-                                                <p className="text-[11px] text-charcoal/40 font-bold">{emp.empNo}</p>
+                                                <p className="font-bold text-sm text-charcoal">{emp.designation || '—'}</p>
+                                                <p className="text-[11px] text-charcoal/40">{emp.department || '—'}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-semibold text-charcoal">{emp.contractStart || '—'}</p>
+                                                <p className="text-[11px] text-charcoal/40">→ {emp.contractEnd || 'Ongoing'}</p>
+                                            </div>
+                                            <p className="text-sm font-bold text-charcoal">{yearsMonths(emp.contractStart)}</p>
+                                            <div className="flex flex-col gap-1">
+                                                <span className={`text-[10px] font-black px-2.5 py-1 rounded-full w-fit ${emp.status === 'Active' ? 'bg-green-100 text-green-700' : emp.status === 'On Leave' ? 'bg-blue-100 text-blue-600' : emp.status === 'Suspended' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-500'}`}>
+                                                    {emp.status}
+                                                </span>
+                                                <span className={`text-[10px] font-black px-2.5 py-1 rounded-full w-fit ${cs.color}`}>{cs.label}</span>
+                                            </div>
+                                            {isAdmin && (
+                                                <p className="text-sm font-black text-secondary">{emp.salary ? Number(emp.salary).toLocaleString() : '—'}</p>
+                                            )}
+                                            <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                                                <button onClick={() => setProfileEmp(emp)} className="p-2 bg-bg-cream hover:bg-secondary/10 text-primary rounded-xl transition-colors" title="View Profile">
+                                                    <Eye className="w-4 h-4" />
+                                                </button>
+                                                {isAdmin && (
+                                                <button onClick={() => openEdit(emp)} className="p-2 bg-bg-cream hover:bg-secondary/10 text-primary rounded-xl transition-colors" title="Edit">
+                                                    <Edit3 className="w-4 h-4" />
+                                                </button>
+                                                )}
+                                                {isAdmin && (
+                                                <button onClick={() => handleDelete(emp.id)} className="p-2 bg-bg-cream hover:bg-red-50 text-red-400 rounded-xl transition-colors" title="Delete">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                                )}
                                             </div>
                                         </div>
-                                        <div>
-                                            <p className="font-bold text-sm text-charcoal">{emp.designation || '—'}</p>
-                                            <p className="text-[11px] text-charcoal/40">{emp.department || '—'}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-semibold text-charcoal">{emp.contractStart || '—'}</p>
-                                            <p className="text-[11px] text-charcoal/40">→ {emp.contractEnd || 'Ongoing'}</p>
-                                        </div>
-                                        <p className="text-sm font-bold text-charcoal">{yearsMonths(emp.contractStart)}</p>
-                                        <div className="flex flex-col gap-1">
-                                            <span className={`text-[10px] font-black px-2.5 py-1 rounded-full w-fit ${emp.status === 'Active' ? 'bg-green-100 text-green-700' : emp.status === 'On Leave' ? 'bg-blue-100 text-blue-600' : emp.status === 'Suspended' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-500'}`}>
-                                                {emp.status}
-                                            </span>
-                                            <span className={`text-[10px] font-black px-2.5 py-1 rounded-full w-fit ${cs.color}`}>{cs.label}</span>
-                                        </div>
-                                        {isAdmin && (
-                                            <p className="text-sm font-black text-secondary">{emp.salary ? Number(emp.salary).toLocaleString() : '—'}</p>
-                                        )}
-                                        <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                                            <button onClick={() => setProfileEmp(emp)} className="p-2 bg-bg-cream hover:bg-secondary/10 text-primary rounded-xl transition-colors" title="View Profile">
-                                                <Eye className="w-4 h-4" />
-                                            </button>
-                                            {isAdmin && (
-                                            <button onClick={() => openEdit(emp)} className="p-2 bg-bg-cream hover:bg-secondary/10 text-primary rounded-xl transition-colors" title="Edit">
-                                                <Edit3 className="w-4 h-4" />
-                                            </button>
-                                            )}
-                                            {isAdmin && (
-                                            <button onClick={() => handleDelete(emp.id)} className="p-2 bg-bg-cream hover:bg-red-50 text-red-400 rounded-xl transition-colors" title="Delete">
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                            )}
-                                        </div>
                                     </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
                     </div>
                 )}
 
