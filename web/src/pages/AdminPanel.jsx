@@ -307,12 +307,12 @@ function AdminPanel() {
                 </div>
 
                 {/* Tab bar */}
-                <div className="flex gap-2 mb-8 bg-white p-1.5 rounded-2xl border border-primary/5 w-fit shadow-sm">
+                <div className="flex gap-2 mb-8 bg-white p-1.5 rounded-2xl border border-primary/5 w-fit max-w-full overflow-x-auto scrollbar-hide shadow-sm">
                     {TABS.map(tab => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
                                 activeTab === tab.id
                                     ? 'bg-primary text-white shadow-lg'
                                     : 'text-charcoal/50 hover:text-primary hover:bg-bg-cream'

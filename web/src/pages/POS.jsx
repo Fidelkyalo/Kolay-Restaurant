@@ -25,6 +25,7 @@ const POS = () => {
     const [lastPlacedOrder, setLastPlacedOrder] = useState(null);
     const [isManageMode, setIsManageMode] = useState(false);
     const [editingDishId, setEditingDishId] = useState(null);
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     const handlePrintReceipt = () => {
         if (!lastPlacedOrder) {
@@ -434,7 +435,7 @@ const POS = () => {
     return (
         <div className="flex flex-col h-screen bg-bg-cream font-body overflow-hidden relative">
             <Navbar />
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-col lg:flex-row flex-1 overflow-hidden relative">
                 {/* Table Selection Modal */}
                 {showTableModal && (
                     <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
@@ -512,21 +513,21 @@ const POS = () => {
                 )}
 
                 {/* Left Menu Side */}
-                <div className="flex-1 flex flex-col p-6 overflow-hidden">
+                <div className="flex-1 flex flex-col p-4 sm:p-6 overflow-y-auto lg:overflow-hidden">
                     {/* Header */}
-                    <div className="flex justify-between items-center mb-8">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
                         <div>
-                            <h1 className="text-3xl font-display font-bold text-primary flex items-center gap-2">
+                            <h1 className="text-2xl sm:text-3xl font-display font-bold text-primary flex items-center gap-2">
                                 <UtensilsCrossed className="text-secondary" /> POS System
                             </h1>
-                            <p className="text-charcoal/50 text-sm">Select items to build a new order</p>
+                            <p className="text-charcoal/50 text-xs sm:text-sm">Select items to build a new order</p>
                         </div>
-                        <div className="relative w-80">
+                        <div className="relative w-full sm:w-80">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/30 w-5 h-5" />
                             <input
                                 type="text"
                                 placeholder="Search dishes..."
-                                className="w-full pl-10 pr-4 py-3 bg-white rounded-2xl border border-cream shadow-sm focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all"
+                                className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-white rounded-2xl border border-cream shadow-sm focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all text-sm"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -534,12 +535,12 @@ const POS = () => {
                     </div>
 
                     {/* Categories */}
-                    <div className="flex gap-4 mb-8 overflow-x-auto pb-2 scrollbar-hide items-center">
+                    <div className="flex gap-4 mb-6 sm:mb-8 overflow-x-auto pb-2 scrollbar-hide items-center">
                         {categories.map(cat => (
                             <button
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
-                                className={`px-6 py-2.5 rounded-full font-bold whitespace-nowrap transition-all ${activeCategory === cat
+                                className={`px-5 sm:px-6 py-2 sm:py-2.5 rounded-full font-bold text-xs sm:text-sm whitespace-nowrap transition-all ${activeCategory === cat
                                     ? 'bg-secondary text-white shadow-lg scale-105'
                                     : 'bg-white text-charcoal/60 hover:bg-cream border border-cream'
                                     }`}
@@ -550,7 +551,7 @@ const POS = () => {
                         {adminMode && (
                         <button
                             onClick={() => setIsManageMode(!isManageMode)}
-                            className={`px-6 py-2.5 rounded-full font-bold border transition-all flex items-center gap-2 ${isManageMode ? 'bg-primary text-white border-primary shadow-lg' : 'bg-primary/5 hover:bg-primary text-primary hover:text-white border-primary/20'
+                            className={`px-5 sm:px-6 py-2 sm:py-2.5 rounded-full font-bold text-xs sm:text-sm border transition-all flex items-center gap-2 whitespace-nowrap ${isManageMode ? 'bg-primary text-white border-primary shadow-lg' : 'bg-primary/5 hover:bg-primary text-primary hover:text-white border-primary/20'
                                 }`}
                         >
                             <Settings className="w-4 h-4" /> Edit Menu
@@ -563,7 +564,7 @@ const POS = () => {
                                     setNewDish({ name: '', price: '', category: 'Main Dish', image: '', desc: '' });
                                     setShowDishModal(true);
                                 }}
-                                className="bg-secondary text-white hover:bg-orange-600 px-6 py-2.5 rounded-full font-bold border border-secondary transition-all flex items-center gap-2 shadow-sm"
+                                className="bg-secondary text-white hover:bg-orange-600 px-5 sm:px-6 py-2 sm:py-2.5 rounded-full font-bold text-xs sm:text-sm border border-secondary transition-all flex items-center gap-2 shadow-sm whitespace-nowrap"
                             >
                                 <Plus className="w-4 h-4" /> Add Dish
                             </button>
@@ -571,7 +572,7 @@ const POS = () => {
                     </div>
 
                     {/* Product Grid */}
-                    <div className="flex-1 overflow-y-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pr-2 custom-scrollbar">
+                    <div className="flex-1 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 pr-2 custom-scrollbar pb-24 lg:pb-0">
                         {filteredProducts.map(product => (
                             <div
                                 key={product.id}
@@ -584,7 +585,7 @@ const POS = () => {
                                         addToCart(product);
                                     }
                                 }}
-                                className={`bg-white p-5 rounded-3xl border border-cream hover:border-secondary/30 hover:shadow-xl transition-all cursor-pointer group active:scale-95 ${isManageMode ? 'ring-2 ring-primary/20' : ''}`}
+                                className={`bg-white p-4 sm:p-5 rounded-3xl border border-cream hover:border-secondary/30 hover:shadow-xl transition-all cursor-pointer group active:scale-95 ${isManageMode ? 'ring-2 ring-primary/20' : ''}`}
                             >
                                 <div className="h-32 bg-bg-cream rounded-2xl mb-4 relative flex items-center justify-center text-5xl group-hover:scale-110 transition-transform overflow-hidden">
                                     {isManageMode && (
@@ -607,8 +608,8 @@ const POS = () => {
                                         product.image
                                     )}
                                 </div>
-                                <h3 className="font-bold text-primary mb-1">{product.name}</h3>
-                                <p className="text-secondary font-bold">KES {product.price.toLocaleString()}</p>
+                                <h3 className="font-bold text-primary mb-1 text-sm sm:text-base">{product.name}</h3>
+                                <p className="text-secondary font-bold text-sm">KES {product.price.toLocaleString()}</p>
                                 <div className="mt-4 flex justify-between items-center text-[10px] text-charcoal/40 uppercase tracking-widest font-bold">
                                     <span>{product.category}</span>
                                     <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded">In Stock</span>
@@ -618,12 +619,44 @@ const POS = () => {
                     </div>
                 </div>
 
+                {/* Floating Mobile Cart Button */}
+                <button
+                    onClick={() => setIsCartOpen(true)}
+                    className="lg:hidden fixed bottom-6 right-6 z-30 bg-secondary text-white px-5 py-3.5 rounded-full shadow-2xl font-bold flex items-center gap-3 active:scale-95 transition-all"
+                >
+                    <ShoppingCart className="w-5 h-5" />
+                    <span className="text-sm">Order ({cart.reduce((acc, item) => acc + item.quantity, 0)})</span>
+                    <span className="bg-white/20 px-2.5 py-0.5 rounded-full text-xs font-black">KES {total.toLocaleString()}</span>
+                </button>
+
+                {/* Mobile Cart Overlay */}
+                {isCartOpen && (
+                    <div
+                        className="fixed inset-0 bg-primary/50 backdrop-blur-sm z-40 lg:hidden animate-in fade-in duration-200"
+                        onClick={() => setIsCartOpen(false)}
+                    />
+                )}
+
                 {/* Right Cart Side */}
-                <div className="w-[400px] bg-white border-l border-cream flex flex-col shadow-2xl">
-                    <div className="p-6 border-b border-cream flex justify-between items-center bg-white/80 backdrop-blur-md sticky top-0 z-10">
-                        <h2 className="text-xl font-bold text-primary flex items-center gap-2">
-                            <ShoppingCart className="w-5 h-5 text-secondary" /> Current Order
-                        </h2>
+                <div className={`
+                    fixed lg:relative inset-y-0 right-0 z-50 lg:z-auto
+                    w-full sm:w-[400px] lg:w-[400px]
+                    bg-white border-l border-cream flex flex-col shadow-2xl
+                    transition-transform duration-300 ease-in-out
+                    ${isCartOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+                `}>
+                    <div className="p-4 sm:p-6 border-b border-cream flex justify-between items-center bg-white/80 backdrop-blur-md sticky top-0 z-10">
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setIsCartOpen(false)}
+                                className="lg:hidden p-1.5 -ml-1 text-charcoal/50 hover:text-primary rounded-lg hover:bg-bg-cream transition-colors"
+                            >
+                                <ArrowLeft className="w-5 h-5" />
+                            </button>
+                            <h2 className="text-lg sm:text-xl font-bold text-primary flex items-center gap-2">
+                                <ShoppingCart className="w-5 h-5 text-secondary" /> Current Order
+                            </h2>
+                        </div>
                         <span className="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold">
                             {cart.reduce((acc, item) => acc + item.quantity, 0)} Items
                         </span>
