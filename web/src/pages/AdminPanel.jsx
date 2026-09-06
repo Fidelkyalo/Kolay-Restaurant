@@ -496,7 +496,7 @@ function AdminPanel() {
                                 ))}
                             </tbody>
                         </table>
-                    </div>
+                    
                 )}
 
                 {/* ── MAINTENANCE TAB ──────────────────────────────────────── */}
