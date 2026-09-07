@@ -475,13 +475,13 @@ const Home = () => {
                         </div>
 
                         <div className="pt-4">
-                            <a
-                                href="#reservations"
+                            <Link
+                                to="/reservations"
                                 className="group inline-flex items-center gap-3 text-white font-black text-sm uppercase tracking-widest hover:text-[#E67E22] transition-colors"
                             >
                                 Reserve Your Experience
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
