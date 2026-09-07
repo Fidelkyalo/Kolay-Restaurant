@@ -87,7 +87,7 @@ const Navbar = () => {
                 </div>
             </div>
 
-            {/* Nav Links — Desktop (scrollable) */}
+            {/* Nav Links - Desktop (scrollable) */}
             <div className="hidden md:flex items-center gap-6 font-bold flex-1 justify-center overflow-x-auto px-4">
                 {links.map((link) => (
                     <Link key={link.path + link.name} to={link.path}

@@ -216,12 +216,12 @@ export default function Specialties() {
                                                 value={menuDishes.find(d => d.name === form.name)?.id || ''}
                                                 onChange={e => handleMenuPick(e.target.value)}
                                             >
-                                                <option value="">— Select a dish from the menu —</option>
+                                                <option value="">- Select a dish from the menu -</option>
                                                 {Object.entries(dishesByCategory).map(([cat, dishes]) => (
                                                     <optgroup key={cat} label={cat}>
                                                         {dishes.map(d => (
                                                             <option key={d.id} value={d.id}>
-                                                                {d.name} — KES {Number(d.price).toLocaleString()}
+                                                                {d.name} - KES {Number(d.price).toLocaleString()}
                                                             </option>
                                                         ))}
                                                     </optgroup>
@@ -287,7 +287,7 @@ export default function Specialties() {
                                     )}
                                 </div>
 
-                                {/* Image URL — only shown in manual mode (menu pick auto-fills it) */}
+                                {/* Image URL - only shown in manual mode (menu pick auto-fills it) */}
                                 {dishSource === 'custom' && (
                                     <div>
                                         <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-2">Image URL</label>
@@ -340,7 +340,7 @@ export default function Specialties() {
                             <div className="flex items-center gap-3 bg-secondary/10 border border-secondary/20 rounded-2xl px-5 py-3">
                                 <Tag className="w-4 h-4 text-secondary shrink-0" />
                                 <p className="text-sm text-secondary font-bold">
-                                    A <strong>{DISCOUNT_RATE}% discount</strong> is automatically applied to all specialties at checkout — no configuration needed.
+                                    A <strong>{DISCOUNT_RATE}% discount</strong> is automatically applied to all specialties at checkout - no configuration needed.
                                 </p>
                             </div>
 
@@ -413,12 +413,12 @@ export default function Specialties() {
                                             <div className="flex items-center gap-2 text-[11px] text-charcoal/40 mb-4">
                                                 <Calendar className="w-3 h-3" />
                                                 <span>
-                                                    {sp.startDate || '—'} → {sp.endDate || 'Ongoing'}
+                                                    {sp.startDate || '-'} → {sp.endDate || 'Ongoing'}
                                                 </span>
                                             </div>
                                         )}
 
-                                        {/* Actions — admin only */}
+                                        {/* Actions - admin only */}
                                         {adminMode && (
                                         <div className="flex gap-3 pt-3 border-t border-primary/5">
                                             <button

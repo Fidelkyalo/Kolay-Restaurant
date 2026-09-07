@@ -39,7 +39,7 @@ const getStaffList = () => {
 const ManageReservations = () => {
     const adminMode = isAdmin();
 
-    // Staff identity — read from localStorage
+    // Staff identity - read from localStorage
     const staffName = (() => {
         try {
             const saved = localStorage.getItem('kolay_staff_name');
@@ -105,7 +105,7 @@ const ManageReservations = () => {
     useEffect(() => {
         const handler = () => {
             setStaffList(getStaffList());
-            // Refresh the list — merges any new locally-saved bookings
+            // Refresh the list - merges any new locally-saved bookings
             fetchReservations();
         };
         window.addEventListener('storage', handler);
@@ -126,7 +126,7 @@ const ManageReservations = () => {
         }
     };
 
-    // Admin cancel — requires a reason; opens modal instead of direct call
+    // Admin cancel - requires a reason; opens modal instead of direct call
     const openAdminCancel = (res) => {
         setCancelTarget({ id: res.id, guestName: res.guestName });
         setCancelReason('');
@@ -153,7 +153,7 @@ const ManageReservations = () => {
 
         try {
             await ReservationService.updateStatus(cancelTarget.id, 'CANCELLED', cancelReason.trim());
-        } catch { /* silent — already updated locally */ }
+        } catch { /* silent - already updated locally */ }
 
         setCancelTarget(null);
         setCancelReason('');
@@ -240,16 +240,16 @@ const ManageReservations = () => {
                     <div className="mb-6 flex items-start gap-3 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl px-5 py-4 text-sm font-bold">
                         <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 text-amber-500" />
                         <div>
-                            <p className="font-black">Server offline — showing locally cached bookings</p>
+                            <p className="font-black">Server offline - showing locally cached bookings</p>
                             <p className="font-semibold text-amber-700/80 text-xs mt-1">
                                 The Railway backend is sleeping. Bookings made while it was offline are shown below.
-                                Hit Refresh to retry — it may take ~30 seconds to wake up.
+                                Hit Refresh to retry - it may take ~30 seconds to wake up.
                             </p>
                         </div>
                     </div>
                 )}
 
-                {/* Filters & Search — admin only */}
+                {/* Filters & Search - admin only */}
                 {adminMode && (
                     <div className="bg-white p-6 rounded-3xl shadow-premium border border-primary/5 mb-8 flex flex-col md:flex-row gap-6 justify-between items-center">
                         <div className="relative w-full md:w-96">
@@ -399,7 +399,7 @@ const ManageReservations = () => {
                                                         value={selectedStaff}
                                                         onChange={e => setSelectedStaff(e.target.value)}
                                                     >
-                                                        <option value="">— Select staff member —</option>
+                                                        <option value="">- Select staff member -</option>
                                                         {staffList.length > 0
                                                             ? staffList.map(s => <option key={s} value={s}>{s}</option>)
                                                             : <option disabled>No active employees found</option>
@@ -610,7 +610,7 @@ const ManageReservations = () => {
                                             <Icon className="w-4 h-4 text-secondary shrink-0" />
                                             <div>
                                                 <p className="text-[10px] font-black uppercase text-charcoal/40">{label}</p>
-                                                <p className="font-semibold text-primary text-sm mt-0.5">{value || '—'}</p>
+                                                <p className="font-semibold text-primary text-sm mt-0.5">{value || '-'}</p>
                                             </div>
                                         </div>
                                     ))}

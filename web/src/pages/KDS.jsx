@@ -58,7 +58,7 @@ const KDS = () => {
                 }
             }
         } catch (err) {
-            // Backend unavailable — fall back to local only
+            // Backend unavailable - fall back to local only
         }
     };
 

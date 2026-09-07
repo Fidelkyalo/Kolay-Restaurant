@@ -260,7 +260,7 @@ export default function MyBookings() {
                                                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                                                 <p className="text-xs font-semibold leading-relaxed">
                                                     {booking.status === 'PENDING'   && "Your reservation is awaiting confirmation from our team. We'll update this shortly."}
-                                                    {booking.status === 'CONFIRMED' && 'Great news — your table is confirmed! We look forward to seeing you.'}
+                                                    {booking.status === 'CONFIRMED' && 'Great news - your table is confirmed! We look forward to seeing you.'}
                                                     {booking.status === 'CANCELLED' && 'This reservation has been cancelled. Feel free to make a new booking anytime.'}
                                                     {booking.status === 'COMPLETED' && 'Thank you for dining with us. We hope to see you again soon!'}
                                                 </p>

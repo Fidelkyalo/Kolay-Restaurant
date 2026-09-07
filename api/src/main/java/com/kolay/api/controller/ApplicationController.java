@@ -19,21 +19,21 @@ public class ApplicationController {
     @Autowired
     private ApplicationRepository applicationRepository;
 
-    // Public — anyone can submit an application
+    // Public - anyone can submit an application
     @PostMapping
     public ResponseEntity<?> submit(@RequestBody Application application) {
         Application saved = applicationRepository.save(application);
         return ResponseEntity.ok(saved);
     }
 
-    // Admin only — view all applications
+    // Admin only - view all applications
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<List<Application>> getAll() {
         return ResponseEntity.ok(applicationRepository.findAllByOrderBySubmittedAtDesc());
     }
 
-    // Admin only — update status (Pending / Approved / Rejected)
+    // Admin only - update status (Pending / Approved / Rejected)
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {

@@ -25,7 +25,7 @@ const Reservations = () => {
             try { return JSON.parse(localStorage.getItem('kolay_auth_user')); } catch { return null; }
         })();
 
-        // Build local reservation record — include username for customer-side lookup
+        // Build local reservation record - include username for customer-side lookup
         const localReservation = {
             ...formData,
             id: Date.now(),
@@ -34,7 +34,7 @@ const Reservations = () => {
             username: authUser?.username || '',
         };
 
-        // 1. Save locally immediately — admin portal and customer MyBookings will
+        // 1. Save locally immediately - admin portal and customer MyBookings will
         //    see it straight away via the storage event
         const existing = JSON.parse(localStorage.getItem('kolay_reservations_local') || '[]');
         localStorage.setItem(

@@ -44,7 +44,7 @@ const Register = () => {
                 password: form.password,
             });
 
-            // Step 2: Auto sign-in — handle separately so a login failure
+            // Step 2: Auto sign-in - handle separately so a login failure
             // doesn't mask the successful registration
             try {
                 const loginRes = await AuthService.login({
@@ -65,7 +65,7 @@ const Register = () => {
                 const isAdmin = userData.roles?.includes('ROLE_ADMIN');
                 setRole(isAdmin ? 'admin' : 'staff');
             } catch (loginErr) {
-                // Auto-login failed — account was still created successfully.
+                // Auto-login failed - account was still created successfully.
                 // User can sign in manually via /customer-login
                 console.warn('Auto-login after registration failed:', loginErr?.message);
             }

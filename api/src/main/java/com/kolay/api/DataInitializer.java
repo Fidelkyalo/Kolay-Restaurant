@@ -72,7 +72,7 @@ public class DataInitializer implements CommandLineRunner {
             }
         }
 
-        // ── 3. Products — ensure all 10 canonical meals exist ─────────────────
+        // ── 3. Products - ensure all 10 canonical meals exist ─────────────────
         // Build a set of existing product names (lowercased) for fast lookup
         Set<String> existingNames = new HashSet<>();
         productRepository.findAll().forEach(p -> existingNames.add(p.getName().toLowerCase()));

@@ -21,7 +21,7 @@ const MENU_DEFAULTS = [
 const getLocalDishes = () => {
     try {
         const saved = JSON.parse(localStorage.getItem('kolay_dishes'));
-        // Accept any non-empty cache — don't gate on an arbitrary item count
+        // Accept any non-empty cache - don't gate on an arbitrary item count
         if (saved && saved.length > 0 && saved[0].image &&
             (saved[0].image.startsWith('http') || saved[0].image.startsWith('/'))) {
             return saved;
@@ -50,7 +50,7 @@ const getActiveSpecialties = () => {
             discount: sp.discount,
             category: 'Specialties',
             image: sp.image || '',
-            desc: sp.description || `${sp.season} special — ${sp.discount}% off`,
+            desc: sp.description || `${sp.season} special - ${sp.discount}% off`,
             isSpecialty: true,
         }));
     } catch { return []; }
@@ -83,12 +83,12 @@ const GuestMenu = () => {
     const [guestInfo, setGuestInfo] = useState({ name: '', phone: '', address: '', mode: initialMode });
 
     useEffect(() => {
-        // Silently refresh from API in the background — menu is already visible from local data
+        // Silently refresh from API in the background - menu is already visible from local data
         const refreshFromApi = async () => {
             try {
                 const response = await MenuService.getProducts();
                 if (response.data && response.data.length > 0) {
-                    // Normalize image field — API returns imageUrl, frontend uses image
+                    // Normalize image field - API returns imageUrl, frontend uses image
                     const fresh = response.data.map(p => ({
                         ...p,
                         image: p.imageUrl || p.image || '',
@@ -130,7 +130,7 @@ const GuestMenu = () => {
                     return;
                 }
             } catch {
-                // API unavailable — fall back to localStorage
+                // API unavailable - fall back to localStorage
             }
             const freshDishes = getLocalDishes();
             setDishes([...freshDishes.filter(d => !d.isSpecialty), ...getActiveSpecialties()]);
@@ -270,7 +270,7 @@ const GuestMenu = () => {
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        {/* Auth buttons — only shown when not logged in */}
+                        {/* Auth buttons - only shown when not logged in */}
                         {!isLoggedIn && (
                             <div className="hidden sm:flex items-center gap-2">
                                 <Link
@@ -348,7 +348,7 @@ const GuestMenu = () => {
                         <div className="flex items-center justify-center gap-3 bg-[#E67E22]/10 border border-[#E67E22]/30 rounded-2xl px-6 py-4 w-full">
                             <span className="text-2xl">🎉</span>
                             <p className="text-[#E67E22] font-black text-sm">
-                                All Specialties include a <strong>10% discount</strong> — automatically applied at checkout!
+                                All Specialties include a <strong>10% discount</strong> - automatically applied at checkout!
                             </p>
                         </div>
                         {!isLoggedIn && (
@@ -371,7 +371,7 @@ const GuestMenu = () => {
                                 <span className="text-3xl">✦</span>
                             </div>
                             <p className="text-white/50 font-black text-lg uppercase tracking-widest mb-2">No Active Specialties</p>
-                            <p className="text-white/20 text-sm">Check back soon — our chef is planning something special.</p>
+                            <p className="text-white/20 text-sm">Check back soon - our chef is planning something special.</p>
                         </div>
                     ) : (
                         dishes.filter(d => !selectedCategory || d.category === selectedCategory).map(dish => (
@@ -603,7 +603,7 @@ const GuestMenu = () => {
                 </div>
             )}
 
-            {/* Auth Gate Modal — shown when guest tries to order a specialty */}
+            {/* Auth Gate Modal - shown when guest tries to order a specialty */}
             {showAuthGate && (
                 <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-[#0D0A07]/90 backdrop-blur-md" onClick={() => setShowAuthGate(false)} />

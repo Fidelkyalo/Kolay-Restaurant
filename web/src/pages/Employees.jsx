@@ -18,7 +18,7 @@ const SEED = [
         designation: 'Executive Chef', department: 'Kitchen',
         email: 'amara.osei@kolay.co.ke', phone: '+254 711 000 001',
         nationalId: '12345678', gender: 'Male', dob: '1985-03-12',
-        address: 'Westlands, Nairobi', emergencyContact: 'Grace Osei — +254 722 000 001',
+        address: 'Westlands, Nairobi', emergencyContact: 'Grace Osei - +254 722 000 001',
         contractStart: '2020-01-15', contractEnd: '2025-01-14',
         contractYears: 5, salary: 120000, status: 'Active',
         notes: 'French & Pan-African fusion specialist.', image: '',
@@ -28,7 +28,7 @@ const SEED = [
         designation: 'Pastry Chef', department: 'Kitchen',
         email: 'lena.mwangi@kolay.co.ke', phone: '+254 711 000 002',
         nationalId: '23456789', gender: 'Female', dob: '1990-07-22',
-        address: 'Kilimani, Nairobi', emergencyContact: 'James Mwangi — +254 722 000 002',
+        address: 'Kilimani, Nairobi', emergencyContact: 'James Mwangi - +254 722 000 002',
         contractStart: '2021-03-01', contractEnd: '2026-02-28',
         contractYears: 5, salary: 95000, status: 'Active',
         notes: 'Artisan desserts & baked goods.', image: '',
@@ -38,7 +38,7 @@ const SEED = [
         designation: 'Sous Chef', department: 'Kitchen',
         email: 'daniel.kiprop@kolay.co.ke', phone: '+254 711 000 003',
         nationalId: '34567890', gender: 'Male', dob: '1992-11-05',
-        address: 'Parklands, Nairobi', emergencyContact: 'Mary Kiprop — +254 722 000 003',
+        address: 'Parklands, Nairobi', emergencyContact: 'Mary Kiprop - +254 722 000 003',
         contractStart: '2022-06-01', contractEnd: '2027-05-31',
         contractYears: 5, salary: 80000, status: 'Active',
         notes: 'Grills, meats & open-fire cooking.', image: '',
@@ -59,7 +59,7 @@ const generateEmpNo = (list) => {
 };
 
 const yearsMonths = (startDate) => {
-    if (!startDate) return '—';
+    if (!startDate) return '-';
     const start = new Date(startDate);
     const now = new Date();
     let years = now.getFullYear() - start.getFullYear();
@@ -79,7 +79,7 @@ const contractStatus = (end) => {
 };
 
 const age = (dob) => {
-    if (!dob) return '—';
+    if (!dob) return '-';
     return Math.floor((new Date() - new Date(dob)) / (1000 * 60 * 60 * 24 * 365.25));
 };
 
@@ -207,7 +207,7 @@ function EmployeeProfileModal({ emp, onClose, onEdit, isAdmin }) {
                         <div className="pb-1">
                             <p className="text-white/60 text-xs font-black uppercase tracking-widest mb-1">{emp.empNo}</p>
                             <h2 className="text-2xl font-display font-black text-white">{emp.firstName} {emp.lastName}</h2>
-                            <p className="text-white/70 font-semibold text-sm mt-0.5">{emp.designation || '—'} · {emp.department || '—'}</p>
+                            <p className="text-white/70 font-semibold text-sm mt-0.5">{emp.designation || '-'} · {emp.department || '-'}</p>
                         </div>
                     </div>
                     <div className="flex gap-2 mt-4 flex-wrap">
@@ -235,7 +235,7 @@ function EmployeeProfileModal({ emp, onClose, onEdit, isAdmin }) {
                                     <Icon className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
                                     <div>
                                         <p className="text-[10px] font-black uppercase text-charcoal/40">{label}</p>
-                                        <p className="font-semibold text-primary text-sm mt-0.5">{value || '—'}</p>
+                                        <p className="font-semibold text-primary text-sm mt-0.5">{value || '-'}</p>
                                     </div>
                                 </div>
                             ))}
@@ -247,7 +247,7 @@ function EmployeeProfileModal({ emp, onClose, onEdit, isAdmin }) {
                         <p className="text-[10px] font-black uppercase text-secondary tracking-widest mb-3">Personal Details</p>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                             {[
-                                { icon: Calendar, label: 'Date of Birth', value: emp.dob ? `${emp.dob} (Age ${age(emp.dob)})` : '—' },
+                                { icon: Calendar, label: 'Date of Birth', value: emp.dob ? `${emp.dob} (Age ${age(emp.dob)})` : '-' },
                                 { icon: Users,    label: 'Gender',        value: emp.gender },
                                 { icon: Award,    label: 'National ID',   value: emp.nationalId },
                             ].map(({ icon: Icon, label, value }) => (
@@ -255,7 +255,7 @@ function EmployeeProfileModal({ emp, onClose, onEdit, isAdmin }) {
                                     <Icon className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
                                     <div>
                                         <p className="text-[10px] font-black uppercase text-charcoal/40">{label}</p>
-                                        <p className="font-semibold text-primary text-sm mt-0.5">{value || '—'}</p>
+                                        <p className="font-semibold text-primary text-sm mt-0.5">{value || '-'}</p>
                                     </div>
                                 </div>
                             ))}
@@ -267,10 +267,10 @@ function EmployeeProfileModal({ emp, onClose, onEdit, isAdmin }) {
                         <p className="text-[10px] font-black uppercase text-secondary tracking-widest mb-3">Contract Details</p>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                             {[
-                                { icon: Calendar, label: 'Start Date',    value: emp.contractStart || '—' },
+                                { icon: Calendar, label: 'Start Date',    value: emp.contractStart || '-' },
                                 { icon: Calendar, label: 'End Date',      value: emp.contractEnd || 'Ongoing' },
                                 { icon: Clock,    label: 'Time Served',   value: yearsMonths(emp.contractStart) },
-                                { icon: Clock,    label: 'Duration',      value: emp.contractYears ? `${emp.contractYears} years` : '—' },
+                                { icon: Clock,    label: 'Duration',      value: emp.contractYears ? `${emp.contractYears} years` : '-' },
                             ].map(({ icon: Icon, label, value }) => (
                                 <div key={label} className="flex items-start gap-3 bg-bg-cream rounded-2xl p-4 border border-primary/5">
                                     <Icon className="w-4 h-4 text-secondary mt-0.5 shrink-0" />
@@ -318,7 +318,7 @@ export default function Employees() {
     const [form, setForm] = useState(EMPTY_FORM);
     const [profileEmp, setProfileEmp] = useState(null); // employee to show in profile modal
 
-    // Role check — only admin can edit/add/delete or see salary
+    // Role check - only admin can edit/add/delete or see salary
     const isAdmin = (() => {
         try { return localStorage.getItem('kolay_portal_role') === 'admin'; }
         catch { return false; }
@@ -498,11 +498,11 @@ export default function Employees() {
                                                 </div>
                                             </div>
                                             <div>
-                                                <p className="font-bold text-sm text-charcoal">{emp.designation || '—'}</p>
-                                                <p className="text-[11px] text-charcoal/40">{emp.department || '—'}</p>
+                                                <p className="font-bold text-sm text-charcoal">{emp.designation || '-'}</p>
+                                                <p className="text-[11px] text-charcoal/40">{emp.department || '-'}</p>
                                             </div>
                                             <div>
-                                                <p className="text-xs font-semibold text-charcoal">{emp.contractStart || '—'}</p>
+                                                <p className="text-xs font-semibold text-charcoal">{emp.contractStart || '-'}</p>
                                                 <p className="text-[11px] text-charcoal/40">→ {emp.contractEnd || 'Ongoing'}</p>
                                             </div>
                                             <p className="text-sm font-bold text-charcoal">{yearsMonths(emp.contractStart)}</p>
@@ -513,7 +513,7 @@ export default function Employees() {
                                                 <span className={`text-[10px] font-black px-2.5 py-1 rounded-full w-fit ${cs.color}`}>{cs.label}</span>
                                             </div>
                                             {isAdmin && (
-                                                <p className="text-sm font-black text-secondary">{emp.salary ? Number(emp.salary).toLocaleString() : '—'}</p>
+                                                <p className="text-sm font-black text-secondary">{emp.salary ? Number(emp.salary).toLocaleString() : '-'}</p>
                                             )}
                                             <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                                                 <button onClick={() => setProfileEmp(emp)} className="p-2 bg-bg-cream hover:bg-secondary/10 text-primary rounded-xl transition-colors" title="View Profile">
@@ -623,7 +623,7 @@ export default function Employees() {
                                         </div>
                                         <div className="md:col-span-2">
                                             <label className={labelCls}>Emergency Contact (Name & Phone)</label>
-                                            <input type="text" placeholder="e.g. Jane Doe — +254 722 000 000" className={inputCls} value={form.emergencyContact} onChange={e => f('emergencyContact', e.target.value)} />
+                                            <input type="text" placeholder="e.g. Jane Doe - +254 722 000 000" className={inputCls} value={form.emergencyContact} onChange={e => f('emergencyContact', e.target.value)} />
                                         </div>
                                     </div>
                                 </div>

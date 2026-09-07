@@ -62,7 +62,7 @@ const PublicNavbar = () => {
         }
     };
 
-    // Logo click — scroll to hero if already on home, else navigate home
+    // Logo click - scroll to hero if already on home, else navigate home
     const handleLogoClick = (e) => {
         e.preventDefault();
         setIsMobileMenuOpen(false);
@@ -118,7 +118,7 @@ const PublicNavbar = () => {
                     {/* ── RIGHT: Actions ── */}
                     <div className="hidden md:flex items-center gap-3 shrink-0">
                         {isCustomer ? (
-                            /* Customer logged in — show My Bookings + avatar + Rate Us */
+                            /* Customer logged in - show My Bookings + avatar + Rate Us */
                             <>
                                 <Link
                                     to="/my-bookings"
@@ -143,7 +143,7 @@ const PublicNavbar = () => {
                                 </a>
                             </>
                         ) : isLoggedIn ? (
-                            /* Staff/admin logged in — just show avatar pill */
+                            /* Staff/admin logged in - just show avatar pill */
                             <div className="flex items-center gap-2 bg-white/8 border border-white/15 rounded-full pl-1.5 pr-4 py-1.5">
                                 <span className="w-7 h-7 bg-[#E67E22] rounded-full flex items-center justify-center text-[11px] font-black text-white shrink-0">
                                     {loggedInUsername?.[0]?.toUpperCase() || '?'}
@@ -153,7 +153,7 @@ const PublicNavbar = () => {
                                 </span>
                             </div>
                         ) : (
-                            /* Not logged in — Sign In + Create Account */
+                            /* Not logged in - Sign In + Create Account */
                             <>
                                 <Link
                                     to="/customer-login"

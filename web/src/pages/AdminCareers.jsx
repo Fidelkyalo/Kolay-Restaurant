@@ -398,7 +398,7 @@ export default function AdminCareers() {
                                                 </div>
                                                 <div>
                                                     <p className="font-black text-primary">{app.fullName}</p>
-                                                    <p className="text-charcoal/50 text-xs">{app.type === 'renewal' ? 'Contract Renewal' : `New Application — ${job?.title || 'Unknown Role'}`} · {new Date(app.submittedAt).toLocaleDateString()}</p>
+                                                    <p className="text-charcoal/50 text-xs">{app.type === 'renewal' ? 'Contract Renewal' : `New Application - ${job?.title || 'Unknown Role'}`} · {new Date(app.submittedAt).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3">
@@ -445,7 +445,7 @@ export default function AdminCareers() {
                                                     {Object.entries(app.answers || {}).map(([q, a]) => (
                                                         <div key={q} className="bg-white rounded-2xl p-4 border border-primary/5">
                                                             <p className="text-[10px] font-black uppercase text-charcoal/40 mb-1">{q}</p>
-                                                            <p className="font-semibold text-primary">{a || '—'}</p>
+                                                            <p className="font-semibold text-primary">{a || '-'}</p>
                                                         </div>
                                                     ))}
                                                 </div>

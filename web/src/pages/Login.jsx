@@ -43,7 +43,7 @@ const Login = ({ defaultPortal = 'staff' }) => {
             return;
         }
 
-        // Credentials match — now get a real JWT from the backend
+        // Credentials match - now get a real JWT from the backend
         // so that API calls (KDS, Dashboard, etc.) work properly
         try {
             const backendCreds = BACKEND_CREDENTIALS[portal];
@@ -60,7 +60,7 @@ const Login = ({ defaultPortal = 'staff' }) => {
             localStorage.setItem('kolay_auth_user', JSON.stringify(normalizedUser));
             localStorage.setItem('kolay_staff_name', enteredUsername);
         } catch (err) {
-            // Backend login failed (e.g. staff user not in DB yet) — store minimal session
+            // Backend login failed (e.g. staff user not in DB yet) - store minimal session
             // Staff can still use the portal but API calls requiring auth may fail
             console.warn('Backend JWT fetch failed for staff portal, using local session:', err?.message);
             localStorage.setItem('kolay_auth_user', JSON.stringify({

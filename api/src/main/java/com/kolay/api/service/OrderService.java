@@ -25,7 +25,7 @@ public class OrderService {
 
     @Transactional
     public Order createOrder(OrderRequest orderRequest) {
-        // Waiter is optional — guest orders arrive unauthenticated
+        // Waiter is optional - guest orders arrive unauthenticated
         User waiter = null;
         try {
             var authentication = SecurityContextHolder.getContext().getAuthentication();

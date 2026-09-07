@@ -3,10 +3,10 @@ import { Package, AlertTriangle, Plus, Search, RefreshCw, Filter, TrendingDown, 
 import Navbar from '../components/Navbar';
 import { isAdmin } from '../hooks/useRole';
 
-// Low-stock threshold — items below this number are flagged LOW
+// Low-stock threshold - items below this number are flagged LOW
 const LOW_THRESHOLD = 20;
 
-// Status is always derived from stock quantity — never stored manually
+// Status is always derived from stock quantity - never stored manually
 const deriveStatus = (stock) => {
     if (stock === 0) return 'OUT';
     if (stock < LOW_THRESHOLD) return 'LOW';
@@ -34,7 +34,7 @@ const Inventory = () => {
 
     const [inventory, setInventory] = useState(() => {
         const saved = localStorage.getItem('kolay_inventory');
-        // Strip any stored status field — always recompute
+        // Strip any stored status field - always recompute
         return saved
             ? JSON.parse(saved).map(i => ({ ...i, status: deriveStatus(i.stock) }))
             : INITIAL_INVENTORY.map(i => ({ ...i, status: deriveStatus(i.stock) }));
@@ -93,7 +93,7 @@ const Inventory = () => {
         return matchSearch && matchStatus;
     });
 
-    // Summary counts — always live
+    // Summary counts - always live
     const outCount  = inventory.filter(i => i.status === 'OUT').length;
     const lowCount  = inventory.filter(i => i.status === 'LOW').length;
     const okCount   = inventory.filter(i => i.status === 'OK').length;
@@ -118,7 +118,7 @@ const Inventory = () => {
 
     return (
         <div className="min-h-screen bg-bg-cream font-body">
-            {/* Add Item Modal — admin only */}
+            {/* Add Item Modal - admin only */}
             {showAddModal && adminMode && (
                 <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                     <div className="bg-white rounded-[2rem] w-full max-w-md shadow-2xl p-8 animate-in zoom-in duration-200">
@@ -307,7 +307,7 @@ const Inventory = () => {
                                                     </button>
                                                 </div>
                                                 ) : (
-                                                <span className="text-[10px] font-black text-charcoal/20 uppercase tracking-widest">—</span>
+                                                <span className="text-[10px] font-black text-charcoal/20 uppercase tracking-widest">-</span>
                                                 )}
                                             </td>
                                         </tr>

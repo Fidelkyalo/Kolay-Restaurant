@@ -214,7 +214,7 @@ const POS = () => {
     const [products, setProducts] = useState(getLocalProducts);
 
     React.useEffect(() => {
-        // Always fetch fresh from API on load — clears stale localStorage cache
+        // Always fetch fresh from API on load - clears stale localStorage cache
         const refreshFromApi = async () => {
             try {
                 const response = await MenuService.getProducts();
@@ -300,7 +300,7 @@ const POS = () => {
                 syncToCache(fresh);
             }
         } catch (err) {
-            // Fallback already in localStorage — that's fine
+            // Fallback already in localStorage - that's fine
         }
 
         setNewDish({ name: '', price: '', category: 'Main Dish', image: '', desc: '' });

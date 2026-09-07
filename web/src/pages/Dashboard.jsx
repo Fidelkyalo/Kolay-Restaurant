@@ -9,7 +9,7 @@ import { isAdmin } from '../hooks/useRole';
 function Dashboard() {
     const adminMode = isAdmin();
 
-    // Staff identity — read from localStorage (set via login)
+    // Staff identity - read from localStorage (set via login)
     const staffName = (() => {
         try {
             const saved = localStorage.getItem('kolay_staff_name');
@@ -970,11 +970,11 @@ function Dashboard() {
                                         <div className="flex flex-wrap items-center gap-3 sm:gap-4">
                                             <div className="flex items-center gap-1.5 text-xs font-bold text-charcoal/60">
                                                 <Calendar className="w-3.5 h-3.5 text-secondary" />
-                                                {res.reservationDate ? new Date(res.reservationDate).toLocaleDateString() : '—'}
+                                                {res.reservationDate ? new Date(res.reservationDate).toLocaleDateString() : '-'}
                                             </div>
                                             <div className="flex items-center gap-1.5 text-xs font-bold text-charcoal/60">
                                                 <Clock className="w-3.5 h-3.5 text-secondary" />
-                                                {res.reservationTime || '—'}
+                                                {res.reservationTime || '-'}
                                             </div>
                                             <div className="flex items-center gap-1.5 text-xs font-bold text-charcoal/60">
                                                 <Users className="w-3.5 h-3.5 text-secondary" />
@@ -1028,7 +1028,7 @@ function Dashboard() {
                 </div>
             </footer>
 
-            {/* Report Preview Modal — admin only */}
+            {/* Report Preview Modal - admin only */}
             {adminMode && showReportPreview && previewData && (
                 <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
                     <div className="bg-white rounded-[2.5rem] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border border-primary/10">

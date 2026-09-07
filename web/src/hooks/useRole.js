@@ -1,4 +1,4 @@
-// Central role helper — reads from localStorage
+// Central role helper - reads from localStorage
 // Role is stored as 'admin' or 'staff' in kolay_portal_role
 
 export const getRole = () => {

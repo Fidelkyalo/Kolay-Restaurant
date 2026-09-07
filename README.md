@@ -43,14 +43,14 @@ The system will cover:
 * Reporting and analytics system
 
 ## System Users and Roles
-* Admin/Owner – Full system control
-* Manager – Daily operations supervision
-* Cashier – Billing and payments
-* Waiter – Order taking and service
-* Chef/Kitchen Staff – Food preparation tracking
-* Storekeeper – Inventory management
-* Accountant – Financial reporting
-* Customer – Ordering and reservations
+* Admin/Owner - Full system control
+* Manager - Daily operations supervision
+* Cashier - Billing and payments
+* Waiter - Order taking and service
+* Chef/Kitchen Staff - Food preparation tracking
+* Storekeeper - Inventory management
+* Accountant - Financial reporting
+* Customer - Ordering and reservations
 
 ## Methodology / Technologies Used
 * **Backend**: Java (Spring Boot)
@@ -105,7 +105,7 @@ After first startup the system seeds a default admin account:
 
 ### Local Development
 
-**Backend (Spring Boot — no MySQL required):**
+**Backend (Spring Boot - no MySQL required):**
 ```bash
 cd api
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
@@ -124,7 +124,7 @@ npm run dev
 
 The frontend is deployed on Vercel. The backend must be hosted separately (e.g. Railway, Render, Fly.io) and the `VITE_API_URL` environment variable **must** be set in Vercel's project settings to point to the live backend URL.
 
-> ⚠️ **Login will fail with "Invalid username or password"** if `VITE_API_URL` is not set — the frontend will try to reach `http://localhost:8080/api` which does not exist in the browser.
+> ⚠️ **Login will fail with "Invalid username or password"** if `VITE_API_URL` is not set - the frontend will try to reach `http://localhost:8080/api` which does not exist in the browser.
 
 **Steps:**
 1. Deploy the backend (Docker image from `api/Dockerfile`) to a cloud provider

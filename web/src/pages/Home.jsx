@@ -216,8 +216,8 @@ const Home = () => {
     ];
 
     const offers = [
-        { icon: Tag, label: 'Happy Hour', badge: 'Daily 3–6pm', title: '20% Off All Drinks', desc: 'Craft cocktails, mocktails and wines at a special rate every day of the week.', color: '#E67E22' },
-        { icon: Gift, label: 'Combo Deal', badge: 'Limited', title: 'Meal for Two — KES 3,500', desc: 'Two mains, two drinks and a shared dessert. Perfect for date night or a casual dinner.', color: '#D4A017' },
+        { icon: Tag, label: 'Happy Hour', badge: 'Daily 3-6pm', title: '20% Off All Drinks', desc: 'Craft cocktails, mocktails and wines at a special rate every day of the week.', color: '#E67E22' },
+        { icon: Gift, label: 'Combo Deal', badge: 'Limited', title: 'Meal for Two - KES 3,500', desc: 'Two mains, two drinks and a shared dessert. Perfect for date night or a casual dinner.', color: '#D4A017' },
         { icon: Repeat, label: 'Loyalty', badge: 'Members Only', title: 'Earn Points on Every Visit', desc: 'Join Kolay Rewards and earn points that convert to free meals and exclusive perks.', color: '#4E2C1E' },
     ];
 
@@ -250,7 +250,7 @@ const Home = () => {
                 <div className="absolute bottom-0 left-1/3 w-[400px] h-[400px] bg-[#D4A017]/8 rounded-full blur-[100px] pointer-events-none" />
 
                 <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 pt-32 pb-20 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                    {/* Left — Text */}
+                    {/* Left - Text */}
                     <div className="space-y-8">
                         <span className="inline-flex items-center gap-2 bg-[#E67E22]/15 border border-[#E67E22]/30 text-[#E67E22] px-5 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.35em]">
                             <span className="w-1.5 h-1.5 bg-[#E67E22] rounded-full animate-pulse" />
@@ -296,7 +296,7 @@ const Home = () => {
                         </div>
                     </div>
 
-                    {/* Right — Featured dish card stack */}
+                    {/* Right - Featured dish card stack */}
                     <div className="hidden lg:block relative h-[540px]">
                         {/* Base image */}
                         <div className="absolute inset-0 rounded-[2.5rem] overflow-hidden border border-white/5 shadow-[0_40px_100px_#00000080]">
@@ -324,7 +324,7 @@ const Home = () => {
                             </div>
                         </div>
 
-                        {/* Price badge — removed */}
+                        {/* Price badge - removed */}
                     </div>
                 </div>
 
@@ -452,7 +452,7 @@ const Home = () => {
                         </div>
 
                         <p className="text-white/50 text-lg leading-relaxed">
-                            Kolay was born from a vision — to make premium dining accessible, warm, and unforgettable. Every dish is a chapter in a story written by chefs who treat cooking as their art form.
+                            Kolay was born from a vision - to make premium dining accessible, warm, and unforgettable. Every dish is a chapter in a story written by chefs who treat cooking as their art form.
                         </p>
 
                         <div className="grid grid-cols-2 gap-6">
@@ -535,7 +535,7 @@ const Home = () => {
                         ))}
                     </div>
 
-                    {/* Items — Photo Cards */}
+                    {/* Items - Photo Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                         {menuCategories[activeMenuTab].map(item => (
                             <div
@@ -607,7 +607,7 @@ const Home = () => {
                                 <ShoppingBag className="w-7 h-7 text-[#D4A017] group-hover:text-white transition-colors" />
                             </div>
                             <h3 className="text-white font-black text-xl mb-3">Takeaway</h3>
-                            <p className="text-white/40 text-sm leading-relaxed mb-6">Pre-order and collect your food ready and waiting — zero wait time.</p>
+                            <p className="text-white/40 text-sm leading-relaxed mb-6">Pre-order and collect your food ready and waiting - zero wait time.</p>
                             <Link to="/order?type=takeaway" className="inline-flex items-center gap-2 bg-[#D4A017] text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#E67E22] transition-all">
                                 Order Takeaway <ArrowRight className="w-4 h-4" />
                             </Link>
@@ -717,7 +717,7 @@ const Home = () => {
                                 </div>
                             </div>
 
-                            {/* Right — Form */}
+                            {/* Right - Form */}
                             <div className="bg-white/3 border border-white/8 rounded-3xl p-8">
                                 {reservationSuccess ? (
                                     <div className="text-center py-12">
@@ -790,7 +790,7 @@ const Home = () => {
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                        {/* Left — Map + Info */}
+                        {/* Left - Map + Info */}
                         <div className="space-y-6">
                             {/* Embedded map */}
                             <div className="rounded-3xl overflow-hidden border border-white/8 h-72">
@@ -824,7 +824,7 @@ const Home = () => {
                             </div>
                         </div>
 
-                        {/* Right — Contact Form */}
+                        {/* Right - Contact Form */}
                         <div className="bg-white/3 border border-white/8 rounded-3xl p-8">
                             <h3 className="text-white font-black text-xl mb-6">Send us a Message</h3>
                             <form className="space-y-4" onSubmit={e => e.preventDefault()}>
@@ -865,7 +865,7 @@ const Home = () => {
                         )}
                     </div>
 
-                    {/* Submit form — only for logged-in customers */}
+                    {/* Submit form - only for logged-in customers */}
                     {customer && !alreadyRated && !ratingSubmitted && (
                         <form onSubmit={handleRatingSubmit} className="bg-white/5 border border-white/8 rounded-3xl p-8 mb-12 backdrop-blur-sm">
                             <p className="text-white font-black text-lg mb-6">
@@ -924,7 +924,7 @@ const Home = () => {
                         </div>
                     )}
 
-                    {/* Not logged in — show prompt but reviews still visible below */}
+                    {/* Not logged in - show prompt but reviews still visible below */}
                     {!customer && (
                         <div className="bg-white/3 border border-white/8 rounded-3xl p-8 mb-12 text-center">
                             <Star className="w-8 h-8 text-white/20 mx-auto mb-3" />

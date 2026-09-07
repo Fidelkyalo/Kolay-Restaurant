@@ -177,7 +177,7 @@ function AdminPanel() {
                 apiSuccess = true;
             }
         } catch {
-            // API unavailable — will fall back to local update
+            // API unavailable - will fall back to local update
         }
 
         // Re-fetch authoritative list from API
@@ -191,7 +191,7 @@ function AdminPanel() {
                 }));
 
                 // If the API create/update failed, the re-fetch won't contain the
-                // new/edited item — merge it in manually so it still shows up everywhere.
+                // new/edited item - merge it in manually so it still shows up everywhere.
                 if (!apiSuccess) {
                     if (editingId) {
                         fresh = fresh.map(p =>
@@ -405,7 +405,7 @@ function AdminPanel() {
                                     {/* info */}
                                     <div className="p-5">
                                         <h3 className="font-bold text-primary text-base leading-tight mb-1 line-clamp-1">{item.name}</h3>
-                                        <p className="text-charcoal/40 text-xs line-clamp-2 mb-4 leading-relaxed">{item.desc || item.description || '—'}</p>
+                                        <p className="text-charcoal/40 text-xs line-clamp-2 mb-4 leading-relaxed">{item.desc || item.description || '-'}</p>
                                         <div className="flex items-center justify-between">
                                             <span className="text-secondary font-black text-lg">KES {Number(item.price).toLocaleString()}</span>
                                             <div className="flex gap-2">

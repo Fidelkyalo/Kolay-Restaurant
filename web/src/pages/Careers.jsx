@@ -292,7 +292,7 @@ export default function Careers() {
                                 {flow === 'choose' && 'How would you like to proceed?'}
                                 {flow === 'register' && 'Create Your Account'}
                                 {flow === 'login' && 'Sign In'}
-                                {flow === 'apply' && `Apply — ${selectedJob?.title}`}
+                                {flow === 'apply' && `Apply - ${selectedJob?.title}`}
                                 {flow === 'renewal' && 'Contract Renewal'}
                             </h2>
                             <button onClick={() => setFlow(null)} className="p-2 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">
@@ -385,7 +385,7 @@ export default function Careers() {
                                         Applying as: {account?.name} ({account?.email})
                                     </div>
 
-                                    {/* Profile Photo — required for new hire applications */}
+                                    {/* Profile Photo - required for new hire applications */}
                                     {flowType === 'new' && (
                                         <div>
                                             <label className={`${labelCls} flex items-center gap-1`}>

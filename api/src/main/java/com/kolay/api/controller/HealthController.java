@@ -32,7 +32,7 @@ public class HealthController {
         return response;
     }
 
-    // Temporary diagnostic endpoint — remove after fixing auth
+    // Temporary diagnostic endpoint - remove after fixing auth
     @GetMapping("/auth-debug")
     public Map<String, Object> authDebug(@RequestParam String username,
                                           @RequestParam String password) {
