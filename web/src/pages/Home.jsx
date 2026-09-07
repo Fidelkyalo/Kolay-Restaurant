@@ -274,12 +274,12 @@ const Home = () => {
                                 Order Online
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </Link>
-                            <a
-                                href="#reservations"
+                            <Link
+                                to="/reservations"
                                 className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300"
                             >
                                 <Calendar className="w-4 h-4" /> Book a Table
-                            </a>
+                            </Link>
                         </div>
 
                         {/* Quick info pills */}
@@ -999,7 +999,11 @@ const Home = () => {
                             <ul className="space-y-3">
                                 {['Home', 'About', 'Menu', 'Order', 'Offers', 'Gallery', 'Reservations', 'Contact'].map(l => (
                                     <li key={l}>
-                                        <a href={`#${l.toLowerCase()}`} className="text-white/30 hover:text-[#E67E22] text-sm transition-colors font-medium">{l}</a>
+                                        {l === 'Reservations' ? (
+                                            <Link to="/reservations" className="text-white/30 hover:text-[#E67E22] text-sm transition-colors font-medium">{l}</Link>
+                                        ) : (
+                                            <a href={`#${l.toLowerCase()}`} className="text-white/30 hover:text-[#E67E22] text-sm transition-colors font-medium">{l}</a>
+                                        )}
                                     </li>
                                 ))}
                             </ul>
