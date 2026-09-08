@@ -6,8 +6,10 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { OrderService, InventoryService } from '../services/api';
 import { isAdmin } from '../hooks/useRole';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 function Dashboard() {
+    const { t } = useLanguage();
     const adminMode = isAdmin();
 
     // Staff identity - read from localStorage (set via login)
@@ -1089,7 +1091,7 @@ function Dashboard() {
                                                         <div className="flex flex-col">
                                                             <span className="font-black text-xs text-secondary">#{o.id}</span>
                                                             <span className="text-primary/60 text-xs">
-                                                                {(o.items || []).map(i => `${i.quantity || 1}x ${i.name || 'Unknown'}`).join(', ')}
+                                                                {(o.items || []).map(i => `${i.quantity || 1}x ${t(i.name || 'Unknown')}`).join(', ')}
                                                             </span>
                                                         </div>
                                                     </td>

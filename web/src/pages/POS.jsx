@@ -5,8 +5,10 @@ import Navbar from '../components/Navbar';
 import { MenuService, OrderService } from '../services/api';
 import { isAdmin } from '../hooks/useRole';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 const POS = () => {
+    const { t } = useLanguage();
     const adminMode = isAdmin();
     const [activeCategory, setActiveCategory] = useState('All');
     const [cart, setCart] = useState([]);
@@ -609,11 +611,11 @@ const POS = () => {
                                         product.image
                                     )}
                                 </div>
-                                <h3 className="font-bold text-primary mb-1 text-sm sm:text-base">{product.name}</h3>
+                                <h3 className="font-bold text-primary mb-1 text-sm sm:text-base">{t(product.name)}</h3>
                                 <p className="text-secondary font-bold text-sm">KES {product.price.toLocaleString()}</p>
                                 <div className="mt-4 flex justify-between items-center text-[10px] text-charcoal/40 uppercase tracking-widest font-bold">
-                                    <span>{product.category}</span>
-                                    <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded">In Stock</span>
+                                    <span>{t(product.category)}</span>
+                                    <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded">{t('In Stock')}</span>
                                 </div>
                             </div>
                         ))}
@@ -655,7 +657,7 @@ const POS = () => {
                                 <ArrowLeft className="w-5 h-5" />
                             </button>
                             <h2 className="text-lg sm:text-xl font-bold text-primary flex items-center gap-2">
-                                <ShoppingCart className="w-5 h-5 text-secondary" /> Current Order
+                                <ShoppingCart className="w-5 h-5 text-secondary" /> {t('Current Order')}
                             </h2>
                         </div>
                         <span className="bg-primary text-white px-3 py-1 rounded-full text-xs font-bold">
@@ -666,8 +668,8 @@ const POS = () => {
                     {/* Cart Items */}
                     <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar bg-bg-cream/20">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-[10px] font-black uppercase text-charcoal/40 tracking-widest">Order Details</h3>
-                            <button onClick={() => setCart([])} className="text-[10px] font-black text-red-500 hover:text-red-700 uppercase tracking-tighter hover:underline">Clear Cart</button>
+                            <h3 className="text-[10px] font-black uppercase text-charcoal/40 tracking-widest">{t('Order Summary')}</h3>
+                            <button onClick={() => setCart([])} className="text-[10px] font-black text-red-500 hover:text-red-700 uppercase tracking-tighter hover:underline">{t('Clear Cart')}</button>
                         </div>
                         {cart.length === 0 ? (
                             <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
@@ -691,7 +693,7 @@ const POS = () => {
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex justify-between items-start mb-1">
-                                            <h4 className="font-bold text-primary text-sm line-clamp-1">{item.name}</h4>
+                                            <h4 className="font-bold text-primary text-sm line-clamp-1">{t(item.name)}</h4>
                                             <button onClick={(e) => { e.stopPropagation(); removeFromCart(item.id); }} className="text-red-300 hover:text-red-500 transition-colors">
                                                 <X className="w-4 h-4" />
                                             </button>
@@ -714,22 +716,22 @@ const POS = () => {
                     <div className="p-8 bg-white border-t border-cream space-y-6 shadow-[0_-20px_40px_-20px_rgba(0,0,0,0.1)] relative z-20">
                         <div className="space-y-3">
                             <div className="flex justify-between text-xs font-bold text-charcoal/40 uppercase tracking-widest">
-                                <span>Subtotal</span>
+                                <span>{t('Subtotal')}</span>
                                 <span>KES {subtotal.toLocaleString()}</span>
                             </div>
                             <div className="flex justify-between text-xs font-bold text-charcoal/40 uppercase tracking-widest">
-                                <span>Tax (16%)</span>
+                                <span>{t('Tax')}</span>
                                 <span>KES {tax.toLocaleString()}</span>
                             </div>
                             <div className="flex justify-between items-end pt-4 border-t border-cream/50">
-                                <span className="font-black text-primary text-lg">Total</span>
+                                <span className="font-black text-primary text-lg">{t('Total')}</span>
                                 <span className="font-black text-secondary text-3xl tracking-tighter">KES {total.toLocaleString()}</span>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <button className="flex items-center justify-center gap-3 py-4 rounded-2xl border-2 border-cream font-black text-charcoal/40 hover:bg-bg-cream transition-all text-xs uppercase tracking-widest">
-                                <User className="w-5 h-5" /> Guest
+                                <User className="w-5 h-5" /> {t('Guest')}
                             </button>
                             <button
                                 onClick={() => setShowTableModal(true)}
@@ -744,7 +746,7 @@ const POS = () => {
                             disabled={cart.length === 0}
                             className="w-full bg-primary hover:bg-charcoal text-white font-black py-5 rounded-2xl shadow-2xl shadow-primary/20 transition-all active:transform active:scale-95 flex items-center justify-center gap-4 disabled:opacity-50 disabled:cursor-not-allowed text-xl uppercase tracking-widest group"
                         >
-                            <CreditCard className="w-6 h-6 text-accent group-hover:rotate-12 transition-transform" /> Place Order
+                            <CreditCard className="w-6 h-6 text-accent group-hover:rotate-12 transition-transform" /> {t('Place Order')}
                         </button>
                     </div>
                 </div>

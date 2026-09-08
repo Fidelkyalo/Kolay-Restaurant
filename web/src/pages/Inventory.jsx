@@ -3,14 +3,15 @@ import { Package, AlertTriangle, Plus, Search, RefreshCw, Filter, TrendingDown, 
 import Navbar from '../components/Navbar';
 import { isAdmin } from '../hooks/useRole';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 // Low-stock threshold - items below this number are flagged LOW
 const LOW_THRESHOLD = 20;
 
 // Status is always derived from stock quantity - never stored manually
 const deriveStatus = (stock) => {
-    if (stock === 0) return 'OUT';
-    if (stock < LOW_THRESHOLD) return 'LOW';
+    if (stock <= 0) return 'OUT';
+    if (stock <= LOW_THRESHOLD) return 'LOW';
     return 'OK';
 };
 
@@ -26,6 +27,7 @@ const INITIAL_INVENTORY = [
 ];
 
 const Inventory = () => {
+    const { t } = useLanguage();
     const adminMode = isAdmin();
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All Items');
@@ -266,11 +268,11 @@ const Inventory = () => {
                                     {filtered.map(item => (
                                         <tr key={item.id} className={`hover:bg-bg-cream/30 transition-colors ${item.status === 'OUT' ? 'bg-red-50/30' : item.status === 'LOW' ? 'bg-orange-50/30' : ''}`}>
                                             <td className="px-6 py-5">
-                                                <p className="font-bold text-primary">{item.name}</p>
+                                                <p className="font-bold text-primary">{t(item.name)}</p>
                                                 <p className="text-[10px] text-charcoal/40 uppercase font-bold">SKU: KOL-{String(item.id).slice(-4)}</p>
                                             </td>
                                             <td className="px-6 py-5">
-                                                <span className="text-[10px] font-black uppercase px-3 py-1 bg-bg-cream border border-cream rounded-full text-charcoal/60">{item.category}</span>
+                                                <span className="text-[10px] font-black uppercase px-3 py-1 bg-bg-cream border border-cream rounded-full text-charcoal/60">{t(item.category)}</span>
                                             </td>
                                             <td className="px-6 py-5">
                                                 {adminMode ? (

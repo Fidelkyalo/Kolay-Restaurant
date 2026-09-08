@@ -4,8 +4,10 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { OrderService } from '../services/api';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 const KDS = () => {
+    const { t } = useLanguage();
     const [allOrders, setAllOrders] = useState([]);
     const activeOrders = allOrders.filter(o => o.status === 'PENDING' || o.status === 'PREPARING');
     const completedToday = allOrders.filter(o => o.status === 'READY' || o.status === 'SERVED').length;
@@ -125,7 +127,7 @@ const KDS = () => {
                             {/* Ticket Header */}
                             <div className={`p-4 sm:p-6 flex justify-between items-center ${order.status === 'PREPARING' ? 'bg-secondary' : 'bg-white/5'}`}>
                                 <div>
-                                    <span className="text-[10px] sm:text-xs font-bold opacity-60 uppercase tracking-widest">{order.status}</span>
+                                    <span className="text-[10px] sm:text-xs font-bold opacity-60 uppercase tracking-widest">{t(order.status)}</span>
                                     <h2 className="text-xl sm:text-2xl font-bold">{order.table}</h2>
                                     {order.source === 'online' && (
                                         <span className="text-[10px] font-black bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full uppercase tracking-widest mt-1 inline-block">🌐 Online Order</span>
@@ -148,7 +150,7 @@ const KDS = () => {
                                             {item.quantity}
                                         </div>
                                         <div className="flex-1">
-                                            <h3 className="text-base sm:text-lg font-bold tracking-tight">{item.name}</h3>
+                                            <h3 className="text-base sm:text-lg font-bold tracking-tight">{t(item.name)}</h3>
                                             {item.notes && <p className="text-xs sm:text-sm text-secondary italic font-medium mt-1">Note: {item.notes}</p>}
                                         </div>
                                     </div>

@@ -3,6 +3,7 @@ import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, ArrowRight, CreditCa
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MenuService, OrderService } from '../services/api';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 const MENU_DEFAULTS = [
     { id: 1,  name: 'Gourmet Beef Burger',    price: 1200, category: 'Main Dish',  image: '/assets/burger.png',  desc: 'Aged wagyu beef, truffle aioli.' },
@@ -58,6 +59,7 @@ const getActiveSpecialties = () => {
 };
 
 const GuestMenu = () => {
+    const { t } = useLanguage();
     const [dishes, setDishes] = useState(() => [...getLocalDishes(), ...getActiveSpecialties()]);
     const [cart, setCart] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
@@ -392,12 +394,12 @@ const GuestMenu = () => {
                                 )}
                                 <div className="absolute inset-0 bg-gradient-to-t from-[#0D0A07] via-transparent to-transparent" />
                                 <span className="absolute top-4 left-4 bg-white/10 backdrop-blur-md border border-white/10 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg">
-                                    {dish.category}
+                                    {t(dish.category)}
                                 </span>
                             </div>
 
                             <div className="p-6">
-                                <h3 className="text-white font-black text-lg group-hover:text-[#E67E22] transition-colors mb-2 leading-tight line-clamp-1">{dish.name}</h3>
+                                <h3 className="text-white font-black text-lg group-hover:text-[#E67E22] transition-colors mb-2 leading-tight line-clamp-1">{t(dish.name)}</h3>
                                 <p className="text-white/30 text-xs leading-relaxed line-clamp-2 mb-6">{dish.desc || 'Finest local ingredients, gourmet prep.'}</p>
                                 <div className="flex justify-between items-center mt-auto">
                                     <div>

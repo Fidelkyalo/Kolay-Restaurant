@@ -3,6 +3,7 @@ import { Sparkles, Plus, Trash2, Edit3, X, Check, Calendar, Tag, Star, ChevronDo
 import Navbar from '../components/Navbar';
 import { isAdmin } from '../hooks/useRole';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 const EMPTY_FORM = {
     id: null,
@@ -58,6 +59,7 @@ const getMenuDishes = () => {
 };
 
 export default function Specialties() {
+    const { t } = useLanguage();
     const adminMode = isAdmin();
     const [specialties, setSpecialties] = useState(getSpecialties);
     const [menuDishes, setMenuDishes] = useState(getMenuDishes);
@@ -398,7 +400,7 @@ export default function Specialties() {
 
                                     <div className="p-5">
                                         <div className="flex items-start justify-between gap-2 mb-1">
-                                            <h3 className="font-black text-primary text-base leading-tight">{sp.name}</h3>
+                                            <h3 className="font-black text-primary text-base leading-tight">{t(sp.name)}</h3>
                                         </div>
                                         <p className="text-[11px] text-secondary font-black uppercase tracking-widest mb-2">{sp.season}</p>
                                         {sp.description && <p className="text-charcoal/50 text-xs mb-3 line-clamp-2">{sp.description}</p>}
