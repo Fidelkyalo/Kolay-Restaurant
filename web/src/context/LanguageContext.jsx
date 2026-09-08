@@ -1608,28 +1608,71 @@ export const translations = {
 const LanguageContext = createContext(null);
 
 export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState(() => {
+  const [language, setLanguageState] = useState(() => {
     return localStorage.getItem('kolay_language') || 'en';
   });
 
+  const changeLanguage = (newLang) => {
+    setLanguageState(newLang);
+    localStorage.setItem('kolay_language', newLang);
+    const lang = LANGUAGES.find(l => l.code === newLang);
+    if (lang) {
+      document.documentElement.dir = lang.dir;
+      document.documentElement.lang = newLang;
+    }
+    window.dispatchEvent(new Event('storage'));
+    window.dispatchEvent(new CustomEvent('kolay_language_changed', { detail: newLang }));
+  };
+
   useEffect(() => {
-    localStorage.setItem('kolay_language', language);
     const lang = LANGUAGES.find(l => l.code === language);
     if (lang) {
       document.documentElement.dir = lang.dir;
       document.documentElement.lang = language;
     }
+
+    const handleStorage = (e) => {
+      if ((e.key === 'kolay_language' || !e.key) && localStorage.getItem('kolay_language')) {
+        const val = localStorage.getItem('kolay_language');
+        if (val && val !== language) setLanguageState(val);
+      }
+    };
+    const handleCustom = (e) => {
+      if (e.detail && e.detail !== language) {
+        setLanguageState(e.detail);
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('kolay_language_changed', handleCustom);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('kolay_language_changed', handleCustom);
+    };
   }, [language]);
 
-  const t = (key) => {
+  const t = (key, fallback) => {
+    if (!key) return fallback || '';
     const dict = translations[language] || translations['en'];
-    return dict[key] ?? translations['en'][key] ?? key;
+    const underscoreKey = key.includes('.') ? key.replace(/\./g, '_') : key;
+    const dotKey = key.includes('_') ? key.replace(/_/g, '.') : key;
+
+    if (dict[key] !== undefined) return dict[key];
+    if (dict[underscoreKey] !== undefined) return dict[underscoreKey];
+    if (dict[dotKey] !== undefined) return dict[dotKey];
+
+    const enDict = translations['en'];
+    if (enDict[key] !== undefined) return enDict[key];
+    if (enDict[underscoreKey] !== undefined) return enDict[underscoreKey];
+    if (enDict[dotKey] !== undefined) return enDict[dotKey];
+
+    return fallback || key;
   };
 
   const currentLang = LANGUAGES.find(l => l.code === language) || LANGUAGES[0];
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t, currentLang, languages: LANGUAGES }}>
+    <LanguageContext.Provider value={{ language, setLanguage: changeLanguage, t, currentLang, languages: LANGUAGES }}>
       {children}
     </LanguageContext.Provider>
   );

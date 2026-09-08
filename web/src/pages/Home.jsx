@@ -8,8 +8,10 @@ import PublicNavbar from '../components/PublicNavbar';
 import { Link } from 'react-router-dom';
 import { MenuService } from '../services/api';
 import LanguageSelector from '../components/LanguageSelector';
+import { useLanguage } from '../context/LanguageContext';
 
 const Home = () => {
+    const { t } = useLanguage();
     const [reservationSuccess, setReservationSuccess] = useState(false);
     const [activeMenuTab, setActiveMenuTab] = useState('Starters');
 
@@ -255,16 +257,16 @@ const Home = () => {
                     <div className="space-y-8">
                         <span className="inline-flex items-center gap-2 bg-[#E67E22]/15 border border-[#E67E22]/30 text-[#E67E22] px-5 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.35em]">
                             <span className="w-1.5 h-1.5 bg-[#E67E22] rounded-full animate-pulse" />
-                            Fine Dining · Nairobi
+                            {t('home_hero_subtitle', 'Fine Dining · Nairobi')}
                         </span>
 
                         <h1 className="font-display font-black text-white leading-tight tracking-tight">
                             <span className="block text-[clamp(2.5rem,6vw,5rem)] text-white">Kolay Restaurant</span>
-                            <span className="block text-[clamp(1.5rem,3.5vw,2.8rem)] italic text-[#E67E22] mt-1">Where Every Meal Feels Right.</span>
+                            <span className="block text-[clamp(1.5rem,3.5vw,2.8rem)] italic text-[#E67E22] mt-1">{t('home_hero_title_1', 'Where Every Dish')} {t('home_hero_title_2', 'Tells a Story')}</span>
                         </h1>
 
                         <p className="text-lg text-white/50 leading-relaxed max-w-md font-medium">
-                            Experience the perfect union of tradition and contemporary culinary mastery, crafted by award-winning chefs in the heart of the city.
+                            {t('home_hero_desc', 'Experience the perfect union of tradition and contemporary culinary mastery, crafted by award-winning chefs in the heart of the city.')}
                         </p>
 
                         <div className="flex flex-wrap gap-4 pt-2">
@@ -272,14 +274,14 @@ const Home = () => {
                                 to="/order"
                                 className="group flex items-center gap-3 bg-[#E67E22] hover:bg-[#D4A017] text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300 shadow-[0_0_40px_#E67E2240]"
                             >
-                                Order Online
+                                {t('menu_order_online', 'Order Online')}
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </Link>
                             <Link
                                 to="/reservations"
                                 className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300"
                             >
-                                <Calendar className="w-4 h-4" /> Book a Table
+                                <Calendar className="w-4 h-4" /> {t('home_reserve_table', 'Book a Table')}
                             </Link>
                         </div>
 
