@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { MenuService, OrderService } from '../services/api';
 import { isAdmin } from '../hooks/useRole';
+import Footer from '../components/Footer';
 
 const POS = () => {
     const adminMode = isAdmin();
@@ -834,6 +835,7 @@ const POS = () => {
                     </div>
                 )}
             </div>
+            <Footer variant="compact" />
         </div>
     );
 };

@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { LanguageProvider } from './context/LanguageContext';
 import Dashboard from './pages/Dashboard';
 import POS from './pages/POS';
 import KDS from './pages/KDS';
@@ -21,29 +22,31 @@ import './index.css';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/order" element={<GuestMenu />} />
-        <Route path="/reservations" element={<Reservations />} />
-        <Route path="/admin/reservations" element={<ManageReservations />} />
-        <Route path="/my-bookings" element={<MyBookings />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/pos" element={<POS />} />
-        <Route path="/kds" element={<KDS />} />
-        <Route path="/inventory" element={<Inventory />} />
-        <Route path="/admin" element={<AdminPanel />} />
-        <Route path="/specialties" element={<Specialties />} />
-        <Route path="/careers" element={<Careers />} />
-        <Route path="/admin/careers" element={<AdminCareers />} />
-        <Route path="/employees" element={<Employees />} />
-        <Route path="/staff" element={<Login defaultPortal="staff" />} />
-        <Route path="/admin-portal" element={<Login defaultPortal="admin" />} />
-        <Route path="/login" element={<Login defaultPortal="staff" />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/customer-login" element={<CustomerLogin />} />
-      </Routes>
-    </Router>
+    <LanguageProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/order" element={<GuestMenu />} />
+          <Route path="/reservations" element={<Reservations />} />
+          <Route path="/admin/reservations" element={<ManageReservations />} />
+          <Route path="/my-bookings" element={<MyBookings />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/pos" element={<POS />} />
+          <Route path="/kds" element={<KDS />} />
+          <Route path="/inventory" element={<Inventory />} />
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/specialties" element={<Specialties />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/admin/careers" element={<AdminCareers />} />
+          <Route path="/employees" element={<Employees />} />
+          <Route path="/staff" element={<Login defaultPortal="staff" />} />
+          <Route path="/admin-portal" element={<Login defaultPortal="admin" />} />
+          <Route path="/login" element={<Login defaultPortal="staff" />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/customer-login" element={<CustomerLogin />} />
+        </Routes>
+      </Router>
+    </LanguageProvider>
   );
 }
 

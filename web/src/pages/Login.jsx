@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChefHat, Lock, User, Eye, EyeOff, Loader2, Shield, Users } from 'lucide-react';
 import { setRole } from '../hooks/useRole';
 import { AuthService } from '../services/api';
+import LanguageSelector from '../components/LanguageSelector';
 
 // Hardcoded credentials for the staff/admin portal UI
 const CREDENTIALS = {
@@ -174,8 +175,9 @@ const Login = ({ defaultPortal = 'staff' }) => {
                     </form>
                 </div>
 
-                <div className="p-6 bg-bg-cream/30 border-t border-cream flex justify-center">
+                <div className="p-6 bg-bg-cream/30 border-t border-cream flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-xs text-charcoal/40">Powered by Kolay Management Platform</p>
+                    <LanguageSelector variant="light" />
                 </div>
             </div>
         </div>

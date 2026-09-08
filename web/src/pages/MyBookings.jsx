@@ -7,6 +7,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import PublicNavbar from '../components/PublicNavbar';
 import { ReservationService } from '../services/api';
+import Footer from '../components/Footer';
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 const LS_KEY = 'kolay_reservations_local';
@@ -342,6 +343,7 @@ export default function MyBookings() {
                     </div>
                 </div>
             )}
+            <Footer />
         </div>
     );
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Package, AlertTriangle, Plus, Search, RefreshCw, Filter, TrendingDown, CheckCircle, XCircle } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { isAdmin } from '../hooks/useRole';
+import Footer from '../components/Footer';
 
 // Low-stock threshold - items below this number are flagged LOW
 const LOW_THRESHOLD = 20;
@@ -325,6 +326,7 @@ const Inventory = () => {
                     </div>
                 </div>
             </div>
+            <Footer variant="compact" />
         </div>
     );
 };

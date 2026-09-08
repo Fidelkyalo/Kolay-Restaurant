@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, UserPlus, LogIn, ChevronRight, Star, BookOpen } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 
 const PublicNavbar = () => {
+    const { t } = useLanguage();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const navigate = useNavigate();
@@ -26,12 +28,12 @@ const PublicNavbar = () => {
     }, []);
 
     const navLinks = [
-        { name: 'About',        href: '/#about' },
-        { name: 'Menu',         href: '/#menu' },
-        { name: 'Reservations', href: '/reservations' },
-        { name: 'Gallery',      href: '/#gallery' },
-        { name: 'Contact',      href: '/#contact' },
-        { name: 'Careers',      href: '/careers' },
+        { name: t('nav.about'),        href: '/#about' },
+        { name: t('nav.menu'),         href: '/#menu' },
+        { name: t('nav.reservations'), href: '/reservations' },
+        { name: t('nav.gallery'),      href: '/#gallery' },
+        { name: t('nav.contact'),      href: '/#contact' },
+        { name: t('nav.careers'),      href: '/careers' },
     ];
 
     // Smooth-scroll for hash links on the same page

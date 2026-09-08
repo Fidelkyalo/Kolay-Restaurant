@@ -7,6 +7,7 @@ import {
 import PublicNavbar from '../components/PublicNavbar';
 import { Link } from 'react-router-dom';
 import { MenuService } from '../services/api';
+import LanguageSelector from '../components/LanguageSelector';
 
 const Home = () => {
     const [reservationSuccess, setReservationSuccess] = useState(false);
@@ -1042,7 +1043,8 @@ const Home = () => {
 
                     <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-white/20 font-black uppercase tracking-widest">
                         <p>© 2026 Kolay Restaurant. All rights reserved.</p>
-                        <div className="flex gap-8">
+                        <div className="flex flex-wrap items-center gap-6">
+                            <LanguageSelector variant="dark" />
                             <span className="cursor-pointer hover:text-white/50 transition-colors">Privacy Policy</span>
                             <span className="cursor-pointer hover:text-white/50 transition-colors">Terms of Use</span>
                             <Link to="/staff" className="cursor-pointer hover:text-[#E67E22] transition-colors">Staff Portal</Link>

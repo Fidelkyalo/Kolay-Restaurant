@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Briefcase, MapPin, Clock, ChevronDown, ChevronUp, ArrowRight, Check, X, User, RefreshCw, Upload, Camera } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
 import { ApplicationService } from '../services/api';
+import Footer from '../components/Footer';
 
 const getJobs = () => {
     try { return JSON.parse(localStorage.getItem('kolay_jobs') || '[]').filter(j => j.isOpen); }
@@ -467,6 +468,8 @@ export default function Careers() {
                     </div>
                 </div>
             )}
+
+            <Footer />
         </div>
     );
 }

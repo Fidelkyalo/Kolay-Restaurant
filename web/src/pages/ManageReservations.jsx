@@ -6,6 +6,7 @@ import {
 import Navbar from '../components/Navbar';
 import { ReservationService } from '../services/api';
 import { isAdmin } from '../hooks/useRole';
+import Footer from '../components/Footer';
 
 // ── Helpers for local reservation store (used for assignment persistence) ──
 const LS_KEY = 'kolay_reservations_local';
@@ -657,6 +658,7 @@ const ManageReservations = () => {
                     </div>
                 </div>
             )}
+            <Footer variant="compact" />
         </div>
     );
 };

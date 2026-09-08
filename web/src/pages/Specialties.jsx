@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sparkles, Plus, Trash2, Edit3, X, Check, Calendar, Tag, Star, ChevronDown } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { isAdmin } from '../hooks/useRole';
+import Footer from '../components/Footer';
 
 const EMPTY_FORM = {
     id: null,
@@ -442,6 +443,7 @@ export default function Specialties() {
                     </div>
                 )}
             </main>
+            <Footer variant="compact" />
         </div>
     );
 }

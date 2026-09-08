@@ -3,6 +3,7 @@ import { Clock, CheckCircle2, AlertCircle, ChefHat, Timer, ArrowRight, History, 
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { OrderService } from '../services/api';
+import Footer from '../components/Footer';
 
 const KDS = () => {
     const [allOrders, setAllOrders] = useState([]);
@@ -206,6 +207,7 @@ const KDS = () => {
                     </div>
                 </div>
             </div>
+            <Footer variant="compact" />
         </div>
     );
 };

@@ -6,31 +6,10 @@ import {
     Briefcase, Users, ClipboardList
 } from 'lucide-react';
 import { getRole, clearRole } from '../hooks/useRole';
-
-// Links visible to STAFF only
-const STAFF_LINKS = [
-    { name: 'Dashboard',         path: '/dashboard',          icon: <Home className="w-4 h-4" /> },
-    { name: 'Menu',              path: '/pos',                icon: <LayoutGrid className="w-4 h-4" /> },
-    { name: 'KDS',               path: '/kds',                icon: <Monitor className="w-4 h-4" /> },
-    { name: 'Inventory',         path: '/inventory',          icon: <Package className="w-4 h-4" /> },
-    { name: 'Bookings',          path: '/admin/reservations', icon: <Calendar className="w-4 h-4" /> },
-    { name: 'Specialties',       path: '/specialties',        icon: <Sparkles className="w-4 h-4" /> },
-    { name: 'Orders',            path: '/kds',                icon: <ClipboardList className="w-4 h-4" /> },
-];
-
-// Links visible to ADMIN only (full set)
-const ADMIN_LINKS = [
-    { name: 'Dashboard',         path: '/dashboard',          icon: <Home className="w-4 h-4" /> },
-    { name: 'Menu',              path: '/pos',                icon: <LayoutGrid className="w-4 h-4" /> },
-    { name: 'KDS',               path: '/kds',                icon: <Monitor className="w-4 h-4" /> },
-    { name: 'Inventory',         path: '/inventory',          icon: <Package className="w-4 h-4" /> },
-    { name: 'Bookings',          path: '/admin/reservations', icon: <Calendar className="w-4 h-4" /> },
-    { name: 'Specialties',       path: '/specialties',        icon: <Sparkles className="w-4 h-4" /> },
-    { name: 'Careers',           path: '/admin/careers',      icon: <Briefcase className="w-4 h-4" /> },
-    { name: 'Employees',         path: '/employees',          icon: <Users className="w-4 h-4" /> },
-];
+import { useLanguage } from '../context/LanguageContext';
 
 const Navbar = () => {
+    const { t } = useLanguage();
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [role, setRoleState] = useState(getRole);
@@ -51,6 +30,29 @@ const Navbar = () => {
         window.addEventListener('storage', handler);
         return () => window.removeEventListener('storage', handler);
     }, []);
+
+    // Links visible to STAFF only
+    const STAFF_LINKS = [
+        { name: t('nav.dashboard'),   path: '/dashboard',          icon: <Home className="w-4 h-4" /> },
+        { name: t('nav.menu'),        path: '/pos',                icon: <LayoutGrid className="w-4 h-4" /> },
+        { name: t('nav.kds'),         path: '/kds',                icon: <Monitor className="w-4 h-4" /> },
+        { name: t('nav.inventory'),   path: '/inventory',          icon: <Package className="w-4 h-4" /> },
+        { name: t('nav.bookings'),    path: '/admin/reservations', icon: <Calendar className="w-4 h-4" /> },
+        { name: t('nav.specialties'), path: '/specialties',        icon: <Sparkles className="w-4 h-4" /> },
+        { name: 'Orders',             path: '/kds',                icon: <ClipboardList className="w-4 h-4" /> },
+    ];
+
+    // Links visible to ADMIN only (full set)
+    const ADMIN_LINKS = [
+        { name: t('nav.dashboard'),   path: '/dashboard',          icon: <Home className="w-4 h-4" /> },
+        { name: t('nav.menu'),        path: '/pos',                icon: <LayoutGrid className="w-4 h-4" /> },
+        { name: t('nav.kds'),         path: '/kds',                icon: <Monitor className="w-4 h-4" /> },
+        { name: t('nav.inventory'),   path: '/inventory',          icon: <Package className="w-4 h-4" /> },
+        { name: t('nav.bookings'),    path: '/admin/reservations', icon: <Calendar className="w-4 h-4" /> },
+        { name: t('nav.specialties'), path: '/specialties',        icon: <Sparkles className="w-4 h-4" /> },
+        { name: t('nav.careers'),     path: '/admin/careers',      icon: <Briefcase className="w-4 h-4" /> },
+        { name: t('nav.employees'),   path: '/employees',          icon: <Users className="w-4 h-4" /> },
+    ];
 
     const isAdmin = role === 'admin';
     const links = isAdmin ? ADMIN_LINKS : STAFF_LINKS;

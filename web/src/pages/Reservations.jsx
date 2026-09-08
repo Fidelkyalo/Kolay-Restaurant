@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calendar, Clock, Users, MessageSquare, Phone, Mail, User, CheckCircle2, ArrowRight } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
 import { ReservationService } from '../services/api';
+import Footer from '../components/Footer';
 
 const Reservations = () => {
     const [formData, setFormData] = useState({
@@ -286,6 +287,7 @@ const Reservations = () => {
                     </div>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 };

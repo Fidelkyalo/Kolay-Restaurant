@@ -5,6 +5,7 @@ import {
     ChevronDown, ChevronUp, Image, Link, Upload, Eye
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 // ── Persistence helpers ───────────────────────────────────────────────────────
 const LS_KEY = 'kolay_employees';
@@ -688,6 +689,7 @@ export default function Employees() {
                     />
                 )}
             </main>
+            <Footer variant="compact" />
         </div>
     );
 }

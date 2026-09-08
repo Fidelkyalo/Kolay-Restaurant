@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { AuthService } from '../services/api';
 import { setRole } from '../hooks/useRole';
+import LanguageSelector from '../components/LanguageSelector';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -269,11 +270,12 @@ const Register = () => {
                     </div>
                 </div>
 
-                <div className="p-5 bg-bg-cream/30 border-t border-cream text-center">
+                <div className="p-5 bg-bg-cream/30 border-t border-cream flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-xs text-charcoal/40">
                         By creating an account you agree to our{' '}
                         <span className="text-secondary font-bold cursor-pointer hover:underline">Terms of Service</span>
                     </p>
+                    <LanguageSelector variant="light" />
                 </div>
             </div>
         </div>

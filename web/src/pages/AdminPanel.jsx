@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { MenuService } from '../services/api';
+import Footer from '../components/Footer';
 
 // ─── Shared helpers (same as POS / GuestMenu) ────────────────────────────────
 const CATEGORIES = ['BreakFast', 'Starters', 'Main Dish', 'Side Dish', 'Desserts', 'Beverages'];
@@ -733,6 +734,7 @@ function AdminPanel() {
                     </div>
                 </div>
             )}
+            <Footer variant="compact" />
         </div>
     );
 }

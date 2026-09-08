@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { OrderService, InventoryService } from '../services/api';
 import { isAdmin } from '../hooks/useRole';
+import Footer from '../components/Footer';
 
 function Dashboard() {
     const adminMode = isAdmin();
@@ -1120,6 +1121,7 @@ function Dashboard() {
                     </div>
                 </div>
             )}
+            <Footer variant="compact" />
         </div>
     );
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Briefcase, Plus, Trash2, Edit3, Check, X, Users, FileText, Clock, ChevronDown, ChevronUp, Eye, UserPlus, RefreshCw } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import { ApplicationService } from '../services/api';
+import Footer from '../components/Footer';
 
 const EMPTY_JOB = {
     id: null,
@@ -458,6 +459,7 @@ export default function AdminCareers() {
                     </div>
                 )}
             </main>
+            <Footer variant="compact" />
         </div>
     );
 }

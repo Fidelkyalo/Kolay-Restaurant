@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, ArrowRight, CreditCard, Check, Clock, Lock, UserPlus, LogIn } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MenuService, OrderService } from '../services/api';
+import Footer from '../components/Footer';
 
 const MENU_DEFAULTS = [
     { id: 1,  name: 'Gourmet Beef Burger',    price: 1200, category: 'Main Dish',  image: '/assets/burger.png',  desc: 'Aged wagyu beef, truffle aioli.' },
@@ -638,6 +639,8 @@ const GuestMenu = () => {
                     </div>
                 </div>
             )}
+
+            <Footer />
         </div>
     );
 };

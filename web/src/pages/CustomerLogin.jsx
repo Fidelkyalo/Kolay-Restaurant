@@ -5,6 +5,7 @@ import {
     LogIn, ArrowLeft
 } from 'lucide-react';
 import { AuthService } from '../services/api';
+import LanguageSelector from '../components/LanguageSelector';
 
 const CustomerLogin = () => {
     const navigate = useNavigate();
@@ -180,8 +181,9 @@ const CustomerLogin = () => {
                     </div>
                 </div>
 
-                <div className="p-5 bg-bg-cream/30 border-t border-cream text-center">
+                <div className="p-5 bg-bg-cream/30 border-t border-cream flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-xs text-charcoal/40">Powered by Kolay Management Platform</p>
+                    <LanguageSelector variant="light" />
                 </div>
             </div>
         </div>
