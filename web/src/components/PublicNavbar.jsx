@@ -126,7 +126,7 @@ const PublicNavbar = () => {
                                     to="/my-bookings"
                                     className="flex items-center gap-1.5 text-white/75 hover:text-white text-[11px] font-bold uppercase tracking-widest px-4 py-2 rounded-full border border-white/15 hover:border-white/30 hover:bg-white/8 transition-all duration-200"
                                 >
-                                    <BookOpen className="w-3.5 h-3.5" /> My Bookings
+                                    <BookOpen className="w-3.5 h-3.5" /> {t('nav_my_bookings')}
                                 </Link>
                                 <div className="flex items-center gap-2 bg-white/8 border border-white/15 rounded-full pl-1.5 pr-4 py-1.5">
                                     <span className="w-7 h-7 bg-[#E67E22] rounded-full flex items-center justify-center text-[11px] font-black text-white shrink-0">
@@ -141,7 +141,7 @@ const PublicNavbar = () => {
                                     onClick={handleRateUs}
                                     className="flex items-center gap-1.5 bg-[#E67E22] hover:bg-[#cf6d17] text-white text-[11px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full transition-all duration-200 shadow-md hover:shadow-[#E67E22]/40 hover:shadow-lg active:scale-95 cursor-pointer"
                                 >
-                                    <Star className="w-3.5 h-3.5" /> Rate Us
+                                    <Star className="w-3.5 h-3.5" /> {t('nav_rate_us')}
                                 </a>
                             </>
                         ) : isLoggedIn ? (
@@ -161,13 +161,13 @@ const PublicNavbar = () => {
                                     to="/customer-login"
                                     className="flex items-center gap-1.5 text-white/75 hover:text-white text-[11px] font-bold uppercase tracking-widest px-4 py-2 rounded-full border border-white/15 hover:border-white/30 hover:bg-white/8 transition-all duration-200"
                                 >
-                                    <LogIn className="w-3.5 h-3.5" /> Sign In
+                                    <LogIn className="w-3.5 h-3.5" /> {t('nav_sign_in')}
                                 </Link>
                                 <Link
                                     to="/register"
                                     className="flex items-center gap-1.5 bg-[#E67E22] hover:bg-[#cf6d17] text-white text-[11px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full transition-all duration-200 shadow-md hover:shadow-[#E67E22]/40 hover:shadow-lg active:scale-95"
                                 >
-                                    <UserPlus className="w-3.5 h-3.5" /> Create Account
+                                    <UserPlus className="w-3.5 h-3.5" /> {t('nav_create_account')}
                                 </Link>
                             </>
                         )}
@@ -227,14 +227,14 @@ const PublicNavbar = () => {
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         className="flex items-center justify-center gap-2 bg-white/8 hover:bg-white/12 border border-white/15 text-white font-bold text-sm py-3 rounded-2xl transition-all"
                                     >
-                                        <BookOpen className="w-4 h-4" /> My Bookings
+                                        <BookOpen className="w-4 h-4" /> {t('nav_my_bookings')}
                                     </Link>
                                     <a
                                         href="#ratings"
                                         onClick={handleRateUs}
                                         className="flex items-center justify-center gap-2 bg-[#E67E22] hover:bg-[#cf6d17] text-white font-black text-sm py-3.5 rounded-2xl transition-all shadow-lg w-full"
                                     >
-                                        <Star className="w-4 h-4" /> Rate Us
+                                        <Star className="w-4 h-4" /> {t('nav_rate_us')}
                                     </a>
                                 </>
                             ) : isLoggedIn ? (
@@ -251,14 +251,14 @@ const PublicNavbar = () => {
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         className="flex items-center justify-center gap-2 bg-white/8 hover:bg-white/12 border border-white/15 text-white font-bold text-sm py-3 rounded-2xl transition-all"
                                     >
-                                        <LogIn className="w-4 h-4" /> Sign In
+                                        <LogIn className="w-4 h-4" /> {t('nav_sign_in')}
                                     </Link>
                                     <Link
                                         to="/register"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         className="flex items-center justify-center gap-2 bg-[#E67E22] hover:bg-[#cf6d17] text-white font-bold text-sm py-3 rounded-2xl transition-all shadow-lg"
                                     >
-                                        <UserPlus className="w-4 h-4" /> Create Account
+                                        <UserPlus className="w-4 h-4" /> {t('nav_create_account')}
                                     </Link>
                                 </div>
                             )}

@@ -88,7 +88,6 @@ const Home = () => {
     const getLoggedInCustomer = () => {
         try {
             const u = JSON.parse(localStorage.getItem('kolay_auth_user'));
-            // Customers have an accessToken (registered via backend); staff/admin do not
             if (u && u.accessToken && u.username) return u;
             return null;
         } catch { return null; }
@@ -115,7 +114,7 @@ const Home = () => {
 
     const handleRatingSubmit = (e) => {
         e.preventDefault();
-        if (!ratingValue) { setRatingError('Please select a star rating.'); return; }
+        if (!ratingValue) { setRatingError(t('ratings_error_select', 'Please select a star rating.')); return; }
         const newRating = {
             username: customer.username,
             stars: ratingValue,
@@ -137,23 +136,22 @@ const Home = () => {
             name: d.name,
             price: Number(d.price),
             desc: d.desc || d.description || '',
-            tag: i === 0 ? 'Best Seller' : i === 1 ? "Chef's Pick" : 'Premium',
+            tag: i === 0 ? t('home_tag_bestseller', 'Best Seller') : i === 1 ? t('home_tag_chefspick', "Chef's Pick") : t('home_tag_premium', 'Premium'),
             image: d.image || d.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600',
           }))
         : [
-            { id: 1, name: 'Gourmet Beef Burger', price: 1200, desc: 'Aged wagyu beef, truffle aioli, melted brie on brioche.', tag: 'Best Seller', image: '/assets/burger.png' },
-            { id: 2, name: 'Herb-Crusted Salmon', price: 2100, desc: 'Fresh Atlantic salmon with sesame glaze & greens.', tag: 'Chef\'s Pick', image: '/assets/salmon.png' },
-            { id: 3, name: 'Signature Ribeye', price: 3500, desc: 'Prime ribeye, garlic herb butter & truffle fries.', tag: 'Premium', image: '/assets/steak.png' },
+            { id: 1, name: 'Gourmet Beef Burger', price: 1200, desc: 'Aged wagyu beef, truffle aioli, melted brie on brioche.', tag: t('home_tag_bestseller', 'Best Seller'), image: '/assets/burger.png' },
+            { id: 2, name: 'Herb-Crusted Salmon', price: 2100, desc: 'Fresh Atlantic salmon with sesame glaze & greens.', tag: t('home_tag_chefspick', "Chef's Pick"), image: '/assets/salmon.png' },
+            { id: 3, name: 'Signature Ribeye', price: 3500, desc: 'Prime ribeye, garlic herb butter & truffle fries.', tag: t('home_tag_premium', 'Premium'), image: '/assets/steak.png' },
         ];
 
     const stats = [
-        { icon: Award, value: '15+', label: 'Years in Service' },
-        { icon: ChefHat, value: '8', label: 'Master Chefs' },
-        { icon: Users, value: '50K+', label: 'Happy Guests' },
-        { icon: TrendingUp, value: '200+', label: 'Menu Items' },
+        { icon: Award, value: '15+', label: t('home_years_service', 'Years in Service') },
+        { icon: ChefHat, value: '8', label: t('home_chefs', 'Master Chefs') },
+        { icon: Users, value: '50K+', label: t('home_happy_guests', 'Happy Guests') },
+        { icon: TrendingUp, value: '200+', label: t('home_menu_items', 'Menu Items') },
     ];
 
-    // Category display name mapping: DB value → tab label shown to visitors
     const CATEGORY_LABEL_MAP = {
         'BreakFast':  'Breakfast',
         'Starters':   'Starters',
@@ -164,14 +162,12 @@ const Home = () => {
         'Beverages':  'Beverages',
     };
 
-    // Build category tabs dynamically from whatever the database returns
     const menuCategories = (() => {
-        // Preserve insertion order using a Map
         const catMap = new Map();
 
         dishes.forEach(item => {
             const raw = item.category || 'Main Dish';
-            const label = CATEGORY_LABEL_MAP[raw] || raw; // unknown categories shown as-is
+            const label = CATEGORY_LABEL_MAP[raw] || raw;
             if (!catMap.has(label)) catMap.set(label, []);
             catMap.get(label).push({
                 name:  item.name,
@@ -182,7 +178,6 @@ const Home = () => {
             });
         });
 
-        // Convert to plain object; ensure Starters / Mains / Desserts always exist
         const categories = Object.fromEntries(catMap);
 
         if (!categories.Starters || categories.Starters.length === 0) {
@@ -214,15 +209,15 @@ const Home = () => {
     })();
 
     const chefs = [
-        { name: 'Chef Amara Osei', role: 'Executive Chef', spec: 'French & Pan-African fusion', image: 'https://images.unsplash.com/photo-1583394293214-5df30a6a1da0?auto=format&fit=crop&q=80&w=400' },
-        { name: 'Chef Lena Mwangi', role: 'Pastry Chef', spec: 'Artisan desserts & baked goods', image: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=400' },
-        { name: 'Chef Daniel Kiprop', role: 'Sous Chef', spec: 'Grills, meats & open-fire cooking', image: 'https://images.unsplash.com/photo-1607631568010-a87245c0daf8?auto=format&fit=crop&q=80&w=400' },
+        { name: 'Chef Amara Osei', role: t('chef_role_exec', 'Executive Chef'), spec: t('chef_spec_exec', 'French & Pan-African fusion'), image: 'https://images.unsplash.com/photo-1583394293214-5df30a6a1da0?auto=format&fit=crop&q=80&w=400' },
+        { name: 'Chef Lena Mwangi', role: t('chef_role_pastry', 'Pastry Chef'), spec: t('chef_spec_pastry', 'Artisan desserts & baked goods'), image: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?auto=format&fit=crop&q=80&w=400' },
+        { name: 'Chef Daniel Kiprop', role: t('chef_role_sous', 'Sous Chef'), spec: t('chef_spec_sous', 'Grills, meats & open-fire cooking'), image: 'https://images.unsplash.com/photo-1607631568010-a87245c0daf8?auto=format&fit=crop&q=80&w=400' },
     ];
 
     const offers = [
-        { icon: Tag, label: 'Happy Hour', badge: 'Daily 3-6pm', title: '20% Off All Drinks', desc: 'Craft cocktails, mocktails and wines at a special rate every day of the week.', color: '#E67E22' },
-        { icon: Gift, label: 'Combo Deal', badge: 'Limited', title: 'Meal for Two - KES 3,500', desc: 'Two mains, two drinks and a shared dessert. Perfect for date night or a casual dinner.', color: '#D4A017' },
-        { icon: Repeat, label: 'Loyalty', badge: 'Members Only', title: 'Earn Points on Every Visit', desc: 'Join Kolay Rewards and earn points that convert to free meals and exclusive perks.', color: '#4E2C1E' },
+        { icon: Tag, label: t('offer_1_label', 'Happy Hour'), badge: t('offer_1_badge', 'Daily 3-6pm'), title: t('offer_1_title', '20% Off All Drinks'), desc: t('offer_1_desc', 'Craft cocktails, mocktails and wines at a special rate every day of the week.'), color: '#E67E22' },
+        { icon: Gift, label: t('offer_2_label', 'Combo Deal'), badge: t('offer_2_badge', 'Limited'), title: t('offer_2_title', 'Meal for Two - KES 3,500'), desc: t('offer_2_desc', 'Two mains, two drinks and a shared dessert. Perfect for date night or a casual dinner.'), color: '#D4A017' },
+        { icon: Repeat, label: t('offer_3_label', 'Loyalty'), badge: t('offer_3_badge', 'Members Only'), title: t('offer_3_title', 'Earn Points on Every Visit'), desc: t('offer_3_desc', 'Join Kolay Rewards and earn points that convert to free meals and exclusive perks.'), color: '#4E2C1E' },
     ];
 
     const galleryPhotos = [
@@ -238,7 +233,6 @@ const Home = () => {
 
             {/* ── HERO ────────────────────────────────── */}
             <section id="home" className="relative min-h-screen flex items-center overflow-hidden">
-                {/* Cinematic background */}
                 <div className="absolute inset-0">
                     <img
                         src="/assets/hero.png"
@@ -249,12 +243,10 @@ const Home = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0D0A07] via-transparent to-transparent" />
                 </div>
 
-                {/* Decorative orbs */}
                 <div className="absolute top-1/4 right-1/4 w-[600px] h-[600px] bg-[#E67E22]/10 rounded-full blur-[120px] pointer-events-none" />
                 <div className="absolute bottom-0 left-1/3 w-[400px] h-[400px] bg-[#D4A017]/8 rounded-full blur-[100px] pointer-events-none" />
 
                 <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 pt-32 pb-20 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                    {/* Left - Text */}
                     <div className="space-y-8">
                         <span className="inline-flex items-center gap-2 bg-[#E67E22]/15 border border-[#E67E22]/30 text-[#E67E22] px-5 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.35em]">
                             <span className="w-1.5 h-1.5 bg-[#E67E22] rounded-full animate-pulse" />
@@ -286,11 +278,10 @@ const Home = () => {
                             </Link>
                         </div>
 
-                        {/* Quick info pills */}
                         <div className="flex flex-wrap gap-3 pt-4">
                             {[
-                                { icon: Clock, text: 'Open 24/7' },
-                                { icon: MapPin, text: 'Thome Estate' },
+                                { icon: Clock, text: t('footer_open_247', 'Open 24/7') },
+                                { icon: MapPin, text: t('home_location', 'Thome Estate') },
                                 { icon: Phone, text: '+254 102 039 121' },
                             ].map(({ icon: Icon, text }) => (
                                 <span key={text} className="flex items-center gap-2 text-white/40 text-xs font-semibold">
@@ -300,21 +291,18 @@ const Home = () => {
                         </div>
                     </div>
 
-                    {/* Right - Featured dish card stack */}
                     <div className="hidden lg:block relative h-[540px]">
-                        {/* Base image */}
                         <div className="absolute inset-0 rounded-[2.5rem] overflow-hidden border border-white/5 shadow-[0_40px_100px_#00000080]">
                             <img src="/assets/steak.png" alt="Signature Dish" className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-[#0D0A07]/80 via-transparent to-transparent" />
                         </div>
 
-                        {/* Floating info card */}
                         <div className="absolute -bottom-6 -left-8 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 w-56 shadow-xl">
                             <p className="text-[10px] text-white/40 uppercase tracking-widest mb-1 font-black">
                                 {activeSpecialty ? `${activeSpecialty.season} Special` : "KOLAY RESTAURANT"}
                             </p>
                             <p className="text-white font-black text-sm leading-tight mb-2">
-                                {activeSpecialty ? activeSpecialty.name : 'DELICIOUSLY MADE'}
+                                {activeSpecialty ? activeSpecialty.name : t('home_deliciously_made', 'DELICIOUSLY MADE')}
                             </p>
                             {activeSpecialty && (
                                 <div className="flex items-center gap-2 mb-2">
@@ -327,12 +315,9 @@ const Home = () => {
                                 {[...Array(5)].map((_, i) => <Star key={i} className="w-3 h-3 fill-[#E67E22] text-[#E67E22]" />)}
                             </div>
                         </div>
-
-                        {/* Price badge - removed */}
                     </div>
                 </div>
 
-                {/* Scroll indicator */}
                 <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
                     <span className="text-white/20 text-[10px] uppercase tracking-[0.3em] font-black">Scroll</span>
                     <ChevronDown className="text-white/20 w-5 h-5" />
@@ -360,27 +345,26 @@ const Home = () => {
             <section id="specials" className="py-32 px-6 md:px-12 max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
                     <div>
-                        <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-3">Chef's Selection</p>
+                        <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-3">{t('home_chefs_selection', "Chef's Selection")}</p>
                         <h2 className="text-4xl md:text-5xl font-display font-black text-white leading-tight">
-                            Signature<br />
-                            <span className="italic text-white/40">Creations</span>
+                            {t('home_signature', 'Signature')}<br />
+                            <span className="italic text-white/40">{t('home_creations', 'Creations')}</span>
                         </h2>
                     </div>
                     <Link
                         to="/order"
                         className="flex items-center gap-2 text-white/40 hover:text-[#E67E22] text-sm font-black uppercase tracking-widest transition-colors"
                     >
-                        Full Menu <ArrowRight className="w-4 h-4" />
+                        {t('menu_explore', 'Full Menu')} <ArrowRight className="w-4 h-4" />
                     </Link>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {featuredMeals.map((meal, i) => (
+                    {featuredMeals.map((meal) => (
                         <div
                             key={meal.id}
                             className="group relative bg-white/3 hover:bg-white/6 border border-white/5 hover:border-[#E67E22]/30 rounded-[2rem] overflow-hidden transition-all duration-500 cursor-pointer"
                         >
-                            {/* Image */}
                             <div className="relative h-64 overflow-hidden">
                                 <img
                                     src={meal.image}
@@ -388,25 +372,22 @@ const Home = () => {
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-[#0D0A07] via-transparent to-transparent" />
-                                {/* Tag */}
                                 <span className="absolute top-4 left-4 bg-[#E67E22] text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-lg">
                                     {meal.tag}
                                 </span>
                             </div>
 
-                            {/* Content */}
                             <div className="p-7">
                                 <div className="flex justify-between items-start mb-3">
-                                    <h3 className="text-white font-black text-xl group-hover:text-[#E67E22] transition-colors leading-tight">{meal.name}</h3>
+                                    <h3 className="text-white font-black text-xl group-hover:text-[#E67E22] transition-colors leading-tight">{t(meal.name, meal.name)}</h3>
                                     <span className="text-[#E67E22] font-black text-lg shrink-0 ml-4">KES {meal.price.toLocaleString()}</span>
                                 </div>
-                                <p className="text-white/40 text-sm leading-relaxed mb-5">{meal.desc}</p>
+                                <p className="text-white/40 text-sm leading-relaxed mb-5">{t(meal.desc, meal.desc)}</p>
                                 <div className="flex items-center gap-1">
                                     {[...Array(5)].map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-[#D4A017] text-[#D4A017]" />)}
                                 </div>
                             </div>
 
-                            {/* Hover action */}
                             <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-[#E67E22] to-[#D4A017] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                         </div>
                     ))}
@@ -415,12 +396,10 @@ const Home = () => {
 
             {/* ── ABOUT SECTION ───────────────────────── */}
             <section id="about" className="py-32 relative overflow-hidden">
-                {/* Background texture */}
                 <div className="absolute inset-0 bg-[#1A1008]" />
                 <div className="absolute top-0 right-0 w-1/2 h-full bg-[#E67E22]/3" />
 
                 <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-                    {/* Image collage */}
                     <div className="relative h-[560px]">
                         <div className="absolute top-0 left-0 w-[72%] h-[75%] rounded-[2.5rem] overflow-hidden border border-white/5">
                             <img
@@ -437,34 +416,32 @@ const Home = () => {
                                 className="w-full h-full object-cover"
                             />
                         </div>
-                        {/* Floating badge */}
                         <div className="absolute left-[60%] top-[42%] -translate-x-1/2 -translate-y-1/2 bg-[#E67E22] text-white rounded-2xl p-6 text-center shadow-[0_0_60px_#E67E2260] z-10">
                             <p className="font-black text-4xl leading-none">15+</p>
-                            <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mt-1">Years</p>
+                            <p className="text-[10px] font-black uppercase tracking-widest opacity-80 mt-1">{t('home_years_excellence', 'Years')}</p>
                         </div>
                     </div>
 
-                    {/* Text */}
                     <div className="space-y-8">
                         <div>
-                            <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">Our Story</p>
+                            <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">{t('about_title', 'Our Story')}</p>
                             <h2 className="text-4xl md:text-6xl font-display font-black text-white leading-[0.95] tracking-tight">
-                                Crafted with<br />
-                                <span className="italic text-white/30">Passion</span>,<br />
-                                Served with Love.
+                                {t('about_heading_1', 'Crafted with')}<br />
+                                <span className="italic text-white/30">{t('about_heading_2', 'Passion')}</span>,<br />
+                                {t('about_heading_3', 'Served with Love.')}
                             </h2>
                         </div>
 
                         <p className="text-white/50 text-lg leading-relaxed">
-                            Kolay was born from a vision - to make premium dining accessible, warm, and unforgettable. Every dish is a chapter in a story written by chefs who treat cooking as their art form.
+                            {t('about_desc_1', 'Kolay Restaurant was born from a vision - to make premium dining accessible, warm, and unforgettable. Every dish is a chapter in a story written by chefs who treat cooking as their art form.')}
                         </p>
 
                         <div className="grid grid-cols-2 gap-6">
                             {[
-                                { title: 'Farm to Table', desc: 'Daily sourced organic ingredients.' },
-                                { title: 'Global Flavours', desc: 'Curated world-class recipes.' },
-                                { title: 'Award Winning', desc: 'Recognized excellence since 2010.' },
-                                { title: 'Private Dining', desc: 'Exclusive events & celebrations.' },
+                                { title: t('about_feat_1_title', 'Farm to Table'), desc: t('about_feat_1_desc', 'Daily sourced organic ingredients.') },
+                                { title: t('about_feat_2_title', 'Global Flavours'), desc: t('about_feat_2_desc', 'Curated world-class recipes.') },
+                                { title: t('about_feat_3_title', 'Award Winning'), desc: t('about_feat_3_desc', 'Recognized excellence since 2010.') },
+                                { title: t('about_feat_4_title', 'Private Dining'), desc: t('about_feat_4_desc', 'Exclusive events & celebrations.') },
                             ].map(({ title, desc }) => (
                                 <div key={title} className="flex gap-3">
                                     <div className="mt-0.5 w-5 h-5 bg-[#E67E22] rounded-full flex items-center justify-center shrink-0">
@@ -483,7 +460,7 @@ const Home = () => {
                                 to="/reservations"
                                 className="group inline-flex items-center gap-3 text-white font-black text-sm uppercase tracking-widest hover:text-[#E67E22] transition-colors"
                             >
-                                Reserve Your Experience
+                                {t('about_reserve_exp', 'Reserve Your Experience')}
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </Link>
                         </div>
@@ -494,8 +471,8 @@ const Home = () => {
                 <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 pb-32">
                     <div className="border-t border-white/8 pt-20">
                         <div className="text-center mb-14">
-                            <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-3">Meet the Team</p>
-                            <h3 className="text-3xl md:text-4xl font-display font-black text-white">The Hands Behind<br /><span className="italic text-white/30">Every Dish</span></h3>
+                            <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-3">{t('about_meet_team', 'Meet the Team')}</p>
+                            <h3 className="text-3xl md:text-4xl font-display font-black text-white">{t('about_hands_behind', 'The Hands Behind Every Dish')}</h3>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {chefs.map(chef => (
@@ -517,13 +494,11 @@ const Home = () => {
             {/* ── MENU SECTION ────────────────────────── */}
             <section id="menu" className="py-32 px-6 md:px-12">
                 <div className="max-w-7xl mx-auto">
-                    {/* Header */}
                     <div className="text-center mb-16">
-                        <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">Explore</p>
-                        <h2 className="text-4xl md:text-5xl font-display font-black text-white">Our Menu</h2>
+                        <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">{t('menu_explore_subtitle', 'Explore')}</p>
+                        <h2 className="text-4xl md:text-5xl font-display font-black text-white">{t('menu_title', 'Our Menu')}</h2>
                     </div>
 
-                    {/* Tabs */}
                     <div className="flex gap-2 justify-center mb-12 bg-white/3 border border-white/5 rounded-2xl p-1.5 w-fit mx-auto">
                         {Object.keys(menuCategories).map(tab => (
                             <button
@@ -534,19 +509,17 @@ const Home = () => {
                                     : 'text-white/40 hover:text-white'
                                     }`}
                             >
-                                {tab}
+                                {t(tab, tab)}
                             </button>
                         ))}
                     </div>
 
-                    {/* Items - Photo Cards */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                         {menuCategories[activeMenuTab].map(item => (
                             <div
                                 key={item.name}
                                 className="group relative bg-white/3 border border-white/5 hover:border-[#E67E22]/40 rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer hover:-translate-y-1"
                             >
-                                {/* Dish image */}
                                 <div className="relative h-44 overflow-hidden">
                                     <img
                                         src={item.image}
@@ -554,19 +527,16 @@ const Home = () => {
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0D0A07] via-[#0D0A07]/20 to-transparent" />
-                                    {/* Price badge */}
                                     <span className="absolute top-3 right-3 bg-[#E67E22] text-white text-[10px] font-black px-2.5 py-1 rounded-lg">
                                         KES {item.price.toLocaleString()}
                                     </span>
                                 </div>
 
-                                {/* Info */}
                                 <div className="p-4">
-                                    <h4 className="text-white font-black text-sm group-hover:text-[#E67E22] transition-colors mb-1.5 leading-tight">{item.name}</h4>
-                                    <p className="text-white/30 text-xs leading-relaxed line-clamp-2">{item.desc}</p>
+                                    <h4 className="text-white font-black text-sm group-hover:text-[#E67E22] transition-colors mb-1.5 leading-tight">{t(item.name, item.name)}</h4>
+                                    <p className="text-white/30 text-xs leading-relaxed line-clamp-2">{t(item.desc, item.desc)}</p>
                                 </div>
 
-                                {/* Bottom accent */}
                                 <div className="h-0.5 bg-gradient-to-r from-[#E67E22] to-[#D4A017] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                             </div>
                         ))}
@@ -577,7 +547,7 @@ const Home = () => {
                             to="/order?view=all"
                             className="inline-flex items-center gap-3 bg-[#E67E22] hover:bg-[#D4A017] text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all duration-300 shadow-[0_0_40px_#E67E2240]"
                         >
-                            View Full Menu <ArrowRight className="w-4 h-4" />
+                            {t('menu_explore', 'View Full Menu')} <ArrowRight className="w-4 h-4" />
                         </Link>
                     </div>
                 </div>
@@ -587,33 +557,31 @@ const Home = () => {
             <section id="order" className="py-32 px-6 md:px-12 bg-[#1A1008]">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
-                        <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">Order Online</p>
-                        <h2 className="text-4xl md:text-5xl font-display font-black text-white mb-4">Delivered to Your<br /><span className="italic text-white/30">Door</span></h2>
-                        <p className="text-white/40 max-w-md mx-auto text-base">Enjoy Kolay's premium meals at home. Choose delivery or come pick up your order.</p>
+                        <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">{t('nav_order', 'Order Online')}</p>
+                        <h2 className="text-4xl md:text-5xl font-display font-black text-white mb-4">{t('order_delivered_door', 'Delivered to Your Door')}</h2>
+                        <p className="text-white/40 max-w-md mx-auto text-base">{t('order_section_desc', "Enjoy Kolay's premium meals at home. Choose delivery or come pick up your order.")}</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-                        {/* Delivery */}
                         <div className="group relative bg-white/3 hover:bg-white/6 border border-white/5 hover:border-[#E67E22]/40 rounded-3xl p-10 text-center transition-all duration-300 cursor-pointer">
                             <div className="w-16 h-16 bg-[#E67E22]/10 border border-[#E67E22]/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-[#E67E22] transition-colors">
                                 <Bike className="w-7 h-7 text-[#E67E22] group-hover:text-white transition-colors" />
                             </div>
-                            <h3 className="text-white font-black text-xl mb-3">Home Delivery</h3>
-                            <p className="text-white/40 text-sm leading-relaxed mb-6">Hot, fresh and at your doorstep within 45 minutes. Available within Nairobi.</p>
+                            <h3 className="text-white font-black text-xl mb-3">{t('order_home_delivery', 'Home Delivery')}</h3>
+                            <p className="text-white/40 text-sm leading-relaxed mb-6">{t('order_delivery_desc', 'Hot, fresh and at your doorstep within 45 minutes. Available within Nairobi.')}</p>
                             <Link to="/order?type=delivery" className="inline-flex items-center gap-2 bg-[#E67E22] text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#D4A017] transition-all">
-                                Order Delivery <ArrowRight className="w-4 h-4" />
+                                {t('order_btn_delivery', 'Order Delivery')} <ArrowRight className="w-4 h-4" />
                             </Link>
                         </div>
 
-                        {/* Takeaway */}
                         <div className="group relative bg-white/3 hover:bg-white/6 border border-white/5 hover:border-[#D4A017]/40 rounded-3xl p-10 text-center transition-all duration-300 cursor-pointer">
                             <div className="w-16 h-16 bg-[#D4A017]/10 border border-[#D4A017]/20 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-[#D4A017] transition-colors">
                                 <ShoppingBag className="w-7 h-7 text-[#D4A017] group-hover:text-white transition-colors" />
                             </div>
-                            <h3 className="text-white font-black text-xl mb-3">Takeaway</h3>
-                            <p className="text-white/40 text-sm leading-relaxed mb-6">Pre-order and collect your food ready and waiting - zero wait time.</p>
+                            <h3 className="text-white font-black text-xl mb-3">{t('Takeaway', 'Takeaway')}</h3>
+                            <p className="text-white/40 text-sm leading-relaxed mb-6">{t('order_takeaway_desc', 'Pre-order and collect your food ready and waiting - zero wait time.')}</p>
                             <Link to="/order?type=takeaway" className="inline-flex items-center gap-2 bg-[#D4A017] text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-[#E67E22] transition-all">
-                                Order Takeaway <ArrowRight className="w-4 h-4" />
+                                {t('order_btn_takeaway', 'Order Takeaway')} <ArrowRight className="w-4 h-4" />
                             </Link>
                         </div>
                     </div>
@@ -624,8 +592,8 @@ const Home = () => {
             <section id="offers" className="py-32 px-6 md:px-12">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
-                        <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">Offers &amp; Promotions</p>
-                        <h2 className="text-4xl md:text-5xl font-display font-black text-white">Deals Worth<br /><span className="italic text-white/30">Savoring</span></h2>
+                        <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">{t('offers_title_sub', 'Offers & Promotions')}</p>
+                        <h2 className="text-4xl md:text-5xl font-display font-black text-white">{t('offers_title_main', 'Deals Worth Savoring')}</h2>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -653,13 +621,12 @@ const Home = () => {
                 <div className="max-w-7xl mx-auto">
                     <div className="flex items-end justify-between mb-12">
                         <div>
-                            <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-3">Gallery</p>
-                            <h2 className="text-4xl font-display font-black text-white">Ambience &amp; Craft</h2>
+                            <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-3">{t('gallery_title', 'Gallery')}</p>
+                            <h2 className="text-4xl font-display font-black text-white">{t('gallery_subtitle', 'Ambience & Craft')}</h2>
                         </div>
-                        <span className="text-white/20 text-xs font-black uppercase tracking-widest hidden md:block">Our World</span>
+                        <span className="text-white/20 text-xs font-black uppercase tracking-widest hidden md:block">{t('gallery_our_world', 'Our World')}</span>
                     </div>
 
-                    {/* Masonry grid */}
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 auto-rows-[220px]">
                         {galleryPhotos.map((photo, i) => (
                             <div
@@ -684,29 +651,26 @@ const Home = () => {
             <section id="reservations" className="py-32 px-6 md:px-12">
                 <div className="max-w-7xl mx-auto">
                     <div className="relative bg-gradient-to-br from-[#1A1008] to-[#0D0A07] border border-white/5 rounded-[3rem] overflow-hidden p-12 md:p-20">
-                        {/* Decorative */}
                         <div className="absolute top-0 right-0 w-96 h-96 bg-[#E67E22]/10 rounded-full blur-[100px] pointer-events-none" />
                         <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#D4A017]/8 rounded-full blur-[80px] pointer-events-none" />
 
                         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-                            {/* Left info */}
                             <div className="space-y-8">
                                 <div>
-                                    <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">Reservations</p>
+                                    <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">{t('reservations_title', 'Reservations')}</p>
                                     <h2 className="text-4xl md:text-5xl font-display font-black text-white leading-tight">
-                                        Reserve Your<br />
-                                        <span className="italic text-white/30">Perfect Evening</span>
+                                        {t('reservations_perfect_evening', 'Reserve Your Perfect Evening')}
                                     </h2>
                                 </div>
                                 <p className="text-white/40 text-base leading-relaxed">
-                                    Book a table and let us take care of everything else. Private dining rooms available for special occasions.
+                                    {t('reservations_desc', 'Book a table and let us take care of everything else. Private dining rooms available for special occasions.')}
                                 </p>
 
                                 <div className="space-y-4">
                                     {[
-                                        { icon: Phone, label: 'Call Us', value: '+254 102 039 121' },
-                                        { icon: MapPin, label: 'Location', value: '123 Thome Street, Nairobi' },
-                        { icon: Clock, label: 'Hours', value: 'Open 24/7' },
+                                        { icon: Phone, label: t('Call Us', 'Call Us'), value: '+254 102 039 121' },
+                                        { icon: MapPin, label: t('contact_location', 'Location'), value: '123 Thome Street, Nairobi' },
+                                        { icon: Clock, label: t('footer_hours', 'Hours'), value: t('footer_open_247', 'Open 24/7') },
                                     ].map(({ icon: Icon, label, value }) => (
                                         <div key={label} className="flex items-center gap-4">
                                             <div className="w-10 h-10 bg-[#E67E22]/10 border border-[#E67E22]/20 rounded-xl flex items-center justify-center shrink-0">
@@ -721,20 +685,19 @@ const Home = () => {
                                 </div>
                             </div>
 
-                            {/* Right - Form */}
                             <div className="bg-white/3 border border-white/8 rounded-3xl p-8">
                                 {reservationSuccess ? (
                                     <div className="text-center py-12">
                                         <div className="w-16 h-16 bg-[#E67E22] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_#E67E2260]">
                                             <Check className="w-8 h-8 text-white" />
                                         </div>
-                                        <h4 className="text-2xl font-black text-white mb-3">Request Sent!</h4>
-                                        <p className="text-white/40 text-sm mb-8 leading-relaxed">Our team will call you within 15 minutes to confirm your table.</p>
+                                        <h4 className="text-2xl font-black text-white mb-3">{t('reservation_request_sent', 'Request Sent!')}</h4>
+                                        <p className="text-white/40 text-sm mb-8 leading-relaxed">{t('reservation_call_confirm', 'Our team will call you within 15 minutes to confirm your table.')}</p>
                                         <button
                                             onClick={() => setReservationSuccess(false)}
                                             className="text-[#E67E22] font-black text-xs uppercase tracking-widest hover:underline"
                                         >
-                                            Make Another Booking
+                                            {t('Make Another Reservation', 'Make Another Booking')}
                                         </button>
                                     </div>
                                 ) : (
@@ -745,13 +708,13 @@ const Home = () => {
                                         <div className="grid grid-cols-2 gap-4">
                                             <input
                                                 required
-                                                placeholder="Your Name"
+                                                placeholder={t('Your Name', 'Your Name')}
                                                 className="w-full bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 focus:ring-0 text-sm font-semibold transition-colors"
                                             />
                                             <input
                                                 required
                                                 type="tel"
-                                                placeholder="Phone"
+                                                placeholder={t('Phone', 'Phone')}
                                                 className="w-full bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold transition-colors"
                                             />
                                         </div>
@@ -762,20 +725,20 @@ const Home = () => {
                                                 className="w-full bg-white/5 border border-white/8 text-white/60 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold transition-colors"
                                             />
                                             <select className="w-full bg-white/5 border border-white/8 text-white/60 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold transition-colors">
-                                                <option>2 Guests</option>
-                                                <option>4 Guests</option>
-                                                <option>6+ Guests</option>
+                                                <option>{t('reservation_2_guests', '2 Guests')}</option>
+                                                <option>{t('reservation_4_guests', '4 Guests')}</option>
+                                                <option>{t('reservation_6_guests', '6+ Guests')}</option>
                                             </select>
                                         </div>
                                         <textarea
-                                            placeholder="Special Requests (optional)"
+                                            placeholder={t('reservation_notes', 'Special Requests (optional)')}
                                             className="w-full h-24 bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold resize-none transition-colors"
                                         />
                                         <button
                                             type="submit"
                                             className="w-full bg-[#E67E22] hover:bg-[#D4A017] text-white font-black py-4 rounded-xl text-sm uppercase tracking-widest transition-all active:scale-95 shadow-[0_0_30px_#E67E2230]"
                                         >
-                                            Check Availability
+                                            {t('reservation_check_avail', 'Check Availability')}
                                         </button>
                                     </form>
                                 )}
@@ -789,18 +752,15 @@ const Home = () => {
             <section id="contact" className="py-32 px-6 md:px-12 bg-[#1A1008]">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
-                        <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">Contact Us</p>
-                        <h2 className="text-4xl md:text-5xl font-display font-black text-white">Get in <span className="italic text-white/30">Touch</span></h2>
+                        <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">{t('nav_contact', 'Contact Us')}</p>
+                        <h2 className="text-4xl md:text-5xl font-display font-black text-white">{t('contact_get_in_touch', 'Get in Touch')}</h2>
                     </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                        {/* Left - Map + Info */}
                         <div className="space-y-6">
-                            {/* Embedded map */}
                             <div className="rounded-3xl overflow-hidden border border-white/8 h-72">
                                 <iframe
                                     title="Kolay Restaurant Location"
-                                    // Thome, Nairobi coordinates approx: -1.2185, 36.8797
                                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.511613217424!2d36.8797!3d-1.2185!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1680d2288339%3A0xc47f2f11c833bb4!2sThome%2C%20Nairobi!5e0!3m2!1sen!2ske!4v1700000000000"
                                     width="100%"
                                     height="100%"
@@ -810,12 +770,11 @@ const Home = () => {
                                 />
                             </div>
 
-                            {/* Info blocks */}
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                 {[
-                                    { icon: MapPin, label: 'Address', value: '123 Thome Street, Nairobi' },
-                                    { icon: Phone, label: 'Phone', value: '+254 102 039 121' },
-                                    { icon: Clock, label: 'Hours', value: 'Open 24/7' },
+                                    { icon: MapPin, label: t('contact_address', 'Address'), value: '123 Thome Street, Nairobi' },
+                                    { icon: Phone, label: t('Phone', 'Phone'), value: '+254 102 039 121' },
+                                    { icon: Clock, label: t('footer_hours', 'Hours'), value: t('footer_open_247', 'Open 24/7') },
                                 ].map(({ icon: Icon, label, value }) => (
                                     <div key={label} className="bg-white/3 border border-white/5 rounded-2xl p-5">
                                         <div className="w-8 h-8 bg-[#E67E22]/10 border border-[#E67E22]/20 rounded-lg flex items-center justify-center mb-3">
@@ -828,18 +787,17 @@ const Home = () => {
                             </div>
                         </div>
 
-                        {/* Right - Contact Form */}
                         <div className="bg-white/3 border border-white/8 rounded-3xl p-8">
-                            <h3 className="text-white font-black text-xl mb-6">Send us a Message</h3>
+                            <h3 className="text-white font-black text-xl mb-6">{t('contact_send_message_title', 'Send us a Message')}</h3>
                             <form className="space-y-4" onSubmit={e => e.preventDefault()}>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <input required placeholder="Your Name" className="w-full bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold transition-colors" />
-                                    <input required type="email" placeholder="Email Address" className="w-full bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold transition-colors" />
+                                    <input required placeholder={t('Your Name', 'Your Name')} className="w-full bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold transition-colors" />
+                                    <input required type="email" placeholder={t('login_email', 'Email Address')} className="w-full bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold transition-colors" />
                                 </div>
-                                <input placeholder="Subject" className="w-full bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold transition-colors" />
-                                <textarea placeholder="Your message..." className="w-full h-36 bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold resize-none transition-colors" />
+                                <input placeholder={t('contact_subject', 'Subject')} className="w-full bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold transition-colors" />
+                                <textarea placeholder={t('contact_message_placeholder', 'Your message...')} className="w-full h-36 bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold resize-none transition-colors" />
                                 <button type="submit" className="w-full flex items-center justify-center gap-2 bg-[#E67E22] hover:bg-[#D4A017] text-white font-black py-4 rounded-xl text-sm uppercase tracking-widest transition-all active:scale-95 shadow-[0_0_30px_#E67E2230]">
-                                    <Mail className="w-4 h-4" /> Send Message
+                                    <Mail className="w-4 h-4" /> {t('contact_send_btn', 'Send Message')}
                                 </button>
                             </form>
                         </div>
@@ -850,11 +808,10 @@ const Home = () => {
             {/* ── RATINGS ─────────────────────────────── */}
             <section id="ratings" className="py-24 px-6 md:px-12 bg-[#0D0A07]">
                 <div className="max-w-4xl mx-auto">
-                    {/* Header */}
                     <div className="text-center mb-14">
-                        <span className="text-[#E67E22] text-xs font-black uppercase tracking-[0.3em]">Our Guests</span>
+                        <span className="text-[#E67E22] text-xs font-black uppercase tracking-[0.3em]">{t('ratings_our_guests', 'Our Guests')}</span>
                         <h2 className="text-4xl md:text-5xl font-display font-black text-white mt-3 mb-4">
-                            Rate Your Experience
+                            {t('ratings_title', 'Rate Your Experience')}
                         </h2>
                         {avgRating && (
                             <div className="flex items-center justify-center gap-3 mt-4">
@@ -864,19 +821,17 @@ const Home = () => {
                                     ))}
                                 </div>
                                 <span className="text-white font-black text-xl">{avgRating}</span>
-                                <span className="text-white/30 text-sm">({ratings.length} {ratings.length === 1 ? 'review' : 'reviews'})</span>
+                                <span className="text-white/30 text-sm">({ratings.length} {ratings.length === 1 ? t('ratings_review', 'review') : t('ratings_reviews', 'reviews')})</span>
                             </div>
                         )}
                     </div>
 
-                    {/* Submit form - only for logged-in customers */}
                     {customer && !alreadyRated && !ratingSubmitted && (
                         <form onSubmit={handleRatingSubmit} className="bg-white/5 border border-white/8 rounded-3xl p-8 mb-12 backdrop-blur-sm">
                             <p className="text-white font-black text-lg mb-6">
-                                Hi <span className="text-[#E67E22]">{customer.username}</span>, how was your experience?
+                                Hi <span className="text-[#E67E22]">{customer.username}</span>, {t('ratings_how_was_exp', 'how was your experience?')}
                             </p>
 
-                            {/* Star picker */}
                             <div className="flex items-center gap-2 mb-6">
                                 {[1,2,3,4,5].map(i => (
                                     <button
@@ -893,17 +848,16 @@ const Home = () => {
                                 ))}
                                 {ratingValue > 0 && (
                                     <span className="ml-3 text-white/50 text-sm font-semibold">
-                                        {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'][ratingValue]}
+                                        {['', t('rating_1_star', 'Poor'), t('rating_2_star', 'Fair'), t('rating_3_star', 'Good'), t('rating_4_star', 'Great'), t('rating_5_star', 'Excellent')][ratingValue]}
                                     </span>
                                 )}
                             </div>
 
                             {ratingError && <p className="text-red-400 text-sm font-semibold mb-4">{ratingError}</p>}
 
-                            {/* Comment */}
                             <textarea
                                 rows={3}
-                                placeholder="Share your experience (optional)..."
+                                placeholder={t('ratings_share_exp_placeholder', 'Share your experience (optional)...')}
                                 value={ratingComment}
                                 onChange={e => setRatingComment(e.target.value)}
                                 maxLength={300}
@@ -914,36 +868,33 @@ const Home = () => {
                                 type="submit"
                                 className="bg-[#E67E22] hover:bg-[#cf6d17] text-white font-black uppercase tracking-widest text-sm px-8 py-3.5 rounded-full transition-all shadow-lg hover:shadow-[#E67E22]/30 active:scale-95"
                             >
-                                Submit Rating
+                                {t('ratings_submit', 'Submit Rating')}
                             </button>
                         </form>
                     )}
 
-                    {/* Success message */}
                     {(ratingSubmitted || (customer && alreadyRated)) && (
                         <div className="bg-[#E67E22]/10 border border-[#E67E22]/20 rounded-3xl p-6 mb-12 text-center">
                             <Star className="w-8 h-8 fill-[#E67E22] text-[#E67E22] mx-auto mb-3" />
-                            <p className="text-white font-black text-lg">Thank you for your rating!</p>
-                            <p className="text-white/40 text-sm mt-1">Your review has been saved.</p>
+                            <p className="text-white font-black text-lg">{t('ratings_thank_you', 'Thank you for your rating!')}</p>
+                            <p className="text-white/40 text-sm mt-1">{t('ratings_review_saved', 'Your review has been saved.')}</p>
                         </div>
                     )}
 
-                    {/* Not logged in - show prompt but reviews still visible below */}
                     {!customer && (
                         <div className="bg-white/3 border border-white/8 rounded-3xl p-8 mb-12 text-center">
                             <Star className="w-8 h-8 text-white/20 mx-auto mb-3" />
-                            <p className="text-white/60 font-semibold mb-1">Want to share your experience?</p>
-                            <p className="text-white/30 text-xs mb-5">Create a free account to leave a rating.</p>
+                            <p className="text-white/60 font-semibold mb-1">{t('ratings_want_share', 'Want to share your experience?')}</p>
+                            <p className="text-white/30 text-xs mb-5">{t('ratings_create_acc_prompt', 'Create a free account to leave a rating.')}</p>
                             <Link
                                 to="/register"
                                 className="inline-flex items-center gap-2 bg-[#E67E22] hover:bg-[#cf6d17] text-white font-black uppercase tracking-widest text-xs px-6 py-3 rounded-full transition-all"
                             >
-                                <UserPlus className="w-3.5 h-3.5" /> Create an Account
+                                <UserPlus className="w-3.5 h-3.5" /> {t('register_title', 'Create an Account')}
                             </Link>
                         </div>
                     )}
 
-                    {/* Reviews list */}
                     {ratings.length > 0 && (
                         <div className="space-y-4">
                             {ratings.map((r, idx) => (
@@ -961,7 +912,7 @@ const Home = () => {
                                                 <Star key={i} className={`w-3.5 h-3.5 ${i <= r.stars ? 'fill-[#E67E22] text-[#E67E22]' : 'text-white/15'}`} />
                                             ))}
                                         </div>
-                                        {r.comment && <p className="text-white/50 text-sm leading-relaxed">{r.comment}</p>}
+                                        {r.comment && <p className="text-white/50 text-sm leading-relaxed">{t(r.comment, r.comment)}</p>}
                                     </div>
                                 </div>
                             ))}
@@ -969,7 +920,7 @@ const Home = () => {
                     )}
 
                     {ratings.length === 0 && (
-                        <p className="text-center text-white/20 text-sm font-semibold">No reviews yet. Be the first to rate us!</p>
+                        <p className="text-center text-white/20 text-sm font-semibold">{t('ratings_no_reviews', 'No reviews yet. Be the first to rate us!')}</p>
                     )}
                 </div>
             </section>

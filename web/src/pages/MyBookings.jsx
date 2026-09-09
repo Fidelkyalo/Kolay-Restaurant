@@ -262,10 +262,10 @@ export default function MyBookings() {
                                             <div className={`flex items-start gap-3 rounded-2xl p-4 border ${cfg.dark}`}>
                                                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                                                 <p className="text-xs font-semibold leading-relaxed">
-                                                    {booking.status === 'PENDING'   && t('Your reservation is awaiting confirmation from our team. We\'ll update this shortly.')}
-                                                    {booking.status === 'CONFIRMED' && t('Great news - your table is confirmed! We look forward to seeing you.')}
-                                                    {booking.status === 'CANCELLED' && t('This reservation has been cancelled. Feel free to make a new booking anytime.')}
-                                                    {booking.status === 'COMPLETED' && t('Thank you for dining with us. We hope to see you again soon!')}
+                                                    {booking.status === 'PENDING'   && t('booking_status_pending_msg')}
+                                                    {booking.status === 'CONFIRMED' && t('booking_status_confirmed_msg')}
+                                                    {booking.status === 'CANCELLED' && t('booking_status_cancelled_msg')}
+                                                    {booking.status === 'COMPLETED' && t('booking_status_completed_msg')}
                                                 </p>
                                             </div>
 

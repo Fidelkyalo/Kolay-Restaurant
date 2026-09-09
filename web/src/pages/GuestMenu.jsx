@@ -280,13 +280,13 @@ const GuestMenu = () => {
                                     to="/customer-login"
                                     className="flex items-center gap-1.5 text-white/50 hover:text-white font-black text-[10px] uppercase tracking-widest transition-colors px-3 py-2 rounded-xl hover:bg-white/5 border border-white/10"
                                 >
-                                    <LogIn className="w-3.5 h-3.5" /> Sign In
+                                    <LogIn className="w-3.5 h-3.5" /> {t('nav_sign_in')}
                                 </Link>
                                 <Link
                                     to="/register"
                                     className="flex items-center gap-1.5 bg-[#E67E22] hover:bg-[#D4A017] text-white px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg active:scale-95"
                                 >
-                                    <UserPlus className="w-3.5 h-3.5" /> Create Account
+                                    <UserPlus className="w-3.5 h-3.5" /> {t('nav_create_account')}
                                 </Link>
                             </div>
                         )}
@@ -317,9 +317,9 @@ const GuestMenu = () => {
 
             <main className="max-w-7xl mx-auto px-6 md:px-12 py-16">
                 <div className="mb-14 text-center">
-                    <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">Live Menu</p>
-                    <h1 className="text-4xl md:text-5xl font-display font-black text-white mb-4 tracking-tight">Order Online</h1>
-                    <p className="text-white/40 font-medium max-w-md mx-auto">Fresh food, prepared with love. Pick your favorites and we'll handle the rest.</p>
+                    <p className="text-[#E67E22] text-xs font-black uppercase tracking-[0.4em] mb-4">{t('menu_explore_subtitle')}</p>
+                    <h1 className="text-4xl md:text-5xl font-display font-black text-white mb-4 tracking-tight">{t('nav_order')}</h1>
+                    <p className="text-white/40 font-medium max-w-md mx-auto">{t('order_section_desc')}</p>
                 </div>
 
                 {/* Categories */}
@@ -351,15 +351,15 @@ const GuestMenu = () => {
                         <div className="flex items-center justify-center gap-3 bg-[#E67E22]/10 border border-[#E67E22]/30 rounded-2xl px-6 py-4 w-full">
                             <span className="text-2xl">🎉</span>
                             <p className="text-[#E67E22] font-black text-sm">
-                                All Specialties include a <strong>10% discount</strong> - automatically applied at checkout!
+                                {t('Specialty Discount')} — {t('automatically applied at checkout', 'automatically applied at checkout')}!
                             </p>
                         </div>
                         {!isLoggedIn && (
                             <div className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl px-6 py-3 w-full">
                                 <Lock className="w-4 h-4 text-white/40 shrink-0" />
                                 <p className="text-white/50 text-xs font-bold">
-                                    You need an account to order specialties.{' '}
-                                    <Link to="/customer-login" className="text-[#E67E22] hover:underline font-black">Sign in here</Link>
+                                    {t('Ordering specialties is exclusive to registered members. Sign in or create a free account to enjoy our seasonal specials with a')}{' '}
+                                    <Link to="/customer-login" className="text-[#E67E22] hover:underline font-black">{t('nav_sign_in')}</Link>
                                 </p>
                             </div>
                         )}
@@ -373,8 +373,8 @@ const GuestMenu = () => {
                             <div className="w-20 h-20 bg-[#E67E22]/10 border border-[#E67E22]/20 rounded-3xl flex items-center justify-center mb-6">
                                 <span className="text-3xl">✦</span>
                             </div>
-                            <p className="text-white/50 font-black text-lg uppercase tracking-widest mb-2">No Active Specialties</p>
-                            <p className="text-white/20 text-sm">Check back soon - our chef is planning something special.</p>
+                            <p className="text-white/50 font-black text-lg uppercase tracking-widest mb-2">{t('careers_no_positions')}</p>
+                            <p className="text-white/20 text-sm">{t('Check back soon or renew your existing contract above.')}</p>
                         </div>
                     ) : (
                         dishes.filter(d => !selectedCategory || d.category === selectedCategory).map(dish => (
@@ -437,7 +437,7 @@ const GuestMenu = () => {
                     <div className="absolute right-0 top-0 h-full w-full max-w-md bg-[#1A1008] border-l border-white/5 shadow-2xl flex flex-col pt-8 animate-in slide-in-from-right duration-300">
                         <div className="flex justify-between items-center mb-8 px-8">
                             <h2 className="text-2xl font-display font-black text-white flex items-center gap-3">
-                                <ShoppingCart className="text-[#E67E22]" /> Your Order
+                                <ShoppingCart className="text-[#E67E22]" /> {t('Order Summary')}
                             </h2>
                             <button onClick={() => setIsCartOpen(false)} className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl transition-colors">
                                 <X className="w-5 h-5 text-white/50" />
@@ -449,8 +449,8 @@ const GuestMenu = () => {
                                 <div className="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mb-6">
                                     <Utensils className="w-10 h-10 text-white" />
                                 </div>
-                                <p className="text-xl font-black uppercase tracking-widest text-white mb-2">Cart is Empty</p>
-                                <p className="text-white/50 text-sm">Add some delicious meals from the menu.</p>
+                                <p className="text-xl font-black uppercase tracking-widest text-white mb-2">{t('Your cart is empty')}</p>
+                                <p className="text-white/50 text-sm">{t('Select items to build a new order')}</p>
                             </div>
                         ) : (
                             <>
@@ -484,19 +484,19 @@ const GuestMenu = () => {
                                 <div className="pt-6 pb-8 px-8 bg-[#0D0A07] border-t border-white/5">
                                     {specialtyDiscount > 0 && (
                                         <div className="flex justify-between items-center mb-2">
-                                            <span className="text-green-400 font-black uppercase tracking-widest text-[10px]">🎉 Specialty Savings</span>
+                                            <span className="text-green-400 font-black uppercase tracking-widest text-[10px]">🎉 {t('Specialty Discount')}</span>
                                             <span className="text-green-400 font-black text-sm">- KES {specialtyDiscount.toLocaleString()}</span>
                                         </div>
                                     )}
                                     <div className="flex justify-between items-end mb-6">
-                                        <span className="text-white/40 font-black uppercase tracking-widest text-[10px]">Total Amount</span>
+                                        <span className="text-white/40 font-black uppercase tracking-widest text-[10px]">{t('Total')}</span>
                                         <span className="text-3xl font-black text-[#E67E22]">KES {total.toLocaleString()}</span>
                                     </div>
                                     <button
                                         onClick={() => setIsCheckoutOpen(true)}
                                         className="w-full bg-[#E67E22] hover:bg-[#D4A017] text-white font-black py-5 rounded-2xl shadow-[0_0_30px_#E67E2230] transition-all flex items-center justify-center gap-3 text-sm tracking-widest uppercase active:scale-95"
                                     >
-                                        Checkout Now <ArrowRight className="w-4 h-4" />
+                                        {t('pos_place_order')} <ArrowRight className="w-4 h-4" />
                                     </button>
                                 </div>
                             </>
