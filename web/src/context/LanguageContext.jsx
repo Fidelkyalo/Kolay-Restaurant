@@ -8,9 +8,14 @@ export const LANGUAGES = [
   { code: 'es',    name: 'Spanish',          native: 'Español',       dir: 'ltr', flag: '🇪🇸' },
   { code: 'ar',    name: 'Arabic',           native: 'العربية',       dir: 'rtl', flag: '🇸🇦' },
   { code: 'fr',    name: 'French',           native: 'Français',      dir: 'ltr', flag: '🇫🇷' },
-  { code: 'bn',    name: 'Bengali',          native: 'বাংলা',          dir: 'ltr', flag: '🇧🇩' },
+  { code: 'de',    name: 'German',           native: 'Deutsch',       dir: 'ltr', flag: '🇩🇪' },
+  { code: 'it',    name: 'Italian',          native: 'Italiano',      dir: 'ltr', flag: '🇮🇹' },
+  { code: 'ja',    name: 'Japanese',         native: '日本語',         dir: 'ltr', flag: '🇯🇵' },
+  { code: 'ko',    name: 'Korean',           native: '한국어',         dir: 'ltr', flag: '🇰🇷' },
+  { code: 'tr',    name: 'Turkish',          native: 'Türkçe',        dir: 'ltr', flag: '🇹🇷' },
   { code: 'pt',    name: 'Portuguese',       native: 'Português',     dir: 'ltr', flag: '🇧🇷' },
   { code: 'ru',    name: 'Russian',          native: 'Русский',       dir: 'ltr', flag: '🇷🇺' },
+  { code: 'bn',    name: 'Bengali',          native: 'বাংলা',          dir: 'ltr', flag: '🇧🇩' },
   { code: 'ur',    name: 'Urdu',             native: 'اردو',           dir: 'rtl', flag: '🇵🇰' },
 ];
 
