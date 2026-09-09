@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 // ── Persistence helpers ───────────────────────────────────────────────────────
 const LS_KEY = 'kolay_employees';
@@ -310,6 +311,7 @@ function EmployeeProfileModal({ emp, onClose, onEdit, isAdmin }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function Employees() {
+    const { t } = useLanguage();
     const [employees, setEmployees] = useState(ensureSeed);
     const [search, setSearch] = useState('');
     const [filterDept, setFilterDept] = useState('All');

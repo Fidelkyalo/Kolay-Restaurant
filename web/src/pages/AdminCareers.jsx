@@ -3,6 +3,7 @@ import { Briefcase, Plus, Trash2, Edit3, Check, X, Users, FileText, Clock, Chevr
 import Navbar from '../components/Navbar';
 import { ApplicationService } from '../services/api';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 const EMPTY_JOB = {
     id: null,
@@ -34,6 +35,7 @@ const getApplications = () => {
 };
 
 export default function AdminCareers() {
+    const { t } = useLanguage();
     const [jobs, setJobs] = useState(getJobs);
     const [applications, setApplications] = useState(getApplications);
     const [form, setForm] = useState(EMPTY_JOB);

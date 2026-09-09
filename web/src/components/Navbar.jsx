@@ -7,9 +7,10 @@ import {
 } from 'lucide-react';
 import { getRole, clearRole } from '../hooks/useRole';
 import { useLanguage } from '../context/LanguageContext';
+import LanguageSelector from './LanguageSelector';
 
 const Navbar = () => {
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [role, setRoleState] = useState(getRole);
@@ -33,25 +34,25 @@ const Navbar = () => {
 
     // Links visible to STAFF only
     const STAFF_LINKS = [
-        { name: t('nav.dashboard'),   path: '/dashboard',          icon: <Home className="w-4 h-4" /> },
-        { name: t('nav.menu'),        path: '/pos',                icon: <LayoutGrid className="w-4 h-4" /> },
-        { name: t('nav.kds'),         path: '/kds',                icon: <Monitor className="w-4 h-4" /> },
-        { name: t('nav.inventory'),   path: '/inventory',          icon: <Package className="w-4 h-4" /> },
-        { name: t('nav.bookings'),    path: '/admin/reservations', icon: <Calendar className="w-4 h-4" /> },
-        { name: t('nav.specialties'), path: '/specialties',        icon: <Sparkles className="w-4 h-4" /> },
-        { name: 'Orders',             path: '/kds',                icon: <ClipboardList className="w-4 h-4" /> },
+        { name: t('nav_dashboard'),   path: '/dashboard',          icon: <Home className="w-4 h-4" /> },
+        { name: t('nav_menu'),        path: '/pos',                icon: <LayoutGrid className="w-4 h-4" /> },
+        { name: t('nav_kds'),         path: '/kds',                icon: <Monitor className="w-4 h-4" /> },
+        { name: t('nav_inventory'),   path: '/inventory',          icon: <Package className="w-4 h-4" /> },
+        { name: t('nav_bookings'),    path: '/admin/reservations', icon: <Calendar className="w-4 h-4" /> },
+        { name: t('nav_specialties'), path: '/specialties',        icon: <Sparkles className="w-4 h-4" /> },
+        { name: t('nav_orders'),      path: '/kds',                icon: <ClipboardList className="w-4 h-4" /> },
     ];
 
     // Links visible to ADMIN only (full set)
     const ADMIN_LINKS = [
-        { name: t('nav.dashboard'),   path: '/dashboard',          icon: <Home className="w-4 h-4" /> },
-        { name: t('nav.menu'),        path: '/pos',                icon: <LayoutGrid className="w-4 h-4" /> },
-        { name: t('nav.kds'),         path: '/kds',                icon: <Monitor className="w-4 h-4" /> },
-        { name: t('nav.inventory'),   path: '/inventory',          icon: <Package className="w-4 h-4" /> },
-        { name: t('nav.bookings'),    path: '/admin/reservations', icon: <Calendar className="w-4 h-4" /> },
-        { name: t('nav.specialties'), path: '/specialties',        icon: <Sparkles className="w-4 h-4" /> },
-        { name: t('nav.careers'),     path: '/admin/careers',      icon: <Briefcase className="w-4 h-4" /> },
-        { name: t('nav.employees'),   path: '/employees',          icon: <Users className="w-4 h-4" /> },
+        { name: t('nav_dashboard'),   path: '/dashboard',          icon: <Home className="w-4 h-4" /> },
+        { name: t('nav_menu'),        path: '/pos',                icon: <LayoutGrid className="w-4 h-4" /> },
+        { name: t('nav_kds'),         path: '/kds',                icon: <Monitor className="w-4 h-4" /> },
+        { name: t('nav_inventory'),   path: '/inventory',          icon: <Package className="w-4 h-4" /> },
+        { name: t('nav_bookings'),    path: '/admin/reservations', icon: <Calendar className="w-4 h-4" /> },
+        { name: t('nav_specialties'), path: '/specialties',        icon: <Sparkles className="w-4 h-4" /> },
+        { name: t('nav_careers'),     path: '/admin/careers',      icon: <Briefcase className="w-4 h-4" /> },
+        { name: t('nav_employees'),   path: '/employees',          icon: <Users className="w-4 h-4" /> },
     ];
 
     const isAdmin = role === 'admin';
@@ -64,7 +65,7 @@ const Navbar = () => {
         navigate('/');
     };
 
-    const portalLabel = isAdmin ? 'Admin Portal' : 'Staff Portal';
+    const portalLabel = isAdmin ? t('portal_admin', 'Admin Portal') : t('portal_staff', 'Staff Portal');
     const portalColor = isAdmin ? 'bg-primary' : 'bg-secondary';
 
     // Get initials from stored user
@@ -99,7 +100,7 @@ const Navbar = () => {
                     </Link>
                 ))}
                 <Link to="/" className="whitespace-nowrap flex items-center gap-1.5 text-white/50 hover:text-secondary transition-all text-sm">
-                    Client View <ExternalLink className="w-3 h-3" />
+                    {t('nav_client_view', 'Client View')} <ExternalLink className="w-3 h-3" />
                 </Link>
             </div>
 
@@ -108,9 +109,14 @@ const Navbar = () => {
                 {isAdmin && (
                     <Link to="/admin"
                         className={`hidden sm:block bg-white/10 text-white px-4 py-1.5 rounded-xl text-[10px] font-black shadow-sm hover:bg-secondary hover:text-white transition-all border border-white/10 ${isActive('/admin') ? 'bg-secondary border-secondary' : ''}`}>
-                        ADMIN CONSOLE
+                        {t('nav_admin_console', 'ADMIN CONSOLE').toUpperCase()}
                     </Link>
                 )}
+
+                {/* Language Selector */}
+                <div className="hidden sm:block">
+                    <LanguageSelector variant="dark" />
+                </div>
 
                 {/* Avatar */}
                 <div className="relative">
@@ -135,19 +141,19 @@ const Navbar = () => {
                                 {isAdmin && (
                                     <Link to="/admin" onClick={() => setShowProfileMenu(false)}
                                         className="w-full text-left px-5 py-3 text-sm hover:bg-bg-cream transition-colors text-charcoal font-bold flex items-center gap-3">
-                                        <Settings className="w-4 h-4 text-secondary" /> Settings
+                                        <Settings className="w-4 h-4 text-secondary" /> {t('nav_settings', 'Settings')}
                                     </Link>
                                 )}
                                 {isAdmin && (
                                     <button onClick={() => { setShowProfileMenu(false); if (window.confirm('Reset all data?')) { localStorage.clear(); window.location.reload(); } }}
                                         className="w-full text-left px-5 py-3 text-sm hover:bg-red-50 transition-colors text-red-500 font-bold flex items-center gap-3">
-                                        <RefreshCw className="w-4 h-4" /> Reset System
+                                        <RefreshCw className="w-4 h-4" /> {t('nav_reset_system', 'Reset System')}
                                     </button>
                                 )}
                                 <div className="mt-2 pt-2 border-t border-primary/5">
                                     <button onClick={handleLogout}
                                         className="w-full text-left px-5 py-3 text-sm hover:bg-bg-cream transition-colors text-charcoal font-bold flex items-center gap-3">
-                                        <LogOut className="w-4 h-4 text-primary" /> Sign Out
+                                        <LogOut className="w-4 h-4 text-primary" /> {t('nav_sign_out', 'Sign Out')}
                                     </button>
                                 </div>
                             </div>
@@ -184,7 +190,7 @@ const Navbar = () => {
                             ))}
                             <Link to="/" onClick={() => setIsMenuOpen(false)}
                                 className="flex items-center gap-4 p-4 rounded-2xl text-white/50 hover:bg-white/5 hover:text-secondary transition-all">
-                                <ExternalLink className="w-4 h-4" /><span>Client View</span>
+                                <ExternalLink className="w-4 h-4" /><span>{t('nav_client_view', 'Client View')}</span>
                             </Link>
                         </div>
 
@@ -192,19 +198,23 @@ const Navbar = () => {
                             {isAdmin && (
                                 <Link to="/admin" onClick={() => setIsMenuOpen(false)}
                                     className="flex items-center gap-4 p-4 text-accent font-black uppercase text-xs tracking-widest hover:bg-white/5 rounded-2xl transition-all">
-                                    <Shield className="w-4 h-4" /> Admin Console
+                                    <Shield className="w-4 h-4" /> {t('nav_admin_console', 'Admin Console')}
                                 </Link>
                             )}
                             {isAdmin && (
                                 <button onClick={() => { if (window.confirm('Reset all data?')) { localStorage.clear(); window.location.reload(); } }}
                                     className="w-full flex items-center gap-4 p-4 text-red-400 font-black uppercase text-xs tracking-widest hover:bg-white/5 rounded-2xl transition-all">
-                                    <RefreshCw className="w-4 h-4" /> Reset System
+                                    <RefreshCw className="w-4 h-4" /> {t('nav_reset_system', 'Reset System')}
                                 </button>
                             )}
                             <button onClick={handleLogout}
                                 className="w-full flex items-center gap-4 p-4 text-white/40 font-black uppercase text-xs tracking-widest hover:bg-white/5 rounded-2xl transition-all">
-                                <LogOut className="w-4 h-4" /> Sign Out
+                                <LogOut className="w-4 h-4" /> {t('nav_sign_out', 'Sign Out')}
                             </button>
+                            {/* Language selector in mobile drawer */}
+                            <div className="p-4">
+                                <LanguageSelector variant="dark" />
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -7,6 +7,7 @@ import Navbar from '../components/Navbar';
 import { ReservationService } from '../services/api';
 import { isAdmin } from '../hooks/useRole';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 // ── Helpers for local reservation store (used for assignment persistence) ──
 const LS_KEY = 'kolay_reservations_local';
@@ -38,6 +39,7 @@ const getStaffList = () => {
 };
 
 const ManageReservations = () => {
+    const { t } = useLanguage();
     const adminMode = isAdmin();
 
     // Staff identity - read from localStorage

@@ -7,6 +7,7 @@ import {
 import Navbar from '../components/Navbar';
 import { MenuService } from '../services/api';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 // ─── Shared helpers (same as POS / GuestMenu) ────────────────────────────────
 const CATEGORIES = ['BreakFast', 'Starters', 'Main Dish', 'Side Dish', 'Desserts', 'Beverages'];
@@ -41,6 +42,7 @@ const EMPTY_DISH = { name: '', price: '', category: 'Main Dish', image: '', desc
 // ─── Component ────────────────────────────────────────────────────────────────
 function AdminPanel() {
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const [activeTab, setActiveTab] = useState('menu'); // 'menu' | 'settings' | 'users' | 'maintenance'
 
     // ── System Settings ───────────────────────────────────────────────────────
@@ -290,10 +292,10 @@ function AdminPanel() {
 
     // ── Tab definitions ───────────────────────────────────────────────────────
     const TABS = [
-        { id: 'menu',        label: 'Menu Management', icon: <UtensilsCrossed className="w-4 h-4" /> },
-        { id: 'settings',    label: 'System Settings',  icon: <Settings className="w-4 h-4" /> },
-        { id: 'users',       label: 'Users',            icon: <Users className="w-4 h-4" /> },
-        { id: 'maintenance', label: 'Maintenance',      icon: <Shield className="w-4 h-4" /> },
+        { id: 'menu',        label: t('tab_menu_mgmt', 'Menu Management'), icon: <UtensilsCrossed className="w-4 h-4" /> },
+        { id: 'settings',    label: t('tab_system_settings', 'System Settings'),  icon: <Settings className="w-4 h-4" /> },
+        { id: 'users',       label: t('tab_users', 'Users'),            icon: <Users className="w-4 h-4" /> },
+        { id: 'maintenance', label: t('tab_maintenance', 'Maintenance'),      icon: <Shield className="w-4 h-4" /> },
     ];
 
     return (
@@ -303,8 +305,8 @@ function AdminPanel() {
             <main className="max-w-7xl mx-auto px-6 py-10">
                 {/* Page header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-display font-bold text-primary">Admin Console</h1>
-                    <p className="text-charcoal/50 text-sm mt-1">Manage your menu, settings, and users from one place.</p>
+                    <h1 className="text-3xl font-display font-bold text-primary">{t('admin_console_title', 'Admin Console')}</h1>
+                    <p className="text-charcoal/50 text-sm mt-1">{t('admin_console_desc', 'Manage your menu, settings, and users from one place.')}</p>
                 </div>
 
                 {/* Tab bar */}
@@ -335,7 +337,7 @@ function AdminPanel() {
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-charcoal/30" />
                                     <input
                                         type="text"
-                                        placeholder="Search items…"
+                                        placeholder={t('search_items_placeholder', 'Search items…')}
                                         value={menuSearch}
                                         onChange={e => setMenuSearch(e.target.value)}
                                         className="pl-9 pr-4 py-2.5 bg-white border border-primary/10 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-secondary/30 w-52"
@@ -347,7 +349,7 @@ function AdminPanel() {
                                     onChange={e => setMenuCategory(e.target.value)}
                                     className="px-4 py-2.5 bg-white border border-primary/10 rounded-xl text-sm font-bold outline-none focus:ring-2 focus:ring-secondary/30 appearance-none"
                                 >
-                                    <option value="All">All Categories</option>
+                                <option value="All">{t('all_categories', 'All Categories')}</option>
                                     {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                                 {/* refresh */}
@@ -357,14 +359,14 @@ function AdminPanel() {
                                     className="flex items-center gap-2 px-4 py-2.5 bg-white border border-primary/10 rounded-xl text-sm font-bold text-charcoal/60 hover:text-primary transition-all disabled:opacity-40"
                                 >
                                     <RefreshCw className={`w-4 h-4 ${menuLoading ? 'animate-spin' : ''}`} />
-                                    {menuLoading ? 'Loading…' : 'Refresh'}
+                                    {menuLoading ? t('loading', 'Loading…') : t('Refresh', 'Refresh')}
                                 </button>
                             </div>
                             <button
                                 onClick={openAdd}
                                 className="flex items-center gap-2 bg-secondary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg active:scale-95"
                             >
-                                <Plus className="w-4 h-4" /> Add Item
+                                <Plus className="w-4 h-4" /> {t('add', 'Add Item')}
                             </button>
                         </div>
 
@@ -396,7 +398,7 @@ function AdminPanel() {
                                                 onError={e => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600'; }}
                                             />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-charcoal/10 font-bold uppercase tracking-widest text-sm">No image</div>
+                                            <div className="w-full h-full flex items-center justify-center text-charcoal/10 font-bold uppercase tracking-widest text-sm">{t('no_image', 'No image')}</div>
                                         )}
                                         <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-primary text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-lg shadow-sm">
                                             {item.category}
@@ -434,8 +436,8 @@ function AdminPanel() {
                             {filteredMenu.length === 0 && !menuLoading && (
                                 <div className="col-span-full flex flex-col items-center py-20 text-center opacity-40">
                                     <UtensilsCrossed className="w-12 h-12 mb-4 text-primary" />
-                                    <p className="font-bold text-primary">No items found</p>
-                                    <p className="text-sm text-charcoal/50 mt-1">Try a different search or category, or add a new item.</p>
+                                    <p className="font-bold text-primary">{t('no_items_found', 'No items found')}</p>
+                                    <p className="text-sm text-charcoal/50 mt-1">{t('no_items_found_sub', 'Try a different search or category, or add a new item.')}</p>
                                 </div>
                             )}
                         </div>
@@ -446,10 +448,10 @@ function AdminPanel() {
                 {activeTab === 'settings' && (
                     <div className="max-w-2xl space-y-5">
                         {[
-                            { label: 'Restaurant Name', sub: settings.restaurantName, type: 'NAME', value: settings.restaurantName },
-                            { label: 'Currency Setting', sub: settings.currency, type: 'CURRENCY', value: settings.currency },
-                            { label: 'Tax Rate', sub: `${settings.taxRate}%`, type: 'TAX_RATE', value: settings.taxRate },
-                            { label: 'Tax Mode', sub: settings.isTaxInclusive ? 'Inclusive' : 'Exclusive', type: 'TAX_MODE', value: settings.isTaxInclusive ? 'INCLUSIVE' : 'EXCLUSIVE' },
+                            { label: t('setting_restaurant_name', 'Restaurant Name'), sub: settings.restaurantName, type: 'NAME', value: settings.restaurantName },
+                            { label: t('setting_currency', 'Currency Setting'), sub: settings.currency, type: 'CURRENCY', value: settings.currency },
+                            { label: t('setting_tax_rate', 'Tax Rate'), sub: `${settings.taxRate}%`, type: 'TAX_RATE', value: settings.taxRate },
+                            { label: t('setting_tax_mode', 'Tax Mode'), sub: settings.isTaxInclusive ? t('setting_inclusive', 'Inclusive') : t('setting_exclusive', 'Exclusive'), type: 'TAX_MODE', value: settings.isTaxInclusive ? 'INCLUSIVE' : 'EXCLUSIVE' },
                         ].map(row => (
                             <div key={row.type} className="flex items-center justify-between bg-white p-5 rounded-2xl border border-primary/5 shadow-sm">
                                 <div>
@@ -460,7 +462,7 @@ function AdminPanel() {
                                     onClick={() => setEditConfig({ type: row.type, value: row.value })}
                                     className="text-secondary font-bold text-sm hover:underline"
                                 >
-                                    Update
+                                    {t('setting_update_btn', 'Update')}
                                 </button>
                             </div>
                         ))}
@@ -473,9 +475,9 @@ function AdminPanel() {
                         <table className="w-full text-left">
                             <thead className="bg-bg-cream border-b border-primary/5">
                                 <tr>
-                                    <th className="px-6 py-4 text-xs uppercase text-charcoal/40 font-black tracking-widest">User</th>
-                                    <th className="px-6 py-4 text-xs uppercase text-charcoal/40 font-black tracking-widest">Role</th>
-                                    <th className="px-6 py-4 text-xs uppercase text-charcoal/40 font-black tracking-widest">Action</th>
+                                    <th className="px-6 py-4 text-xs uppercase text-charcoal/40 font-black tracking-widest">{t('user_col', 'User')}</th>
+                                    <th className="px-6 py-4 text-xs uppercase text-charcoal/40 font-black tracking-widest">{t('role_col', 'Role')}</th>
+                                    <th className="px-6 py-4 text-xs uppercase text-charcoal/40 font-black tracking-widest">{t('action_col', 'Action')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -490,7 +492,7 @@ function AdminPanel() {
                                                 onClick={() => setEditConfig({ type: 'USER', id: user.id, value: user.name, role: user.role })}
                                                 className="text-secondary text-sm font-bold hover:underline"
                                             >
-                                                Edit
+                                                {t('edit', 'Edit')}
                                             </button>
                                         </td>
                                     </tr>
@@ -514,15 +516,15 @@ function AdminPanel() {
                                 className="w-full flex items-center justify-between p-4 bg-red-50 hover:bg-red-100 border border-red-100 rounded-2xl transition-all text-left"
                             >
                                 <div>
-                                    <h3 className="font-bold text-sm text-red-700">Clear History Archive</h3>
-                                    <p className="text-[10px] text-red-400">Permanently delete all sales records</p>
+                                    <h3 className="font-bold text-sm text-red-700">{t('maintenance_clear_archive', 'Clear History Archive')}</h3>
+                                    <p className="text-[10px] text-red-400">{t('maintenance_clear_archive_sub', 'Permanently delete all sales records')}</p>
                                 </div>
                                 <Trash2 className="w-4 h-4 text-red-400" />
                             </button>
                             <button className="w-full flex items-center justify-between p-4 bg-bg-cream rounded-2xl border border-primary/5 text-left opacity-50 cursor-not-allowed">
                                 <div>
-                                    <h3 className="font-bold text-sm">System Update</h3>
-                                    <p className="text-[10px] text-charcoal/40">Latest version installed (v2.4.1)</p>
+                                    <h3 className="font-bold text-sm">{t('maintenance_system_update', 'System Update')}</h3>
+                                    <p className="text-[10px] text-charcoal/40">{t('maintenance_latest_version', 'Latest version installed')} (v2.4.1)</p>
                                 </div>
                                 <Database className="w-4 h-4 text-secondary" />
                             </button>
@@ -541,7 +543,7 @@ function AdminPanel() {
                     <div className="bg-white rounded-[2rem] w-full max-w-md shadow-2xl p-8 animate-in zoom-in duration-200">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-2xl font-bold text-primary">
-                                {editingId ? 'Edit Menu Item' : 'Add New Item'}
+                                {editingId ? t('Edit Dish', 'Edit Menu Item') : t('Add New Dish', 'Add New Item')}
                             </h3>
                             <button onClick={() => setShowDishModal(false)} className="p-2 hover:bg-bg-cream rounded-xl text-charcoal/40 hover:text-primary transition-colors">
                                 <X className="w-5 h-5" />
@@ -559,13 +561,13 @@ function AdminPanel() {
                                         onError={e => { e.target.onerror = null; e.target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600'; }}
                                     />
                                 ) : (
-                                    <span className="text-charcoal/20 text-xs font-bold uppercase tracking-widest">Image Preview</span>
+                                    <span className="text-charcoal/20 text-xs font-bold uppercase tracking-widest">{t('dish_image_preview', 'Image Preview')}</span>
                                 )}
                             </div>
 
                             {/* name */}
                             <div>
-                                <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-1.5">Item Name *</label>
+                                <label className="block text-[10px] font-black uppercase text-charcoal/40 mb-1.5">{t('Dish Name', 'Item Name')} *</label>
                                 <input
                                     type="text"
                                     placeholder="e.g. Chicken Wings"
