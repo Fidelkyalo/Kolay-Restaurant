@@ -274,9 +274,11 @@ const Register = () => {
                 </div>
 
                 <div className="p-5 bg-bg-cream/30 border-t border-cream flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-xs text-charcoal/40">
+                    <p className="text-xs text-charcoal/50">
                         By creating an account you agree to our{' '}
-                        <span className="text-secondary font-bold cursor-pointer hover:underline">Terms of Service</span>
+                        <Link to="/terms-of-use" target="_blank" className="text-secondary font-bold hover:underline">Terms of Use</Link>
+                        {' '}and{' '}
+                        <Link to="/privacy-policy" target="_blank" className="text-secondary font-bold hover:underline">Privacy Policy</Link>.
                     </p>
                     <LanguageSelector variant="light" />
                 </div>

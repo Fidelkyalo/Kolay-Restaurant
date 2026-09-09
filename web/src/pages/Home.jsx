@@ -5,6 +5,7 @@ import {
     Award, Users, TrendingUp, Bike, ShoppingBag, Gift, Tag, Repeat, Mail, UserPlus
 } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
+import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
 import { MenuService } from '../services/api';
 import LanguageSelector from '../components/LanguageSelector';
@@ -974,86 +975,9 @@ const Home = () => {
             </section>
 
             {/* ── FOOTER ──────────────────────────────── */}
-            <footer id="contact" className="border-t border-white/5 bg-[#0A0704] px-6 md:px-12 pt-20 pb-8">
-                <div className="max-w-7xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-                        <div className="space-y-5 lg:col-span-1">
-                            <div className="flex items-center gap-2">
-                                <a href="#home" onClick={(e) => { e.preventDefault(); document.getElementById('home')?.scrollIntoView({ behavior: 'smooth' }); }} className="flex items-center gap-2 group cursor-pointer" aria-label="Go to top">
-                                    <img src="/Logo.png" alt="Kolay Logo" className="w-10 h-10 rounded shadow-sm group-hover:scale-105 transition-transform duration-300" />
-                                    <span className="text-xl font-display font-black text-white uppercase tracking-tight italic">Kolay Restaurant</span>
-                                </a>
-                            </div>
-                            <p className="text-white/30 text-sm leading-relaxed">
-                                Artisan culinary experiences crafted for those who appreciate the finer things in life.
-                            </p>
-                            <div className="flex gap-3">
-                                {[Camera, MessageCircle, Send].map((Icon, i) => (
-                                    <button key={i} className="w-9 h-9 bg-white/5 hover:bg-[#E67E22] border border-white/8 hover:border-[#E67E22] rounded-xl flex items-center justify-center transition-all group">
-                                        <Icon className="w-4 h-4 text-white/40 group-hover:text-white transition-colors" />
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Quick Links */}
-                        <div className="space-y-5">
-                            <h4 className="text-white font-black text-xs uppercase tracking-[0.3em]">Navigate</h4>
-                            <ul className="space-y-3">
-                                {['Home', 'About', 'Menu', 'Order', 'Offers', 'Gallery', 'Reservations', 'Contact'].map(l => (
-                                    <li key={l}>
-                                        {l === 'Reservations' ? (
-                                            <Link to="/reservations" className="text-white/30 hover:text-[#E67E22] text-sm transition-colors font-medium">{l}</Link>
-                                        ) : (
-                                            <a href={`#${l.toLowerCase()}`} className="text-white/30 hover:text-[#E67E22] text-sm transition-colors font-medium">{l}</a>
-                                        )}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Hours */}
-                        <div className="space-y-5">
-                            <h4 className="text-white font-black text-xs uppercase tracking-[0.3em]">Hours</h4>
-                            <ul className="space-y-3 text-sm">
-                                {[
-                                    { days: 'Every Day', time: 'Open 24/7' },
-                                ].map(({ days, time }) => (
-                                    <li key={days} className="flex justify-between gap-4">
-                                        <span className="text-white/30">{days}</span>
-                                        <span className="text-white font-bold">{time}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* Newsletter */}
-                        <div className="space-y-5">
-                            <h4 className="text-white font-black text-xs uppercase tracking-[0.3em]">Newsletter</h4>
-                            <p className="text-white/30 text-sm">Get exclusive offers and event invites.</p>
-                            <div className="flex gap-2">
-                                <input
-                                    placeholder="Email address"
-                                    className="flex-1 bg-white/5 border border-white/8 text-white/60 placeholder-white/20 px-4 py-2.5 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm transition-colors"
-                                />
-                                <button className="bg-[#E67E22] hover:bg-[#D4A017] text-white px-4 py-2.5 rounded-xl font-black text-xs transition-all shrink-0">
-                                    Join
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-white/20 font-black uppercase tracking-widest">
-                        <p>© 2026 Kolay Restaurant. All rights reserved.</p>
-                        <div className="flex flex-wrap items-center gap-6">
-                            <LanguageSelector variant="dark" />
-                            <span className="cursor-pointer hover:text-white/50 transition-colors">Privacy Policy</span>
-                            <span className="cursor-pointer hover:text-white/50 transition-colors">Terms of Use</span>
-                            <Link to="/staff" className="cursor-pointer hover:text-[#E67E22] transition-colors">Staff Portal</Link>
-                        </div>
-                    </div>
-                </div>
-            </footer>
+            <div id="contact">
+                <Footer />
+            </div>
         </div>
     );
 };
