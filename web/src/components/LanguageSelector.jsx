@@ -2,29 +2,64 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Globe, ChevronDown, Check, Search, X } from 'lucide-react';
 import { useLanguage, LANGUAGES } from '../context/LanguageContext';
 
-const LanguageSelector = ({ variant = 'dark', direction = 'auto' }) => {
+const LanguageSelector = ({ variant = 'dark' }) => {
   const { language, setLanguage, t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const ref = useRef(null);
+  const [coords, setCoords] = useState({ top: 0, left: 0, openUp: false });
+  const buttonRef = useRef(null);
+  const menuRef = useRef(null);
   const inputRef = useRef(null);
 
   const current = LANGUAGES.find(l => l.code === language) || LANGUAGES[0];
 
+  const updatePosition = () => {
+    if (!buttonRef.current) return;
+    const rect = buttonRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openUp = spaceBelow < 380;
+    
+    setCoords({
+      top: openUp ? rect.top - 8 : rect.bottom + 8,
+      left: Math.max(12, Math.min(rect.left + rect.width / 2 - 128, window.innerWidth - 268)),
+      openUp
+    });
+  };
+
+  const handleToggle = () => {
+    if (!open) updatePosition();
+    setOpen(!open);
+  };
+
   useEffect(() => {
-    const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) {
+    const handleOutsideClick = (e) => {
+      if (
+        buttonRef.current && !buttonRef.current.contains(e.target) &&
+        menuRef.current && !menuRef.current.contains(e.target)
+      ) {
         setOpen(false);
       }
     };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
+
+    const handleScroll = () => {
+      if (open) updatePosition();
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+    window.addEventListener('scroll', handleScroll, true);
+    window.addEventListener('resize', handleScroll);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (open && inputRef.current) {
       setTimeout(() => inputRef.current?.focus(), 50);
-    } else {
+    } else if (!open) {
       setSearch('');
     }
   }, [open]);
@@ -38,9 +73,10 @@ const LanguageSelector = ({ variant = 'dark', direction = 'auto' }) => {
   );
 
   return (
-    <div ref={ref} className="relative inline-block text-left">
+    <div className="relative inline-block text-left">
       <button
-        onClick={() => setOpen(!open)}
+        ref={buttonRef}
+        onClick={handleToggle}
         aria-label={t('footer_language', 'Select Language')}
         className={`flex items-center gap-2 px-3.5 py-2 rounded-full border text-xs font-bold tracking-wider transition-all duration-200 cursor-pointer select-none ${
           isDark 
@@ -56,11 +92,15 @@ const LanguageSelector = ({ variant = 'dark', direction = 'auto' }) => {
 
       {open && (
         <div
-          className={`absolute z-[9999] w-64 max-h-[380px] bg-[#140D06] border border-[#E67E22]/30 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] p-2 flex flex-col animate-in fade-in zoom-in-95 duration-150 ${
-            direction === 'down' 
-              ? 'top-full mt-2 left-0 sm:left-auto sm:right-0' 
-              : 'bottom-full mb-2 left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0'
-          }`}
+          ref={menuRef}
+          style={{
+            position: 'fixed',
+            top: coords.openUp ? 'auto' : `${coords.top}px`,
+            bottom: coords.openUp ? `${window.innerHeight - coords.top}px` : 'auto',
+            left: `${coords.left}px`,
+            zIndex: 999999,
+          }}
+          className="w-64 max-h-[380px] bg-[#140D06] border border-[#E67E22]/40 rounded-2xl shadow-[0_10px_50px_rgba(0,0,0,0.9)] p-2.5 flex flex-col animate-in fade-in zoom-in-95 duration-150"
         >
           {/* Header & Search */}
           <div className="p-2 border-b border-white/10 mb-1 space-y-2">

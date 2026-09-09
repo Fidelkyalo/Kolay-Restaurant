@@ -236,7 +236,7 @@ export default function Footer({ variant = 'full' }) {
 
     return (
         <>
-            <footer className="w-full bg-gradient-to-b from-[#0F0B07] to-[#070503] border-t border-white/5 text-white pt-16 pb-8 px-6 mt-auto relative overflow-hidden">
+            <footer className="w-full bg-gradient-to-b from-[#0F0B07] to-[#070503] border-t border-white/5 text-white pt-16 pb-8 px-6 mt-auto relative">
                 {/* Subtle Background Glow & Floating Culinary Motif Icons */}
                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#E67E22]/5 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#B8860B]/5 rounded-full blur-3xl pointer-events-none" />
