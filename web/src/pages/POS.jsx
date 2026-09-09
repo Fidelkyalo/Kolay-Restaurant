@@ -42,6 +42,24 @@ const POS = () => {
             return;
         }
 
+        // Translated receipt strings
+        const rDate = t('Date');
+        const rTime = t('Time');
+        const rTable = t('Table');
+        const rQty = t('Qty');
+        const rItem = t('Item');
+        const rPrice = t('Price');
+        const rSubtotal = t('Subtotal');
+        const rTotal = t('Total');
+        const rTotalPayable = t('Total Payable') || 'TOTAL PAYABLE';
+        const rPaymentStatus = t('Payment Status') || 'PAYMENT STATUS';
+        const rSpecialDiscount = t('Specialty Discount') || 'Specialty Discount (10%)';
+        const rThankYou = t('Thank you for dining with us!');
+        const rVisitAgain = t('Visit again soon.') || 'Visit again soon.';
+        const rUnpaid = t('UNPAID') || 'UNPAID';
+        const rSpecial = t('SPECIAL') || 'SPECIAL';
+        const rTagline = t('Where Every Meal Feels Right') || 'Where Every Meal Feels Right';
+
         const receiptHtml = `
             <!DOCTYPE html>
             <html>
@@ -88,24 +106,24 @@ const POS = () => {
                     <img src="/Logo.png" class="watermark" />
                     <div class="header">
                         <h1 class="restaurant-name">KOLAY RESTAURANT</h1>
-                        <p class="tagline">"Where Every Meal Feels Right"</p>
+                        <p class="tagline">"${rTagline}"</p>
                         <p style="font-size: 11px;">123 Thome Street, Nairobi<br>Tel: +254 102 039 121<br>Email: kolayrestaurant@gmail.com</p>
                     </div>
                     <div class="order-info">
                         <div class="total-row"><span>ID:</span> <strong>${lastPlacedOrder.id}</strong></div>
-                        <div class="total-row"><span>Date:</span> <span>${new Date(lastPlacedOrder.timestamp).toLocaleDateString()}</span></div>
-                        <div class="total-row"><span>Time:</span> <span>${new Date(lastPlacedOrder.timestamp).toLocaleTimeString('en-GB')}</span></div>
-                        <div class="total-row"><span>Table/Mode:</span> <strong style="text-transform: uppercase;">${lastPlacedOrder.table}</strong></div>
+                        <div class="total-row"><span>${rDate}:</span> <span>${new Date(lastPlacedOrder.timestamp).toLocaleDateString()}</span></div>
+                        <div class="total-row"><span>${rTime}:</span> <span>${new Date(lastPlacedOrder.timestamp).toLocaleTimeString('en-GB')}</span></div>
+                        <div class="total-row"><span>${rTable}:</span> <strong style="text-transform: uppercase;">${lastPlacedOrder.table}</strong></div>
                     </div>
                     <table class="items">
                         <thead>
-                            <tr><th class="qty">QTY</th><th>ITEM</th><th class="price">PRICE</th></tr>
+                            <tr><th class="qty">${rQty}</th><th>${rItem}</th><th class="price">${rPrice}</th></tr>
                         </thead>
                         <tbody>
                             ${lastPlacedOrder.items.map(item => `
                                 <tr>
                                     <td class="qty">${item.quantity}</td>
-                                    <td>${item.name}${item.isSpecialty ? ' <span style="color:#E67E22;font-size:9px;font-weight:bold;">★ SPECIAL</span>' : ''}</td>
+                                    <td>${t(item.name)}${item.isSpecialty ? ` <span style="color:#E67E22;font-size:9px;font-weight:bold;">★ ${rSpecial}</span>` : ''}</td>
                                     <td class="price">
                                         ${item.isSpecialty && item.originalPrice
                                             ? `<span style="text-decoration:line-through;color:#aaa;font-size:11px;">KES ${(item.originalPrice * item.quantity).toLocaleString()}</span><br><strong>KES ${(item.price * item.quantity).toLocaleString()}</strong>`
@@ -116,32 +134,32 @@ const POS = () => {
                             `).join('')}
                             ${lastPlacedOrder.specialtyDiscount > 0 ? `
                             <tr style="color:#E67E22;">
-                                <td colspan="2" style="padding-top: 8px; border-top: 1px dashed #eee; font-weight:bold;">🎉 Specialty Discount (10%)</td>
+                                <td colspan="2" style="padding-top: 8px; border-top: 1px dashed #eee; font-weight:bold;">🎉 ${rSpecialDiscount}</td>
                                 <td style="padding-top: 8px; border-top: 1px dashed #eee; text-align: right; font-weight:bold;">- KES ${lastPlacedOrder.specialtyDiscount.toLocaleString()}</td>
                             </tr>` : ''}
                             <tr>
-                                <td colspan="2" style="padding-top: 10px; border-top: 1px dashed #eee;">SUBTOTAL</td>
+                                <td colspan="2" style="padding-top: 10px; border-top: 1px dashed #eee;">${rSubtotal.toUpperCase()}</td>
                                 <td style="padding-top: 10px; border-top: 1px dashed #eee; text-align: right;">KES ${lastPlacedOrder.subtotal.toLocaleString()}</td>
                             </tr>
                             <tr>
-                                <td colspan="2">${isTaxInclusive ? `VAT (${taxRate}% Incl.)` : `VAT (${taxRate}%)`}</td>
+                                <td colspan="2">${isTaxInclusive ? `${t('VAT')} (${taxRate}% ${t('Incl.')})` : `${t('VAT')} (${taxRate}%)`}</td>
                                 <td style="text-align: right;">KES ${lastPlacedOrder.tax.toLocaleString()}</td>
                             </tr>
                             <tr style="font-weight: bold; font-size: 14px;">
-                                <td colspan="2" style="padding-top: 5px;">TOTAL PAYABLE</td>
+                                <td colspan="2" style="padding-top: 5px;">${rTotalPayable}</td>
                                 <td style="padding-top: 5px; text-align: right;">KES ${lastPlacedOrder.totalAmount.toLocaleString()}</td>
                             </tr>
                         </tbody>
                     </table>
                     <div class="totals">
                         <div class="total-row payment" style="margin-top:10px; border-top: 1px solid #eee; padding-top: 10px;">
-                            <span style="font-size:16px; font-weight:bold;">PAYMENT STATUS:</span>
-                            <span style="font-size:16px; font-weight:bold;">${lastPlacedOrder.paymentStatus || 'UNPAID'}</span>
+                            <span style="font-size:16px; font-weight:bold;">${rPaymentStatus}:</span>
+                            <span style="font-size:16px; font-weight:bold;">${t(lastPlacedOrder.paymentStatus) || rUnpaid}</span>
                         </div>
                     </div>
                     <div class="footer">
-                        <p>Thank you for dining with us!<br>Visit again soon.</p>
-                        <p style="font-size: 8px; margin-top: 10px;">GENERATED BY KOLAY RMS</p>
+                        <p>${rThankYou}<br>${rVisitAgain}</p>
+                        <p style="font-size: 8px; margin-top: 10px;">${t('GENERATED BY KOLAY RMS')}</p>
                     </div>
                 </body>
             </html>
@@ -444,7 +462,7 @@ const POS = () => {
                     <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
                         <div className="bg-white rounded-[2rem] w-full max-w-lg shadow-2xl p-8 animate-in zoom-in duration-200">
                             <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-2xl font-bold text-primary">Assign Table</h3>
+                                <h3 className="text-2xl font-bold text-primary">{t('Assign Table')}</h3>
                                 <button onClick={() => setShowTableModal(false)} className="text-charcoal/40 hover:text-primary text-2xl">&times;</button>
                             </div>
                             <div className="grid grid-cols-4 gap-4 mb-8">
@@ -464,7 +482,7 @@ const POS = () => {
                             <div className="flex gap-4 border-t border-cream pt-6 mt-4">
                                 <input
                                     type="text"
-                                    placeholder="New table # (e.g. 16)"
+                                    placeholder={t('New table # (e.g. 16)')}
                                     className="flex-1 px-4 py-3 bg-bg-cream border border-cream rounded-xl outline-none focus:ring-2 focus:ring-secondary/50 font-bold"
                                     value={newTableNumber}
                                     onChange={(e) => setNewTableNumber(e.target.value)}
@@ -473,14 +491,14 @@ const POS = () => {
                                     onClick={addTable}
                                     className="bg-secondary text-white px-6 py-3 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg active:scale-95"
                                 >
-                                    Add Table
+                                    {t('Add Table')}
                                 </button>
                             </div>
                             <button
                                 onClick={() => setShowTableModal(false)}
                                 className="w-full py-4 mt-4 bg-bg-cream text-charcoal font-bold rounded-2xl hover:bg-cream transition-colors text-sm uppercase tracking-widest"
                             >
-                                Close
+                                {t('Close')}
                             </button>
                         </div>
                     </div>
@@ -493,22 +511,22 @@ const POS = () => {
                             <div className="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
                                 <CheckCircle className="w-12 h-12" />
                             </div>
-                            <h3 className="text-3xl font-black text-primary mb-4">Order Placed!</h3>
+                            <h3 className="text-3xl font-black text-primary mb-4">{t('Order Placed!')}</h3>
                             <p className="text-charcoal/60 font-medium mb-10 leading-relaxed">
-                                Order <strong>#{lastPlacedOrder?.id}</strong> has been sent to the kitchen.
+                                {t('Order')} <strong>#{lastPlacedOrder?.id}</strong> {t('has been sent to the kitchen.')}
                             </p>
                             <div className="space-y-4">
                                 <button
                                     onClick={handlePrintReceipt}
                                     className="w-full bg-secondary text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-orange-600 transition-all shadow-xl active:scale-95 text-lg"
                                 >
-                                    <Printer className="w-6 h-6" /> Print Receipt
+                                    <Printer className="w-6 h-6" /> {t('Print Receipt')}
                                 </button>
                                 <button
                                     onClick={() => setShowSuccess(false)}
                                     className="w-full bg-bg-cream text-charcoal/40 py-4 rounded-xl font-bold hover:bg-cream transition-colors text-sm uppercase tracking-widest"
                                 >
-                                    Continue Shopping
+                                    {t('Continue Shopping')}
                                 </button>
                             </div>
                         </div>
@@ -521,15 +539,15 @@ const POS = () => {
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
                         <div>
                             <h1 className="text-2xl sm:text-3xl font-display font-bold text-primary flex items-center gap-2">
-                                <UtensilsCrossed className="text-secondary" /> POS System
+                                <UtensilsCrossed className="text-secondary" /> {t('POS System')}
                             </h1>
-                            <p className="text-charcoal/50 text-xs sm:text-sm">Select items to build a new order</p>
+                            <p className="text-charcoal/50 text-xs sm:text-sm">{t('Select items to build a new order')}</p>
                         </div>
                         <div className="relative w-full sm:w-80">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-charcoal/30 w-5 h-5" />
                             <input
                                 type="text"
-                                placeholder="Search dishes..."
+                                placeholder={t('Search dishes...')}
                                 className="w-full pl-10 pr-4 py-2.5 sm:py-3 bg-white rounded-2xl border border-cream shadow-sm focus:ring-2 focus:ring-secondary focus:border-transparent outline-none transition-all text-sm"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -548,7 +566,7 @@ const POS = () => {
                                     : 'bg-white text-charcoal/60 hover:bg-cream border border-cream'
                                     }`}
                             >
-                                {cat}
+                                {t(cat)}
                             </button>
                         ))}
                         {adminMode && (
@@ -557,7 +575,7 @@ const POS = () => {
                             className={`px-5 sm:px-6 py-2 sm:py-2.5 rounded-full font-bold text-xs sm:text-sm border transition-all flex items-center gap-2 whitespace-nowrap ${isManageMode ? 'bg-primary text-white border-primary shadow-lg' : 'bg-primary/5 hover:bg-primary text-primary hover:text-white border-primary/20'
                                 }`}
                         >
-                            <Settings className="w-4 h-4" /> Edit Menu
+                            <Settings className="w-4 h-4" /> {t('Edit Menu')}
                         </button>
                         )}
                         {adminMode && isManageMode && (
@@ -674,7 +692,7 @@ const POS = () => {
                         {cart.length === 0 ? (
                             <div className="h-full flex flex-col items-center justify-center opacity-20 py-20">
                                 <ShoppingCart className="w-20 h-20 mb-4" />
-                                <p className="font-bold">Your cart is empty</p>
+                                <p className="font-bold">{t('Your cart is empty')}</p>
                             </div>
                         ) : (
                             cart.map(item => (

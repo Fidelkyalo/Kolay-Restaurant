@@ -3,6 +3,7 @@ import { Briefcase, MapPin, Clock, ChevronDown, ChevronUp, ArrowRight, Check, X,
 import PublicNavbar from '../components/PublicNavbar';
 import { ApplicationService } from '../services/api';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 const getJobs = () => {
     try { return JSON.parse(localStorage.getItem('kolay_jobs') || '[]').filter(j => j.isOpen); }
@@ -39,6 +40,7 @@ const RENEWAL_QUESTIONS = [
 ];
 
 export default function Careers() {
+    const { t } = useLanguage();
     const [jobs, setJobs] = useState(getJobs);
     const [expandedJob, setExpandedJob] = useState(null);
     const [account, setAccount] = useState(getAccount);
@@ -179,23 +181,23 @@ export default function Careers() {
             {/* Hero */}
             <section className="pt-40 pb-20 px-6 md:px-12 max-w-7xl mx-auto text-center">
                 <span className="inline-flex items-center gap-2 bg-[#E67E22]/15 border border-[#E67E22]/30 text-[#E67E22] px-5 py-2 rounded-full text-[11px] font-black uppercase tracking-[0.35em] mb-6">
-                    <span className="w-1.5 h-1.5 bg-[#E67E22] rounded-full animate-pulse" /> Join Our Team
+                    <span className="w-1.5 h-1.5 bg-[#E67E22] rounded-full animate-pulse" /> {t('careers_subtitle')}
                 </span>
                 <h1 className="text-5xl md:text-6xl font-display font-black text-white mb-4">
-                    Build Your Career<br /><span className="italic text-[#E67E22]">at Kolay</span>
+                    {t('Build Your Career')}<br /><span className="italic text-[#E67E22]">{t('at Kolay')}</span>
                 </h1>
                 <p className="text-white/40 text-lg max-w-xl mx-auto mb-10">
-                    We hire on 5-year contracts. Grow with us, be part of something exceptional.
+                    {t('We hire on 5-year contracts. Grow with us, be part of something exceptional.')}
                 </p>
                 <div className="flex flex-wrap gap-4 justify-center">
                     <button onClick={openRenewal}
                         className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all">
-                        <RefreshCw className="w-4 h-4" /> Renew My Contract
+                        <RefreshCw className="w-4 h-4" /> {t('Renew My Contract')}
                     </button>
                     {account && (
                         <button onClick={handleLogout}
                             className="flex items-center gap-2 text-white/30 hover:text-white/60 text-xs font-bold transition-colors">
-                            <User className="w-3.5 h-3.5" /> Signed in as {account.name} · Sign out
+                            <User className="w-3.5 h-3.5" /> {t('Signed in as')} {account.name} · {t('nav_sign_out')}
                         </button>
                     )}
                 </div>
@@ -204,14 +206,14 @@ export default function Careers() {
             {/* Jobs List */}
             <section className="pb-32 px-6 md:px-12 max-w-5xl mx-auto">
                 <h2 className="text-2xl font-display font-black text-white mb-8">
-                    Open Positions <span className="text-white/20 text-lg font-normal">({jobs.length})</span>
+                    {t('Open Positions')} <span className="text-white/20 text-lg font-normal">({jobs.length})</span>
                 </h2>
 
                 {jobs.length === 0 ? (
                     <div className="bg-white/3 border border-white/5 rounded-3xl p-16 text-center">
                         <Briefcase className="w-12 h-12 text-white/10 mx-auto mb-4" />
-                        <p className="text-white/30 font-bold text-lg">No open positions right now</p>
-                        <p className="text-white/20 text-sm mt-1">Check back soon or renew your existing contract above.</p>
+                        <p className="text-white/30 font-bold text-lg">{t('careers_no_positions')}</p>
+                        <p className="text-white/20 text-sm mt-1">{t('Check back soon or renew your existing contract above.')}</p>
                     </div>
                 ) : (
                     <div className="space-y-4">
@@ -225,11 +227,11 @@ export default function Careers() {
                                             <div className="flex items-center gap-3 flex-wrap mb-1">
                                                 <h3 className="font-black text-white text-lg">{job.title}</h3>
                                                 <span className="text-[10px] font-black px-3 py-1 rounded-full bg-[#E67E22]/20 text-[#E67E22] uppercase">{job.type}</span>
-                                                {isExpired && <span className="text-[10px] font-black px-3 py-1 rounded-full bg-white/10 text-white/40 uppercase">Deadline passed</span>}
+                                                {isExpired && <span className="text-[10px] font-black px-3 py-1 rounded-full bg-white/10 text-white/40 uppercase">{t('Deadline passed')}</span>}
                                             </div>
                                             <p className="text-white/40 text-sm flex items-center gap-3">
                                                 <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{job.location}</span>
-                                                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{job.contractYears}-year contract</span>
+                                                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{job.contractYears}-{t('year contract')}</span>
                                                 {job.department && <span>{job.department}</span>}
                                             </p>
                                         </div>
@@ -237,7 +239,7 @@ export default function Careers() {
                                             {!isExpired && (
                                                 <button onClick={e => { e.stopPropagation(); openApply(job); }}
                                                     className="flex items-center gap-2 bg-[#E67E22] hover:bg-[#D4A017] text-white px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all shadow-[0_0_20px_#E67E2230]">
-                                                    Apply <ArrowRight className="w-3.5 h-3.5" />
+                                                    {t('careers_apply')} <ArrowRight className="w-3.5 h-3.5" />
                                                 </button>
                                             )}
                                             {isExp ? <ChevronUp className="w-5 h-5 text-white/30" /> : <ChevronDown className="w-5 h-5 text-white/30" />}
@@ -246,12 +248,12 @@ export default function Careers() {
                                     {isExp && (
                                         <div className="border-t border-white/5 p-6 space-y-5 bg-white/2">
                                             <div>
-                                                <p className="text-[10px] font-black uppercase text-white/30 mb-2">About the Role</p>
+                                                <p className="text-[10px] font-black uppercase text-white/30 mb-2">{t('About the Role')}</p>
                                                 <p className="text-white/60 text-sm leading-relaxed">{job.description}</p>
                                             </div>
                                             {job.requirements && (
                                                 <div>
-                                                    <p className="text-[10px] font-black uppercase text-white/30 mb-2">Requirements</p>
+                                                    <p className="text-[10px] font-black uppercase text-white/30 mb-2">{t('Requirements')}</p>
                                                     <ul className="space-y-1">
                                                         {job.requirements.split('\n').filter(Boolean).map((r, i) => (
                                                             <li key={i} className="flex items-start gap-2 text-white/60 text-sm">
@@ -263,7 +265,7 @@ export default function Careers() {
                                             )}
                                             {job.responsibilities && (
                                                 <div>
-                                                    <p className="text-[10px] font-black uppercase text-white/30 mb-2">Responsibilities</p>
+                                                    <p className="text-[10px] font-black uppercase text-white/30 mb-2">{t('Responsibilities')}</p>
                                                     <ul className="space-y-1">
                                                         {job.responsibilities.split('\n').filter(Boolean).map((r, i) => (
                                                             <li key={i} className="flex items-start gap-2 text-white/60 text-sm">
@@ -273,7 +275,7 @@ export default function Careers() {
                                                     </ul>
                                                 </div>
                                             )}
-                                            {job.deadline && <p className="text-[11px] text-white/30">Application deadline: {new Date(job.deadline).toLocaleDateString()}</p>}
+                                            {job.deadline && <p className="text-[11px] text-white/30">{t('Application deadline')}: {new Date(job.deadline).toLocaleDateString()}</p>}
                                         </div>
                                     )}
                                 </div>
@@ -290,11 +292,11 @@ export default function Careers() {
                     <div className="relative bg-[#1A1008] border border-white/5 rounded-[2.5rem] w-full max-w-lg shadow-2xl animate-in zoom-in duration-300 max-h-[90vh] overflow-y-auto">
                         <div className="flex justify-between items-center p-8 pb-0">
                             <h2 className="text-xl font-display font-black text-white">
-                                {flow === 'choose' && 'How would you like to proceed?'}
-                                {flow === 'register' && 'Create Your Account'}
-                                {flow === 'login' && 'Sign In'}
-                                {flow === 'apply' && `Apply - ${selectedJob?.title}`}
-                                {flow === 'renewal' && 'Contract Renewal'}
+                                {flow === 'choose' && t('How would you like to proceed?')}
+                                {flow === 'register' && t('Create Your Account')}
+                                {flow === 'login' && t('nav_sign_in')}
+                                {flow === 'apply' && `${t('careers_apply')} - ${selectedJob?.title}`}
+                                {flow === 'renewal' && t('Contract Renewal')}
                             </h2>
                             <button onClick={() => setFlow(null)} className="p-2 bg-white/5 hover:bg-white/10 rounded-xl transition-colors">
                                 <X className="w-5 h-5 text-white/50" />
@@ -307,24 +309,24 @@ export default function Careers() {
                                 <div className="space-y-4">
                                     <p className="text-white/40 text-sm mb-6">
                                         {flowType === 'renewal'
-                                            ? 'To renew your contract, please sign in to your account.'
-                                            : 'New applicants need to create an account first. Existing account holders can sign in.'}
+                                            ? t('To renew your contract, please sign in to your account.')
+                                            : t('New applicants need to create an account first. Existing account holders can sign in.')}
                                     </p>
                                     {!account ? (
                                         <>
                                             <button onClick={() => { setFlowType(flowType || 'new'); setFlow('register'); }}
                                                 className="w-full bg-[#E67E22] hover:bg-[#D4A017] text-white font-black py-4 rounded-2xl text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2">
-                                                <User className="w-4 h-4" /> Create Account & Apply
+                                                <User className="w-4 h-4" /> {t('nav_create_account')}
                                             </button>
                                             <button onClick={() => { setFlowType(flowType || 'new'); setFlow('login'); }}
                                                 className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black py-4 rounded-2xl text-sm uppercase tracking-widest transition-all">
-                                                Sign In to Existing Account
+                                                {t('Sign In to Existing Account')}
                                             </button>
                                         </>
                                     ) : (
                                         <button onClick={() => setFlow(flowType === 'renewal' ? 'renewal' : 'apply')}
                                             className="w-full bg-[#E67E22] hover:bg-[#D4A017] text-white font-black py-4 rounded-2xl text-sm uppercase tracking-widest transition-all flex items-center justify-center gap-2">
-                                            Continue as {account.name} <ArrowRight className="w-4 h-4" />
+                                            {t('Continue as')} {account.name} <ArrowRight className="w-4 h-4" />
                                         </button>
                                     )}
                                 </div>
@@ -335,11 +337,11 @@ export default function Careers() {
                                 <form onSubmit={handleRegister} className="space-y-4">
                                     {authError && <p className="text-red-400 text-sm font-bold bg-red-400/10 px-4 py-3 rounded-xl">{authError}</p>}
                                     {[
-                                        { key: 'name', label: 'Full Name', type: 'text', placeholder: 'Your full name' },
-                                        { key: 'email', label: 'Email Address', type: 'email', placeholder: 'you@example.com' },
-                                        { key: 'phone', label: 'Phone Number', type: 'tel', placeholder: '+254 ...' },
-                                        { key: 'password', label: 'Password', type: 'password', placeholder: 'Min. 6 characters' },
-                                        { key: 'confirmPassword', label: 'Confirm Password', type: 'password', placeholder: 'Repeat password' },
+                                        { key: 'name', label: t('register_username'), type: 'text', placeholder: 'Your full name' },
+                                        { key: 'email', label: t('register_email'), type: 'email', placeholder: 'you@example.com' },
+                                        { key: 'phone', label: t('Phone Number'), type: 'tel', placeholder: '+254 ...' },
+                                        { key: 'password', label: t('register_password'), type: 'password', placeholder: 'Min. 6 characters' },
+                                        { key: 'confirmPassword', label: t('register_confirm'), type: 'password', placeholder: 'Repeat password' },
                                     ].map(f => (
                                         <div key={f.key}>
                                             <label className={labelCls}>{f.label}</label>
@@ -348,10 +350,10 @@ export default function Careers() {
                                         </div>
                                     ))}
                                     <button type="submit" className="w-full bg-[#E67E22] hover:bg-[#D4A017] text-white font-black py-4 rounded-2xl text-sm uppercase tracking-widest transition-all mt-2">
-                                        Create Account
+                                        {t('register_btn')}
                                     </button>
                                     <button type="button" onClick={() => setFlow('login')} className="w-full text-white/30 hover:text-white/60 text-xs font-bold transition-colors py-2">
-                                        Already have an account? Sign in
+                                        {t('register_have_account')} {t('register_sign_in')}
                                     </button>
                                 </form>
                             )}
@@ -361,8 +363,8 @@ export default function Careers() {
                                 <form onSubmit={handleLogin} className="space-y-4">
                                     {authError && <p className="text-red-400 text-sm font-bold bg-red-400/10 px-4 py-3 rounded-xl">{authError}</p>}
                                     {[
-                                        { key: 'email', label: 'Email Address', type: 'email', placeholder: 'you@example.com' },
-                                        { key: 'password', label: 'Password', type: 'password', placeholder: 'Your password' },
+                                        { key: 'email', label: t('login_email'), type: 'email', placeholder: 'you@example.com' },
+                                        { key: 'password', label: t('login_password'), type: 'password', placeholder: 'Your password' },
                                     ].map(f => (
                                         <div key={f.key}>
                                             <label className={labelCls}>{f.label}</label>
@@ -371,10 +373,10 @@ export default function Careers() {
                                         </div>
                                     ))}
                                     <button type="submit" className="w-full bg-[#E67E22] hover:bg-[#D4A017] text-white font-black py-4 rounded-2xl text-sm uppercase tracking-widest transition-all mt-2">
-                                        Sign In
+                                        {t('login_btn')}
                                     </button>
                                     <button type="button" onClick={() => setFlow('register')} className="w-full text-white/30 hover:text-white/60 text-xs font-bold transition-colors py-2">
-                                        No account yet? Create one
+                                        {t('login_no_account')} {t('login_register')}
                                     </button>
                                 </form>
                             )}
@@ -383,26 +385,26 @@ export default function Careers() {
                             {(flow === 'apply' || flow === 'renewal') && (
                                 <form onSubmit={handleSubmitApplication} className="space-y-5">
                                     <div className="bg-[#E67E22]/10 border border-[#E67E22]/20 rounded-2xl px-4 py-3 text-sm text-[#E67E22] font-bold mb-2">
-                                        Applying as: {account?.name} ({account?.email})
+                                        {t('Applying as')}: {account?.name} ({account?.email})
                                     </div>
 
                                     {/* Profile Photo - required for new hire applications */}
                                     {flowType === 'new' && (
                                         <div>
                                             <label className={`${labelCls} flex items-center gap-1`}>
-                                                <Camera className="w-3 h-3" /> Profile Photo <span className="text-red-400">*</span>
+                                                <Camera className="w-3 h-3" /> {t('Profile Photo')} <span className="text-red-400">*</span>
                                             </label>
-                                            <p className="text-white/30 text-xs mb-3">A clear, recent photo is required as part of your application.</p>
+                                            <p className="text-white/30 text-xs mb-3">{t('A clear, recent photo is required as part of your application.')}</p>
 
                                             {profileImage ? (
                                                 <div className="flex items-center gap-4 p-3 bg-white/5 rounded-2xl border border-white/10">
                                                     <img src={profileImage} alt="Profile preview"
                                                         className="w-16 h-16 rounded-xl object-cover border border-white/10" />
                                                     <div className="flex-1">
-                                                        <p className="text-white/60 text-xs font-semibold mb-2">Photo uploaded</p>
+                                                        <p className="text-white/60 text-xs font-semibold mb-2">{t('Photo uploaded')}</p>
                                                         <button type="button" onClick={() => { setProfileImage(''); if (fileRef.current) fileRef.current.value = ''; }}
                                                             className="text-xs text-red-400 hover:text-red-300 font-bold transition-colors">
-                                                            Remove
+                                                            {t('delete')}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -412,8 +414,8 @@ export default function Careers() {
                                                     <button type="button" onClick={() => fileRef.current.click()}
                                                         className={`w-full border-2 border-dashed rounded-2xl py-6 flex flex-col items-center gap-2 transition-all ${imageError ? 'border-red-400/50 bg-red-400/5' : 'border-white/10 hover:border-[#E67E22]/40 bg-white/3 hover:bg-white/5'}`}>
                                                         <Upload className={`w-6 h-6 ${imageError ? 'text-red-400' : 'text-white/30'}`} />
-                                                        <span className={`text-sm font-bold ${imageError ? 'text-red-400' : 'text-white/40'}`}>Click to upload your photo</span>
-                                                        <span className="text-white/20 text-xs">JPG, PNG, WEBP accepted</span>
+                                                        <span className={`text-sm font-bold ${imageError ? 'text-red-400' : 'text-white/40'}`}>{t('Click to upload your photo')}</span>
+                                                        <span className="text-white/20 text-xs">{t('JPG, PNG, WEBP accepted')}</span>
                                                     </button>
                                                 </div>
                                             )}
@@ -423,7 +425,7 @@ export default function Careers() {
 
                                     {questions.map(q => (
                                         <div key={q.key}>
-                                            <label className={labelCls}>{q.label}</label>
+                                            <label className={labelCls}>{t(q.label)}</label>
                                             {q.type === 'textarea' ? (
                                                 <textarea required rows={3} className={`${inputCls} resize-none`}
                                                     value={answers[q.label] || ''}
@@ -436,7 +438,7 @@ export default function Careers() {
                                         </div>
                                     ))}
                                     <button type="submit" className="w-full bg-[#E67E22] hover:bg-[#D4A017] text-white font-black py-4 rounded-2xl text-sm uppercase tracking-widest transition-all active:scale-95 mt-2">
-                                        Submit {flow === 'renewal' ? 'Renewal Request' : 'Application'}
+                                        {flow === 'renewal' ? t('Submit Renewal Request') : t('reservation_submit')}
                                     </button>
                                 </form>
                             )}
@@ -454,16 +456,16 @@ export default function Careers() {
                             <Check className="w-10 h-10 text-white" />
                         </div>
                         <h2 className="text-2xl font-display font-black text-white mb-3">
-                            {flowType === 'renewal' ? 'Renewal Submitted!' : 'Application Sent!'}
+                            {flowType === 'renewal' ? t('Renewal Submitted!') : t('Application Sent!')}
                         </h2>
                         <p className="text-white/40 text-sm leading-relaxed mb-8">
                             {flowType === 'renewal'
-                                ? 'Your contract renewal request has been received. Our HR team will be in touch shortly.'
-                                : 'Your application has been received. We will review it and get back to you.'}
+                                ? t('Your contract renewal request has been received. Our HR team will be in touch shortly.')
+                                : t('Your application has been received. We will review it and get back to you.')}
                         </p>
                         <button onClick={() => setFlow(null)}
                             className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black w-full py-4 rounded-xl text-[10px] uppercase tracking-widest transition-colors">
-                            Back to Careers
+                            {t('Back to Careers')}
                         </button>
                     </div>
                 </div>

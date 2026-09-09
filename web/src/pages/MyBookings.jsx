@@ -8,6 +8,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import PublicNavbar from '../components/PublicNavbar';
 import { ReservationService } from '../services/api';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 const LS_KEY = 'kolay_reservations_local';
@@ -37,6 +38,7 @@ const CANCEL_SUGGESTIONS = [
 
 // ── component ─────────────────────────────────────────────────────────────────
 export default function MyBookings() {
+    const { t } = useLanguage();
     const navigate = useNavigate();
     const customer = getCustomer();
 
@@ -139,10 +141,10 @@ export default function MyBookings() {
                         <ArrowLeft className="w-5 h-5" />
                     </Link>
                     <div>
-                        <p className="text-[#E67E22] text-[10px] font-black uppercase tracking-[0.4em] mb-1">My Account</p>
-                        <h1 className="text-3xl md:text-4xl font-display font-black text-white">My Bookings</h1>
+                        <p className="text-[#E67E22] text-[10px] font-black uppercase tracking-[0.4em] mb-1">{t('My Account')}</p>
+                        <h1 className="text-3xl md:text-4xl font-display font-black text-white">{t('bookings_title')}</h1>
                     </div>
-                    <button onClick={fetchBookings} disabled={loading} className="ml-auto p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white/50 hover:text-white transition-all" title="Refresh">
+                    <button onClick={fetchBookings} disabled={loading} className="ml-auto p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white/50 hover:text-white transition-all" title={t('Refresh')}>
                         <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
                     </button>
                 </div>
@@ -154,7 +156,7 @@ export default function MyBookings() {
                         return (
                             <button key={f} onClick={() => setFilter(f)}
                                 className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${filter === f ? 'bg-[#E67E22] text-white shadow-[0_0_20px_#E67E2240]' : 'text-white/40 hover:text-white'}`}>
-                                {f}
+                                {f === 'ALL' ? t('All') : f === 'PENDING' ? t('Pending') : f === 'CONFIRMED' ? t('Confirmed') : f === 'CANCELLED' ? t('Cancelled') : t('Completed')}
                                 {count > 0 && (
                                     <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-black ${filter === f ? 'bg-white/20 text-white' : 'bg-white/10 text-white/50'}`}>{count}</span>
                                 )}
@@ -167,7 +169,7 @@ export default function MyBookings() {
                 {loading && bookings.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-32 text-white/20">
                         <RefreshCw className="w-10 h-10 animate-spin mb-4" />
-                        <p className="font-black uppercase tracking-widest text-sm">Loading your bookings…</p>
+                        <p className="font-black uppercase tracking-widest text-sm">{t('loading')}</p>
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-32 text-center">
@@ -175,11 +177,11 @@ export default function MyBookings() {
                             <Calendar className="w-8 h-8 text-white/20" />
                         </div>
                         <p className="text-white/30 font-black uppercase tracking-widest text-sm mb-2">
-                            {filter === 'ALL' ? 'No bookings yet' : `No ${filter.toLowerCase()} bookings`}
+                            {filter === 'ALL' ? t('bookings_no_bookings') : `${t('No')} ${filter.toLowerCase()} ${t('bookings_title').toLowerCase()}`}
                         </p>
                         {filter === 'ALL' && (
                             <Link to="/reservations" className="mt-4 flex items-center gap-2 bg-[#E67E22] hover:bg-[#cf6d17] text-white font-black text-xs uppercase tracking-widest px-6 py-3 rounded-xl transition-all shadow-lg active:scale-95">
-                                <Calendar className="w-4 h-4" /> Make a Reservation
+                                <Calendar className="w-4 h-4" /> {t('Make a Reservation')}
                             </Link>
                         )}
                     </div>
@@ -203,13 +205,13 @@ export default function MyBookings() {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 flex-wrap mb-1">
                                                 <span className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border ${cfg.dark}`}>
-                                                    {cfg.icon} {cfg.label}
+                                                    {cfg.icon} {t(cfg.label)}
                                                 </span>
                                                 <span className="text-white/20 text-[10px] font-bold">#{String(booking.id).slice(-6).toUpperCase()}</span>
                                             </div>
                                             <div className="flex items-center gap-3 text-white/50 text-xs font-bold flex-wrap">
                                                 <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{booking.reservationTime}</span>
-                                                <span className="flex items-center gap-1"><Users className="w-3 h-3" />{booking.numberOfGuests} {booking.numberOfGuests === 1 ? 'Guest' : 'Guests'}</span>
+                                                <span className="flex items-center gap-1"><Users className="w-3 h-3" />{booking.numberOfGuests} {booking.numberOfGuests === 1 ? t('Guest') : t('reservation_guests')}</span>
                                             </div>
                                         </div>
                                         <ChevronDown className={`w-4 h-4 text-white/30 transition-transform duration-300 shrink-0 ${isExp ? 'rotate-180' : ''}`} />
@@ -223,13 +225,13 @@ export default function MyBookings() {
                                                 {booking.phone && (
                                                     <div className="flex items-center gap-3 bg-white/3 rounded-2xl p-3 border border-white/5">
                                                         <Phone className="w-4 h-4 text-[#E67E22] shrink-0" />
-                                                        <div><p className="text-[9px] font-black uppercase text-white/30 tracking-widest">Phone</p><p className="text-white/70 text-sm font-bold">{booking.phone}</p></div>
+                                                        <div><p className="text-[9px] font-black uppercase text-white/30 tracking-widest">{t('Phone')}</p><p className="text-white/70 text-sm font-bold">{booking.phone}</p></div>
                                                     </div>
                                                 )}
                                                 {booking.email && (
                                                     <div className="flex items-center gap-3 bg-white/3 rounded-2xl p-3 border border-white/5">
                                                         <Mail className="w-4 h-4 text-[#E67E22] shrink-0" />
-                                                        <div><p className="text-[9px] font-black uppercase text-white/30 tracking-widest">Email</p><p className="text-white/70 text-sm font-bold truncate">{booking.email}</p></div>
+                                                        <div><p className="text-[9px] font-black uppercase text-white/30 tracking-widest">{t('Email')}</p><p className="text-white/70 text-sm font-bold truncate">{booking.email}</p></div>
                                                     </div>
                                                 )}
                                             </div>
@@ -239,7 +241,7 @@ export default function MyBookings() {
                                                 <div className="flex items-start gap-3 bg-amber-500/5 border border-amber-500/15 rounded-2xl p-4">
                                                     <MessageSquare className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                                                     <div>
-                                                        <p className="text-[9px] font-black uppercase text-amber-400/60 tracking-widest mb-1">Special Requests</p>
+                                                        <p className="text-[9px] font-black uppercase text-amber-400/60 tracking-widest mb-1">{t('reservation_notes')}</p>
                                                         <p className="text-amber-200/70 text-sm italic">"{booking.specialRequests}"</p>
                                                     </div>
                                                 </div>
@@ -250,7 +252,7 @@ export default function MyBookings() {
                                                 <div className="flex items-start gap-3 bg-red-500/5 border border-red-500/15 rounded-2xl p-4">
                                                     <XCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                                                     <div>
-                                                        <p className="text-[9px] font-black uppercase text-red-400/60 tracking-widest mb-1">Cancellation Reason</p>
+                                                        <p className="text-[9px] font-black uppercase text-red-400/60 tracking-widest mb-1">{t('Cancellation Reason')}</p>
                                                         <p className="text-red-200/70 text-sm italic">"{booking.cancellationReason}"</p>
                                                     </div>
                                                 </div>
@@ -260,10 +262,10 @@ export default function MyBookings() {
                                             <div className={`flex items-start gap-3 rounded-2xl p-4 border ${cfg.dark}`}>
                                                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                                                 <p className="text-xs font-semibold leading-relaxed">
-                                                    {booking.status === 'PENDING'   && "Your reservation is awaiting confirmation from our team. We'll update this shortly."}
-                                                    {booking.status === 'CONFIRMED' && 'Great news - your table is confirmed! We look forward to seeing you.'}
-                                                    {booking.status === 'CANCELLED' && 'This reservation has been cancelled. Feel free to make a new booking anytime.'}
-                                                    {booking.status === 'COMPLETED' && 'Thank you for dining with us. We hope to see you again soon!'}
+                                                    {booking.status === 'PENDING'   && t('Your reservation is awaiting confirmation from our team. We\'ll update this shortly.')}
+                                                    {booking.status === 'CONFIRMED' && t('Great news - your table is confirmed! We look forward to seeing you.')}
+                                                    {booking.status === 'CANCELLED' && t('This reservation has been cancelled. Feel free to make a new booking anytime.')}
+                                                    {booking.status === 'COMPLETED' && t('Thank you for dining with us. We hope to see you again soon!')}
                                                 </p>
                                             </div>
 
@@ -271,7 +273,7 @@ export default function MyBookings() {
                                             {canCancel && (
                                                 <button onClick={() => openCancel(booking)}
                                                     className="w-full flex items-center justify-center gap-2 py-3 border border-red-500/30 hover:border-red-500/60 text-red-400 hover:text-red-300 hover:bg-red-500/5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all">
-                                                    <X className="w-3.5 h-3.5" /> Cancel This Booking
+                                                    <X className="w-3.5 h-3.5" /> {t('bookings_cancel')}
                                                 </button>
                                             )}
                                         </div>
@@ -286,7 +288,7 @@ export default function MyBookings() {
                     <div className="mt-10 flex justify-center">
                         <Link to="/reservations"
                             className="flex items-center gap-2 bg-white/5 hover:bg-[#E67E22] border border-white/10 hover:border-[#E67E22] text-white/60 hover:text-white font-black text-xs uppercase tracking-widest px-6 py-3 rounded-xl transition-all duration-300">
-                            <Calendar className="w-4 h-4" /> Make Another Reservation
+                            <Calendar className="w-4 h-4" /> {t('Make Another Reservation')}
                         </Link>
                     </div>
                 )}
@@ -303,19 +305,19 @@ export default function MyBookings() {
                                 <XCircle className="w-6 h-6 text-red-400" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-black text-white">Cancel Booking?</h3>
-                                <p className="text-white/40 text-xs">This action cannot be undone.</p>
+                                <h3 className="text-lg font-black text-white">{t('bookings_cancel')}?</h3>
+                                <p className="text-white/40 text-xs">{t('This action cannot be undone.')}</p>
                             </div>
                         </div>
 
                         {/* Quick suggestions */}
                         <div className="mb-4">
-                            <p className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2">Quick reason <span className="text-white/20 normal-case font-semibold">(optional)</span></p>
+                            <p className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-2">{t('Quick reason')} <span className="text-white/20 normal-case font-semibold">({t('optional')})</span></p>
                             <div className="flex flex-wrap gap-2">
                                 {CANCEL_SUGGESTIONS.map(s => (
                                     <button key={s} onClick={() => setCancelReason(cancelReason === s ? '' : s)}
                                         className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all ${cancelReason === s ? 'bg-[#E67E22] border-[#E67E22] text-white' : 'bg-white/5 border-white/10 text-white/50 hover:text-white hover:border-white/20'}`}>
-                                        {s}
+                                        {t(s)}
                                     </button>
                                 ))}
                             </div>
@@ -333,11 +335,11 @@ export default function MyBookings() {
                         <div className="flex gap-3">
                             <button onClick={() => { setCancelTarget(null); setCancelReason(''); }}
                                 className="flex-1 py-3 border border-white/10 hover:border-white/20 text-white/50 hover:text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all">
-                                Keep It
+                                {t('Keep It')}
                             </button>
                             <button onClick={confirmCancel} disabled={cancelling}
                                 className="flex-1 bg-red-500 hover:bg-red-600 text-white font-black py-3 rounded-xl transition-all active:scale-95 disabled:opacity-60 text-xs uppercase tracking-widest">
-                                {cancelling ? 'Cancelling…' : 'Yes, Cancel'}
+                                {cancelling ? t('Cancelling…') : t('Yes, Cancel')}
                             </button>
                         </div>
                     </div>

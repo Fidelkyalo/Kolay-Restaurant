@@ -98,20 +98,20 @@ const KDS = () => {
                             <ChefHat className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                         </div>
                         <div>
-                            <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-tight">KITCHEN DISPLAY</h1>
+                            <h1 className="text-2xl sm:text-3xl font-display font-bold tracking-tight">{t('KITCHEN DISPLAY')}</h1>
                             <div className="flex flex-wrap gap-3 sm:gap-4 mt-1 text-xs sm:text-sm text-white/40">
-                                <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> Live Tracking</span>
-                                <span className="flex items-center gap-1 font-bold text-secondary"><Timer className="w-3.5 h-3.5" /> Avg. Time: 15m</span>
+                                <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" /> {t('Live Tracking')}</span>
+                                <span className="flex items-center gap-1 font-bold text-secondary"><Timer className="w-3.5 h-3.5" /> {t('Avg. Time: 15m')}</span>
                             </div>
                         </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
                         <button className="bg-white/5 hover:bg-white/10 px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl flex items-center gap-2 font-bold text-xs sm:text-sm transition-all border border-white/5 shadow-sm">
-                            <History className="w-4 h-4 sm:w-5 sm:h-5" /> History
+                            <History className="w-4 h-4 sm:w-5 sm:h-5" /> {t('History')}
                         </button>
                         <div className="bg-primary text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-2xl flex items-center gap-2.5 sm:gap-3 border border-accent/20 shadow-[0_0_20px_rgba(78,44,30,0.5)] text-xs sm:text-sm">
                             <span className="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse"></span>
-                            <span className="font-bold tracking-wide">STATION: MAIN GRILL</span>
+                            <span className="font-bold tracking-wide">{t('STATION: MAIN GRILL')}</span>
                         </div>
                     </div>
                 </div>
@@ -130,7 +130,7 @@ const KDS = () => {
                                     <span className="text-[10px] sm:text-xs font-bold opacity-60 uppercase tracking-widest">{t(order.status)}</span>
                                     <h2 className="text-xl sm:text-2xl font-bold">{order.table}</h2>
                                     {order.source === 'online' && (
-                                        <span className="text-[10px] font-black bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full uppercase tracking-widest mt-1 inline-block">🌐 Online Order</span>
+                                        <span className="text-[10px] font-black bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full uppercase tracking-widest mt-1 inline-block">🌐 {t('Online Order')}</span>
                                     )}
                                     {order.guestName && (
                                         <p className="text-xs opacity-60 mt-0.5">👤 {order.guestName}</p>
@@ -138,7 +138,7 @@ const KDS = () => {
                                 </div>
                                 <div className="text-right text-xs font-bold opacity-60">
                                     <p>{order.id}</p>
-                                    <p className="flex items-center gap-1 justify-end mt-1"><Clock className="w-3 h-3 text-secondary" /> {order.time || 'Just now'}</p>
+                                    <p className="flex items-center gap-1 justify-end mt-1"><Clock className="w-3 h-3 text-secondary" /> {order.time || t('Just now')}</p>
                                 </div>
                             </div>
 
@@ -151,7 +151,7 @@ const KDS = () => {
                                         </div>
                                         <div className="flex-1">
                                             <h3 className="text-base sm:text-lg font-bold tracking-tight">{t(item.name)}</h3>
-                                            {item.notes && <p className="text-xs sm:text-sm text-secondary italic font-medium mt-1">Note: {item.notes}</p>}
+                                            {item.notes && <p className="text-xs sm:text-sm text-secondary italic font-medium mt-1">{t('Note')}: {item.notes}</p>}
                                         </div>
                                     </div>
                                 )) : (
@@ -159,7 +159,7 @@ const KDS = () => {
                                         <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center font-bold text-secondary text-lg border border-white/5 transition-all">
                                             1
                                         </div>
-                                        <p className="text-lg font-bold tracking-tight">{order.items}</p>
+                                        <p className="text-lg font-bold tracking-tight">{t(order.items)}</p>
                                     </div>
                                 )}
                             </div>
@@ -171,14 +171,14 @@ const KDS = () => {
                                         onClick={() => updateStatus(order.id, 'PREPARING')}
                                         className="w-full bg-secondary hover:bg-orange-600 text-white font-bold py-4 sm:py-5 rounded-2xl shadow-lg transition-all active:transform active:scale-95 flex items-center justify-center gap-3 uppercase tracking-widest text-xs sm:text-sm"
                                     >
-                                        START PREPARING <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        {t('START PREPARING')} <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                                     </button>
                                 ) : (
                                     <button
                                         onClick={() => updateStatus(order.id, 'READY')}
                                         className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 sm:py-5 rounded-2xl shadow-[0_0_20px_rgba(22,163,74,0.3)] transition-all active:transform active:scale-95 flex items-center justify-center gap-3 uppercase tracking-widest text-xs sm:text-sm"
                                     >
-                                        MARK AS READY <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                                        {t('MARK AS READY')} <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" />
                                     </button>
                                 )}
                             </div>
@@ -188,7 +188,7 @@ const KDS = () => {
                     {activeOrders.length === 0 && (
                         <div className="w-full py-16 flex flex-col items-center justify-center opacity-20">
                             <AlertCircle className="w-14 h-14 mb-4" />
-                            <p className="font-bold text-center px-6 italic">Waiting for incoming tickets...</p>
+                            <p className="font-bold text-center px-6 italic">{t('Waiting for incoming tickets...')}</p>
                         </div>
                     )}
                 </div>
@@ -196,15 +196,15 @@ const KDS = () => {
                 {/* KDS Stats Footer */}
                 <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="bg-[#252525] p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/5 flex items-center justify-between shadow-lg">
-                        <span className="text-xs sm:text-sm font-bold opacity-40 uppercase tracking-widest">Active Tickets</span>
+                        <span className="text-xs sm:text-sm font-bold opacity-40 uppercase tracking-widest">{t('Active Tickets')}</span>
                         <span className="text-2xl sm:text-3xl font-display font-bold text-secondary">{activeOrders.length}</span>
                     </div>
                     <div className="bg-[#252525] p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/5 flex items-center justify-between shadow-lg">
-                        <span className="text-xs sm:text-sm font-bold opacity-40 uppercase tracking-widest">Urgent Tickets (10m+)</span>
+                        <span className="text-xs sm:text-sm font-bold opacity-40 uppercase tracking-widest">{t('Urgent Tickets (10m+)')}</span>
                         <span className="text-2xl sm:text-3xl font-display font-bold text-red-500">0</span>
                     </div>
                     <div className="bg-primary p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-accent/20 flex items-center justify-between shadow-xl">
-                        <span className="text-xs sm:text-sm font-bold text-white/50 uppercase tracking-widest">Completed Today</span>
+                        <span className="text-xs sm:text-sm font-bold text-white/50 uppercase tracking-widest">{t('Completed Today')}</span>
                         <span className="text-2xl sm:text-3xl font-display font-bold text-accent">{completedToday}</span>
                     </div>
                 </div>

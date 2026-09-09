@@ -7,6 +7,7 @@ import {
 import { AuthService } from '../services/api';
 import { setRole } from '../hooks/useRole';
 import LanguageSelector from '../components/LanguageSelector';
+import { useLanguage } from '../context/LanguageContext';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -16,6 +17,8 @@ const Register = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+
+    const { t } = useLanguage();
 
     const f = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
 
@@ -109,9 +112,9 @@ const Register = () => {
                     <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <CheckCircle2 className="w-10 h-10 text-green-500" />
                     </div>
-                    <h2 className="text-2xl font-display font-bold text-primary mb-2">Account Created!</h2>
+                    <h2 className="text-2xl font-display font-bold text-primary mb-2">{t('Account Created!')}</h2>
                     <p className="text-charcoal/50 text-sm mb-2">Welcome, <strong>{form.username}</strong>.</p>
-                    <p className="text-charcoal/40 text-xs">Redirecting you to the menu…</p>
+                    <p className="text-charcoal/40 text-xs">{t('Redirecting you to the menu')}</p>
                 </div>
             </div>
         );
@@ -139,17 +142,17 @@ const Register = () => {
                         Kolay Restaurant
                     </h1>
                     <p className="text-white/80 text-sm mt-1 font-semibold italic">
-                        Where Every Meal Feels Right.
+                        {t('Where Every Meal Feels Right')}
                     </p>
                 </div>
 
                 <div className="p-8">
                     <div className="mb-6">
                         <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
-                            <UserPlus className="w-5 h-5 text-secondary" /> Join Kolay
+                            <UserPlus className="w-5 h-5 text-secondary" /> {t('Join Kolay')}
                         </h2>
                         <p className="text-charcoal/50 text-sm mt-1">
-                            Get access to exclusive specialties and member discounts.
+                            {t('Get access to exclusive specialties and member discounts.')}
                         </p>
                     </div>
 
@@ -163,7 +166,7 @@ const Register = () => {
                         {/* Username */}
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-charcoal/60 flex items-center gap-2">
-                                <User className="w-3.5 h-3.5" /> Username
+                                <User className="w-3.5 h-3.5" /> {t('register_username')}
                             </label>
                             <input
                                 type="text"
@@ -179,7 +182,7 @@ const Register = () => {
                         {/* Email */}
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-charcoal/60 flex items-center gap-2">
-                                <Mail className="w-3.5 h-3.5" /> Email Address
+                                <Mail className="w-3.5 h-3.5" /> {t('register_email')}
                             </label>
                             <input
                                 type="email"
@@ -195,7 +198,7 @@ const Register = () => {
                         {/* Password */}
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-charcoal/60 flex items-center gap-2">
-                                <Lock className="w-3.5 h-3.5" /> Password
+                                <Lock className="w-3.5 h-3.5" /> {t('register_password')}
                             </label>
                             <div className="relative">
                                 <input
@@ -220,7 +223,7 @@ const Register = () => {
                         {/* Confirm Password */}
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-charcoal/60 flex items-center gap-2">
-                                <Lock className="w-3.5 h-3.5" /> Confirm Password
+                                <Lock className="w-3.5 h-3.5" /> {t('register_confirm')}
                             </label>
                             <div className="relative">
                                 <input
@@ -254,17 +257,17 @@ const Register = () => {
                             className="w-full bg-secondary hover:bg-orange-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
                         >
                             {isLoading
-                                ? <><Loader2 className="w-5 h-5 animate-spin" /> Creating account…</>
-                                : <><UserPlus className="w-5 h-5" /> Create Account</>
+                                ? <><Loader2 className="w-5 h-5 animate-spin" /> {t('Creating account…')}</>
+                                : <><UserPlus className="w-5 h-5" /> {t('register_btn')}</>
                             }
                         </button>
                     </form>
 
                     <div className="mt-6 text-center">
                         <p className="text-sm text-charcoal/50">
-                            Already have an account?{' '}
+                            {t('register_have_account')}{' '}
                             <Link to="/customer-login" className="text-secondary font-bold hover:underline">
-                                Sign in
+                                {t('register_sign_in')}
                             </Link>
                         </p>
                     </div>

@@ -4,6 +4,7 @@ import { ChefHat, Lock, User, Eye, EyeOff, Loader2, Shield, Users } from 'lucide
 import { setRole } from '../hooks/useRole';
 import { AuthService } from '../services/api';
 import LanguageSelector from '../components/LanguageSelector';
+import { useLanguage } from '../context/LanguageContext';
 
 // Hardcoded credentials for the staff/admin portal UI
 const CREDENTIALS = {
@@ -18,6 +19,7 @@ const BACKEND_CREDENTIALS = {
 };
 
 const Login = ({ defaultPortal = 'staff' }) => {
+    const { t } = useLanguage();
     const [portal, setPortal] = useState(defaultPortal);
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -78,8 +80,8 @@ const Login = ({ defaultPortal = 'staff' }) => {
     };
 
     const portalConfig = {
-        admin: { label: 'Admin Portal', icon: Shield, color: 'bg-primary', hint: 'Full access to all features' },
-        staff: { label: 'Staff Portal', icon: Users, color: 'bg-secondary', hint: 'Operational access only' },
+        admin: { label: t('portal_admin'), icon: Shield, color: 'bg-primary', hint: t('Full access to all features') },
+        staff: { label: t('portal_staff'), icon: Users, color: 'bg-secondary', hint: t('Operational access only') },
     };
 
     const active = portalConfig[portal];
@@ -96,7 +98,7 @@ const Login = ({ defaultPortal = 'staff' }) => {
                         <ChefHat className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-3xl font-display font-bold text-white tracking-tight">KOLAY</h1>
-                    <p className="text-white/70 text-sm mt-1">Restaurant Management System</p>
+                    <p className="text-white/70 text-sm mt-1">{t('Restaurant Management System')}</p>
                 </div>
 
                 <div className="p-8">
@@ -118,7 +120,7 @@ const Login = ({ defaultPortal = 'staff' }) => {
                     </div>
 
                     <div className="mb-6">
-                        <h2 className="text-2xl font-bold text-primary">Welcome Back</h2>
+                        <h2 className="text-2xl font-bold text-primary">{t('Welcome Back')}</h2>
                         <p className="text-charcoal/50 text-sm">{active.hint}</p>
                     </div>
 
@@ -131,7 +133,7 @@ const Login = ({ defaultPortal = 'staff' }) => {
 
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-charcoal/70 flex items-center gap-2">
-                                <User className="w-4 h-4" /> Username
+                                <User className="w-4 h-4" /> {t('Username')}
                             </label>
                             <input
                                 type="text"
@@ -146,7 +148,7 @@ const Login = ({ defaultPortal = 'staff' }) => {
 
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-charcoal/70 flex items-center gap-2">
-                                <Lock className="w-4 h-4" /> Password
+                                <Lock className="w-4 h-4" /> {t('login_password')}
                             </label>
                             <div className="relative">
                                 <input
@@ -170,13 +172,13 @@ const Login = ({ defaultPortal = 'staff' }) => {
                             disabled={isLoading}
                             className={`w-full ${portal === 'admin' ? 'bg-primary hover:bg-primary-dark' : 'bg-secondary hover:bg-orange-600'} text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed`}
                         >
-                            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : `Sign in to ${active.label}`}
+                            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : `${t('Sign in to')} ${active.label}`}
                         </button>
                     </form>
                 </div>
 
                 <div className="p-6 bg-bg-cream/30 border-t border-cream flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-xs text-charcoal/40">Powered by Kolay Management Platform</p>
+                    <p className="text-xs text-charcoal/40">{t('Powered by Kolay Management Platform')}</p>
                     <LanguageSelector variant="light" />
                 </div>
             </div>

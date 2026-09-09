@@ -6,9 +6,11 @@ import {
 } from 'lucide-react';
 import { AuthService } from '../services/api';
 import LanguageSelector from '../components/LanguageSelector';
+import { useLanguage } from '../context/LanguageContext';
 
 const CustomerLogin = () => {
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const [form, setForm] = useState({ username: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -90,24 +92,24 @@ const CustomerLogin = () => {
                         <ChefHat className="w-8 h-8 text-white" />
                     </div>
                     <h1 className="text-3xl font-display font-bold text-white tracking-tight">
-                        Kolay Restaurant
+                        {t('Kolay Restaurant')}
                     </h1>
                     <p className="text-white/80 text-sm mt-1 font-semibold italic">
-                        Where Every Meal Feels Right.
+                        {t('Where Every Meal Feels Right.')}
                     </p>
                     {/* Customer badge - makes it clear this is NOT the staff portal */}
                     <span className="inline-flex items-center gap-1.5 mt-3 bg-white/20 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
-                        <span className="w-1.5 h-1.5 bg-white rounded-full" /> Customer Sign In
+                        <span className="w-1.5 h-1.5 bg-white rounded-full" /> {t('login_title')}
                     </span>
                 </div>
 
                 <div className="p-8">
                     <div className="mb-6">
                         <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
-                            <LogIn className="w-5 h-5 text-secondary" /> Welcome Back
+                            <LogIn className="w-5 h-5 text-secondary" /> {t('Welcome Back')}
                         </h2>
                         <p className="text-charcoal/50 text-sm mt-1">
-                            Sign in to access Specialties and member perks.
+                            {t('login_subtitle')}
                         </p>
                     </div>
 
@@ -121,7 +123,7 @@ const CustomerLogin = () => {
                         {/* Username */}
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-charcoal/60 flex items-center gap-2">
-                                <User className="w-3.5 h-3.5" /> Username
+                                <User className="w-3.5 h-3.5" /> {t('register_username')}
                             </label>
                             <input
                                 type="text"
@@ -137,7 +139,7 @@ const CustomerLogin = () => {
                         {/* Password */}
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-charcoal/60 flex items-center gap-2">
-                                <Lock className="w-3.5 h-3.5" /> Password
+                                <Lock className="w-3.5 h-3.5" /> {t('login_password')}
                             </label>
                             <div className="relative">
                                 <input
@@ -165,24 +167,24 @@ const CustomerLogin = () => {
                             className="w-full bg-secondary hover:bg-orange-600 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed mt-2"
                         >
                             {isLoading
-                                ? <><Loader2 className="w-5 h-5 animate-spin" /> Signing in…</>
-                                : <><LogIn className="w-5 h-5" /> Sign In</>
+                                ? <><Loader2 className="w-5 h-5 animate-spin" /> {t('Signing in…')}</>
+                                : <><LogIn className="w-5 h-5" /> {t('nav_sign_in')}</>
                             }
                         </button>
                     </form>
 
                     <div className="mt-6 text-center">
                         <p className="text-sm text-charcoal/50">
-                            Don't have an account?{' '}
+                            {t('login_no_account')}{' '}
                             <Link to="/register" className="text-secondary font-bold hover:underline">
-                                Create one
+                                {t('nav_create_account')}
                             </Link>
                         </p>
                     </div>
                 </div>
 
                 <div className="p-5 bg-bg-cream/30 border-t border-cream flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-xs text-charcoal/40">Powered by Kolay Management Platform</p>
+                    <p className="text-xs text-charcoal/40">{t('Powered by Kolay Management Platform')}</p>
                     <LanguageSelector variant="light" />
                 </div>
             </div>

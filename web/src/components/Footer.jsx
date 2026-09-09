@@ -16,16 +16,16 @@ export default function Footer({ variant = 'full' }) {
                             <Utensils className="w-3.5 h-3.5 text-white" />
                         </div>
                         <span className="text-white font-black tracking-widest text-xs">KOLAY</span>
-                        <span>© 2026 {t('footer.rights')}</span>
+                        <span>© 2026 Kolay Restaurant. {t('footer_copyright', 'All rights reserved.')}</span>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4">
                         <LanguageSelector variant="dark" />
-                        <Link to="/" className="hover:text-white transition-colors">{t('nav.home')}</Link>
-                        <Link to="/order" className="hover:text-white transition-colors">{t('nav.menu')}</Link>
-                        <Link to="/reservations" className="hover:text-white transition-colors">{t('nav.reservations')}</Link>
-                        <Link to="/careers" className="hover:text-white transition-colors">{t('nav.careers')}</Link>
-                        <Link to="/staff" className="hover:text-[#E67E22] transition-colors">{t('footer.staffPortal')}</Link>
+                        <Link to="/" className="hover:text-white transition-colors">{t('nav_home', 'Home')}</Link>
+                        <Link to="/order" className="hover:text-white transition-colors">{t('nav_menu', 'Menu')}</Link>
+                        <Link to="/reservations" className="hover:text-white transition-colors">{t('nav_reservations', 'Reservations')}</Link>
+                        <Link to="/careers" className="hover:text-white transition-colors">{t('nav_careers', 'Careers')}</Link>
+                        <Link to="/staff" className="hover:text-[#E67E22] transition-colors">{t('footer_staff_portal', 'Staff Portal')}</Link>
                     </div>
                 </div>
             </footer>
@@ -45,36 +45,36 @@ export default function Footer({ variant = 'full' }) {
                             <span className="text-xl font-display font-black text-white tracking-wider">KOLAY</span>
                         </div>
                         <p className="text-white/40 text-xs leading-relaxed font-medium">
-                            {t('footer.tagline')}
+                            {t('footer_tagline', 'Artisan culinary experiences crafted for those who appreciate the finer things in life.')}
                         </p>
                     </div>
 
                     {/* Quick Links */}
                     <div className="space-y-4">
-                        <h4 className="text-white font-black text-xs uppercase tracking-[0.2em]">{t('nav.menu')} & Info</h4>
+                        <h4 className="text-white font-black text-xs uppercase tracking-[0.2em]">{t('footer_navigate', 'NAVIGATE')}</h4>
                         <ul className="space-y-2.5 text-xs text-white/40 font-medium">
-                            <li><Link to="/" className="hover:text-white transition-colors">{t('nav.home')}</Link></li>
-                            <li><Link to="/order" className="hover:text-white transition-colors">{t('nav.menu')}</Link></li>
-                            <li><Link to="/reservations" className="hover:text-white transition-colors">{t('nav.reservations')}</Link></li>
-                            <li><Link to="/specialties" className="hover:text-white transition-colors">Specialties</Link></li>
-                            <li><Link to="/careers" className="hover:text-white transition-colors">{t('nav.careers')}</Link></li>
+                            <li><Link to="/" className="hover:text-white transition-colors">{t('nav_home', 'Home')}</Link></li>
+                            <li><Link to="/order" className="hover:text-white transition-colors">{t('nav_menu', 'Menu')}</Link></li>
+                            <li><Link to="/reservations" className="hover:text-white transition-colors">{t('nav_reservations', 'Reservations')}</Link></li>
+                            <li><Link to="/specialties" className="hover:text-white transition-colors">{t('nav_specialties', 'Specialties')}</Link></li>
+                            <li><Link to="/careers" className="hover:text-white transition-colors">{t('nav_careers', 'Careers')}</Link></li>
                         </ul>
                     </div>
 
                     {/* Contact & Hours */}
                     <div className="space-y-4">
-                        <h4 className="text-white font-black text-xs uppercase tracking-[0.2em]">{t('footer.contact')}</h4>
+                        <h4 className="text-white font-black text-xs uppercase tracking-[0.2em]">{t('footer_hours', 'HOURS')}</h4>
                         <ul className="space-y-2.5 text-xs text-white/40 font-medium">
                             <li>Nairobi, Kenya</li>
-                            <li>+254 700 000 000</li>
+                            <li>+254 102 039 121</li>
                             <li>info@kolayrestaurant.com</li>
-                            <li>Mon - Sun: 10:00 AM - 11:00 PM</li>
+                            <li>{t('footer_every_day', 'Every Day')}: {t('footer_open_247', 'Open 24/7')}</li>
                         </ul>
                     </div>
 
-                    {/* Language & Portal */}
+                    {/* Language & Preferences */}
                     <div className="space-y-4">
-                        <h4 className="text-white font-black text-xs uppercase tracking-[0.2em]">Language / Preferences</h4>
+                        <h4 className="text-white font-black text-xs uppercase tracking-[0.2em]">{t('footer_language', 'Language')} / Preferences</h4>
                         <p className="text-white/40 text-xs">Select your preferred language for the Kolay experience:</p>
                         <LanguageSelector variant="dark" />
                     </div>
@@ -82,11 +82,11 @@ export default function Footer({ variant = 'full' }) {
 
                 {/* Bottom Bar */}
                 <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-white/20 font-black uppercase tracking-widest">
-                    <p>© 2026 Kolay Restaurant. {t('footer.rights')}</p>
+                    <p>© 2026 Kolay Restaurant. {t('footer_copyright', 'All rights reserved.')}</p>
                     <div className="flex flex-wrap items-center gap-6">
-                        <span className="cursor-pointer hover:text-white/50 transition-colors">{t('footer.privacy')}</span>
-                        <span className="cursor-pointer hover:text-white/50 transition-colors">{t('footer.terms')}</span>
-                        <Link to="/staff" className="cursor-pointer hover:text-[#E67E22] transition-colors">{t('footer.staffPortal')}</Link>
+                        <span className="cursor-pointer hover:text-white/50 transition-colors">{t('footer_privacy', 'Privacy Policy')}</span>
+                        <span className="cursor-pointer hover:text-white/50 transition-colors">{t('footer_terms', 'Terms of Use')}</span>
+                        <Link to="/staff" className="cursor-pointer hover:text-[#E67E22] transition-colors">{t('footer_staff_portal', 'Staff Portal')}</Link>
                     </div>
                 </div>
             </div>

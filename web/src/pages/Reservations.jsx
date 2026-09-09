@@ -3,8 +3,10 @@ import { Calendar, Clock, Users, MessageSquare, Phone, Mail, User, CheckCircle2,
 import PublicNavbar from '../components/PublicNavbar';
 import { ReservationService } from '../services/api';
 import Footer from '../components/Footer';
+import { useLanguage } from '../context/LanguageContext';
 
 const Reservations = () => {
+    const { t } = useLanguage();
     const [formData, setFormData] = useState({
         guestName: '',
         email: '',
@@ -106,11 +108,10 @@ const Reservations = () => {
                 />
                 <div className="relative z-20 text-center px-4">
                     <h1 className="text-4xl md:text-6xl font-display font-black text-white mb-4 drop-shadow-lg">
-                        RESERVE A TABLE
+                        {t('reservations_title').toUpperCase()}
                     </h1>
                     <p className="text-white/90 text-lg md:text-xl font-medium max-w-2xl mx-auto drop-shadow">
-                        Join us for an unforgettable dining experience.
-                        Secure your spot today.
+                        {t('reservation_hero_desc') || t('Join us for an unforgettable dining experience.')}
                     </p>
                 </div>
             </div>
@@ -120,15 +121,15 @@ const Reservations = () => {
                     <div className="grid md:grid-cols-5">
                         {/* Info Sidebar */}
                         <div className="md:col-span-2 bg-primary p-8 md:p-12 text-white">
-                            <h2 className="text-2xl font-display font-bold mb-8">Booking Info</h2>
+                            <h2 className="text-2xl font-display font-bold mb-8">{t('Booking Info')}</h2>
                             <div className="space-y-8">
                                 <div className="flex items-start gap-4">
                                     <div className="bg-white/10 p-3 rounded-xl">
                                         <Clock className="w-6 h-6 text-secondary" />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-sm uppercase tracking-widest text-white/50 mb-1">Hours</p>
-                                        <p className="text-white/90">Open 24/7</p>
+                                        <p className="font-bold text-sm uppercase tracking-widest text-white/50 mb-1">{t('footer_hours')}</p>
+                                        <p className="text-white/90">{t('footer_open_247')}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">
@@ -136,7 +137,7 @@ const Reservations = () => {
                                         <Phone className="w-6 h-6 text-secondary" />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-sm uppercase tracking-widest text-white/50 mb-1">Call Us</p>
+                                        <p className="font-bold text-sm uppercase tracking-widest text-white/50 mb-1">{t('Call Us')}</p>
                                         <p className="text-white/90">+254 102 039 121</p>
                                     </div>
                                 </div>
@@ -145,7 +146,7 @@ const Reservations = () => {
                                         <Mail className="w-6 h-6 text-secondary" />
                                     </div>
                                     <div>
-                                        <p className="font-bold text-sm uppercase tracking-widest text-white/50 mb-1">Email</p>
+                                        <p className="font-bold text-sm uppercase tracking-widest text-white/50 mb-1">{t('Email')}</p>
                                         <p className="text-white/90">reservations@kolay.com</p>
                                     </div>
                                 </div>
@@ -153,7 +154,7 @@ const Reservations = () => {
 
                             <div className="mt-16 p-6 bg-white/5 rounded-2xl border border-white/10">
                                 <p className="text-sm italic text-white/70">
-                                    "For large parties (8+ guests), please contact us directly via phone to ensure optimal seating arrangements."
+                                    {t('reservation_large_party_note') || '"For large parties (8+ guests), please contact us directly via phone to ensure optimal seating arrangements."'}
                                 </p>
                             </div>
                         </div>
@@ -165,13 +166,13 @@ const Reservations = () => {
                                     <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
                                         <CheckCircle2 className="w-10 h-10 text-green-500" />
                                     </div>
-                                    <h3 className="text-2xl font-display font-bold text-primary mb-2">Booking Confirmed!</h3>
-                                    <p className="text-charcoal/60 mb-8 lowercase">We've received your request and look forward to seeing you soon.</p>
+                                    <h3 className="text-2xl font-display font-bold text-primary mb-2">{t('reservation_success')}</h3>
+                                    <p className="text-charcoal/60 mb-8 lowercase">{t("We've received your request and look forward to seeing you soon.")}</p>
                                     <button
                                         onClick={() => setShowSuccess(false)}
                                         className="text-secondary font-bold flex items-center gap-2 hover:gap-3 transition-all"
                                     >
-                                        Make another booking <ArrowRight className="w-4 h-4" />
+                                        {t('Make another booking')} <ArrowRight className="w-4 h-4" />
                                     </button>
                                 </div>
                             ) : (
@@ -179,7 +180,7 @@ const Reservations = () => {
                                     <div className="grid grid-cols-1 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-xs font-black text-primary/40 uppercase tracking-widest flex items-center gap-2">
-                                                <User className="w-3 h-3" /> Full Name
+                                                <User className="w-3 h-3" /> {t('reservation_name')}
                                             </label>
                                             <input
                                                 required
@@ -194,7 +195,7 @@ const Reservations = () => {
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
                                                 <label className="text-xs font-black text-primary/40 uppercase tracking-widest flex items-center gap-2">
-                                                    <Mail className="w-3 h-3" /> Email
+                                                    <Mail className="w-3 h-3" /> {t('reservation_email')}
                                                 </label>
                                                 <input
                                                     required
@@ -207,7 +208,7 @@ const Reservations = () => {
                                             </div>
                                             <div className="space-y-2">
                                                 <label className="text-xs font-black text-primary/40 uppercase tracking-widest flex items-center gap-2">
-                                                    <Phone className="w-3 h-3" /> Phone
+                                                    <Phone className="w-3 h-3" /> {t('reservation_phone')}
                                                 </label>
                                                 <input
                                                     required
@@ -223,7 +224,7 @@ const Reservations = () => {
                                         <div className="grid grid-cols-3 gap-4">
                                             <div className="col-span-1 space-y-2">
                                                 <label className="text-xs font-black text-primary/40 uppercase tracking-widest flex items-center gap-2">
-                                                    <Calendar className="w-3 h-3" /> Date
+                                                    <Calendar className="w-3 h-3" /> {t('reservation_date')}
                                                 </label>
                                                 <input
                                                     required
@@ -235,7 +236,7 @@ const Reservations = () => {
                                             </div>
                                             <div className="col-span-1 space-y-2">
                                                 <label className="text-xs font-black text-primary/40 uppercase tracking-widest flex items-center gap-2">
-                                                    <Clock className="w-3 h-3" /> Time
+                                                    <Clock className="w-3 h-3" /> {t('reservation_time')}
                                                 </label>
                                                 <input
                                                     required
@@ -247,7 +248,7 @@ const Reservations = () => {
                                             </div>
                                             <div className="col-span-1 space-y-2">
                                                 <label className="text-xs font-black text-primary/40 uppercase tracking-widest flex items-center gap-2">
-                                                    <Users className="w-3 h-3" /> Guests
+                                                    <Users className="w-3 h-3" /> {t('reservation_guests')}
                                                 </label>
                                                 <select
                                                     className="w-full px-4 py-4 bg-bg-cream/50 border border-primary/5 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary/20 transition-all font-bold appearance-none"
@@ -255,7 +256,7 @@ const Reservations = () => {
                                                     onChange={(e) => setFormData({ ...formData, numberOfGuests: parseInt(e.target.value) })}
                                                 >
                                                     {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
-                                                        <option key={n} value={n}>{n} Persons</option>
+                                                        <option key={n} value={n}>{n} {t('Persons')}</option>
                                                     ))}
                                                 </select>
                                             </div>
@@ -263,7 +264,7 @@ const Reservations = () => {
 
                                         <div className="space-y-2">
                                             <label className="text-xs font-black text-primary/40 uppercase tracking-widest flex items-center gap-2">
-                                                <MessageSquare className="w-3 h-3" /> Special Requests
+                                                <MessageSquare className="w-3 h-3" /> {t('reservation_notes')}
                                             </label>
                                             <textarea
                                                 rows="3"
@@ -279,7 +280,7 @@ const Reservations = () => {
                                         disabled={submitting}
                                         className="w-full bg-secondary text-white py-5 rounded-2xl font-black uppercase text-sm tracking-widest shadow-lg hover:bg-secondary-dark hover:-translate-y-1 transition-all disabled:opacity-50 disabled:translate-y-0"
                                     >
-                                        {submitting ? 'Confirming...' : 'Confirm Reservation'}
+                                        {submitting ? t('Confirming...') : t('reservation_submit')}
                                     </button>
                                 </form>
                             )}

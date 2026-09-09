@@ -511,14 +511,14 @@ const GuestMenu = () => {
                     <div className="absolute inset-0 bg-[#0D0A07]/90 backdrop-blur-sm" onClick={() => setIsCheckoutOpen(false)} />
                     <div className="relative bg-[#1A1008] border border-white/5 rounded-[3rem] w-full max-w-xl p-10 shadow-2xl animate-in zoom-in duration-300">
                         <div className="flex justify-between items-center mb-8">
-                            <h2 className="text-2xl font-display font-black text-white">Finalize Order</h2>
+                            <h2 className="text-2xl font-display font-black text-white">{t('Finalize Order')}</h2>
                             <button onClick={() => setIsCheckoutOpen(false)} className="p-3 bg-white/5 hover:bg-white/10 rounded-2xl text-white/40 hover:text-white transition-colors"><X className="w-5 h-5" /></button>
                         </div>
                         <form onSubmit={handlePlaceOrder} className="space-y-5">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <input
                                     required
-                                    placeholder="Your Name"
+                                    placeholder={t('Your Name')}
                                     className="w-full bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 focus:ring-0 text-sm font-semibold transition-colors"
                                     value={guestInfo.name}
                                     onChange={e => setGuestInfo({ ...guestInfo, name: e.target.value })}
@@ -526,7 +526,7 @@ const GuestMenu = () => {
                                 <input
                                     required
                                     type="tel"
-                                    placeholder="Phone Number"
+                                    placeholder={t('Phone Number')}
                                     className="w-full bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold transition-colors"
                                     value={guestInfo.phone}
                                     onChange={e => setGuestInfo({ ...guestInfo, phone: e.target.value })}
@@ -535,7 +535,7 @@ const GuestMenu = () => {
                             {guestInfo.mode === 'Home Delivery' && (
                                 <input
                                     required
-                                    placeholder="Full Delivery Address (e.g. Westlands, 4th Street)"
+                                    placeholder={t('Full Delivery Address (e.g. Westlands, 4th Street)')}
                                     className="w-full bg-white/5 border border-white/8 text-white placeholder-white/20 p-4 rounded-xl outline-none focus:border-[#E67E22]/50 text-sm font-semibold transition-colors"
                                     value={guestInfo.address}
                                     onChange={e => setGuestInfo({ ...guestInfo, address: e.target.value })}
@@ -544,7 +544,7 @@ const GuestMenu = () => {
 
                             {orderType === 'delivery' || orderType === 'takeaway' ? (
                                 <div className="flex bg-[#E67E22]/10 p-4 rounded-2xl border border-[#E67E22]/20 items-center justify-center">
-                                    <span className="text-[#E67E22] font-black text-sm uppercase tracking-widest">{orderType === 'delivery' ? '🚗 Fast Home Delivery' : '🛍️ Quick Takeaway'}</span>
+                                    <span className="text-[#E67E22] font-black text-sm uppercase tracking-widest">{orderType === 'delivery' ? `🚗 ${t('Fast Home Delivery')}` : `🛍️ ${t('Quick Takeaway')}`}</span>
                                 </div>
                             ) : (
                                 <div className="flex bg-white/3 p-1.5 rounded-2xl border border-white/5">
@@ -556,7 +556,7 @@ const GuestMenu = () => {
                                             className={`flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${guestInfo.mode === m ? 'bg-[#E67E22] text-white shadow-[0_4px_15px_#E67E2240]' : 'text-white/30 hover:text-white'
                                                 }`}
                                         >
-                                            {m}
+                                            {t(m)}
                                         </button>
                                     ))}
                                 </div>
@@ -566,15 +566,15 @@ const GuestMenu = () => {
                                     <CreditCard className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">Payment Options</p>
-                                    <p className="font-semibold text-white text-sm">Pay seamlessly on delivery/collection</p>
+                                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1">{t('Payment Options')}</p>
+                                    <p className="font-semibold text-white text-sm">{t('Pay seamlessly on delivery/collection')}</p>
                                 </div>
                             </div>
                             <button
                                 type="submit"
                                 className="w-full bg-[#E67E22] hover:bg-[#D4A017] text-white font-black mt-2 py-4 rounded-xl text-sm uppercase tracking-widest transition-all active:scale-95 shadow-[0_0_30px_#E67E2230]"
                             >
-                                Confirm Order • {total.toLocaleString()} KES
+                                {t('Confirm Order')} • {total.toLocaleString()} KES
                             </button>
                         </form>
                     </div>
@@ -589,9 +589,9 @@ const GuestMenu = () => {
                         <div className="w-20 h-20 bg-[#E67E22] rounded-3xl mx-auto flex items-center justify-center mb-6 shadow-[0_0_40px_#E67E2250]">
                             <Check className="w-10 h-10 text-white" />
                         </div>
-                        <h2 className="text-3xl font-display font-black text-white mb-3">Chef is ready!</h2>
+                        <h2 className="text-3xl font-display font-black text-white mb-3">{t('Chef is ready!')}</h2>
                         <p className="text-white/40 text-sm leading-relaxed mb-8">
-                            Your order has been sent straight to the kitchen. {guestInfo.mode === 'Takeaway' ? 'We will prepare it right away.' : 'A server will attend to you matching your name.'}
+                            {t('Your order has been sent straight to the kitchen.')} {guestInfo.mode === 'Takeaway' ? t('We will prepare it right away.') : t('A server will attend to you matching your name.')}
                         </p>
                         <button
                             onClick={() => {
@@ -600,7 +600,7 @@ const GuestMenu = () => {
                             }}
                             className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black w-full py-4 rounded-xl text-[10px] uppercase tracking-widest transition-colors"
                         >
-                            Return to Menu
+                            {t('Return to Menu')}
                         </button>
                     </div>
                 </div>
@@ -614,28 +614,28 @@ const GuestMenu = () => {
                         <div className="w-16 h-16 bg-[#E67E22]/20 border border-[#E67E22]/30 rounded-2xl mx-auto flex items-center justify-center mb-6">
                             <Lock className="w-8 h-8 text-[#E67E22]" />
                         </div>
-                        <h2 className="text-2xl font-display font-black text-white mb-3">Account Required</h2>
+                        <h2 className="text-2xl font-display font-black text-white mb-3">{t('Account Required')}</h2>
                         <p className="text-white/40 text-sm leading-relaxed mb-8">
-                            Ordering specialties is exclusive to registered members. Sign in or create a free account to enjoy our seasonal specials with a <strong className="text-[#E67E22]">10% discount</strong>.
+                            {t('Ordering specialties is exclusive to registered members. Sign in or create a free account to enjoy our seasonal specials with a')} <strong className="text-[#E67E22]">10% discount</strong>.
                         </p>
                         <div className="space-y-3">
                             <Link
                                 to="/register"
                                 className="w-full bg-[#E67E22] hover:bg-[#D4A017] text-white font-black py-4 rounded-xl text-sm uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2 shadow-[0_0_30px_#E67E2230]"
                             >
-                                <UserPlus className="w-4 h-4" /> Create Free Account
+                                <UserPlus className="w-4 h-4" /> {t('Create Free Account')}
                             </Link>
                             <Link
                                 to="/customer-login"
                                 className="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black py-3.5 rounded-xl text-sm uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-2"
                             >
-                                <LogIn className="w-4 h-4" /> Sign In
+                                <LogIn className="w-4 h-4" /> {t('register_sign_in')}
                             </Link>
                             <button
                                 onClick={() => setShowAuthGate(false)}
                                 className="w-full text-white/30 hover:text-white/50 font-bold py-2 text-xs uppercase tracking-widest transition-colors"
                             >
-                                Continue Browsing
+                                {t('Continue Browsing')}
                             </button>
                         </div>
                     </div>
