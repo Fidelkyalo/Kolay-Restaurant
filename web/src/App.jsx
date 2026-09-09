@@ -18,6 +18,8 @@ import Employees from './pages/Employees';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CustomerLogin from './pages/CustomerLogin';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfUse from './pages/TermsOfUse';
 import './index.css';
 
 function App() {
@@ -44,6 +46,8 @@ function App() {
           <Route path="/login" element={<Login defaultPortal="staff" />} />
           <Route path="/register" element={<Register />} />
           <Route path="/customer-login" element={<CustomerLogin />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-use" element={<TermsOfUse />} />
         </Routes>
       </Router>
     </LanguageProvider>

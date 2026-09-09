@@ -25,6 +25,8 @@ export default function Footer({ variant = 'full' }) {
                         <Link to="/order" className="hover:text-white transition-colors">{t('nav_menu', 'Menu')}</Link>
                         <Link to="/reservations" className="hover:text-white transition-colors">{t('nav_reservations', 'Reservations')}</Link>
                         <Link to="/careers" className="hover:text-white transition-colors">{t('nav_careers', 'Careers')}</Link>
+                        <Link to="/privacy-policy" className="hover:text-white transition-colors">{t('footer_privacy', 'Privacy Policy')}</Link>
+                        <Link to="/terms-of-use" className="hover:text-white transition-colors">{t('footer_terms', 'Terms of Use')}</Link>
                         <Link to="/staff" className="hover:text-[#E67E22] transition-colors">{t('footer_staff_portal', 'Staff Portal')}</Link>
                     </div>
                 </div>
@@ -58,6 +60,8 @@ export default function Footer({ variant = 'full' }) {
                             <li><Link to="/reservations" className="hover:text-white transition-colors">{t('nav_reservations', 'Reservations')}</Link></li>
                             <li><Link to="/specialties" className="hover:text-white transition-colors">{t('nav_specialties', 'Specialties')}</Link></li>
                             <li><Link to="/careers" className="hover:text-white transition-colors">{t('nav_careers', 'Careers')}</Link></li>
+                            <li><Link to="/privacy-policy" className="hover:text-white transition-colors">{t('footer_privacy', 'Privacy Policy')}</Link></li>
+                            <li><Link to="/terms-of-use" className="hover:text-white transition-colors">{t('footer_terms', 'Terms of Use')}</Link></li>
                         </ul>
                     </div>
 
@@ -84,8 +88,8 @@ export default function Footer({ variant = 'full' }) {
                 <div className="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-[11px] text-white/20 font-black uppercase tracking-widest">
                     <p>© 2026 Kolay Restaurant. {t('footer_copyright', 'All rights reserved.')}</p>
                     <div className="flex flex-wrap items-center gap-6">
-                        <span className="cursor-pointer hover:text-white/50 transition-colors">{t('footer_privacy', 'Privacy Policy')}</span>
-                        <span className="cursor-pointer hover:text-white/50 transition-colors">{t('footer_terms', 'Terms of Use')}</span>
+                        <Link to="/privacy-policy" className="cursor-pointer hover:text-white/50 transition-colors">{t('footer_privacy', 'Privacy Policy')}</Link>
+                        <Link to="/terms-of-use" className="cursor-pointer hover:text-white/50 transition-colors">{t('footer_terms', 'Terms of Use')}</Link>
                         <Link to="/staff" className="cursor-pointer hover:text-[#E67E22] transition-colors">{t('footer_staff_portal', 'Staff Portal')}</Link>
                     </div>
                 </div>
