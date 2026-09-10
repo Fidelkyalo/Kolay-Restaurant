@@ -3,16 +3,18 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     Settings, RefreshCw, Shield, Menu, X, Home, LayoutGrid, Monitor,
     Package, ChevronRight, LogOut, Calendar, ExternalLink, Sparkles,
-    Briefcase, Users, ClipboardList, UserCheck
+    Briefcase, Users, ClipboardList, UserCheck, Bot
 } from 'lucide-react';
 import { getRole, clearRole } from '../hooks/useRole';
 import { useLanguage } from '../context/LanguageContext';
 import LanguageSelector from './LanguageSelector';
+import AiAssistantModal from './AiAssistantModal';
 
 const Navbar = () => {
     const { t, language } = useLanguage();
     const [showProfileMenu, setShowProfileMenu] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [showAiModal, setShowAiModal] = useState(false);
     const [role, setRoleState] = useState(getRole);
     const location = useLocation();
     const navigate = useNavigate();
@@ -100,6 +102,13 @@ const Navbar = () => {
                         {isActive(link.path) && <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-secondary rounded-full shadow-[0_0_10px_rgba(230,126,34,0.5)]" />}
                     </Link>
                 ))}
+                <button
+                    onClick={() => setShowAiModal(true)}
+                    className="whitespace-nowrap flex items-center gap-1.5 text-amber-300 hover:text-white transition-all text-sm font-bold bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 px-3 py-1 rounded-full shadow-sm"
+                >
+                    <Bot className="w-4 h-4 text-amber-400 animate-pulse" />
+                    <span>{t('nav_ai_simulator', 'AI Simulator')}</span>
+                </button>
                 <Link to="/" className="whitespace-nowrap flex items-center gap-1.5 text-white/50 hover:text-secondary transition-all text-sm">
                     {t('nav_client_view', 'Client View')} <ExternalLink className="w-3 h-3" />
                 </Link>
@@ -189,6 +198,10 @@ const Navbar = () => {
                                     <ChevronRight className={`w-4 h-4 ${isActive(link.path) ? 'opacity-100' : 'opacity-0'}`} />
                                 </Link>
                             ))}
+                            <button onClick={() => { setIsMenuOpen(false); setShowAiModal(true); }}
+                                className="w-full flex items-center gap-4 p-4 rounded-2xl bg-amber-500/10 text-amber-300 border border-amber-500/20 font-bold hover:bg-amber-500/20 transition-all text-left">
+                                <Bot className="w-4 h-4 text-amber-400" /><span>{t('nav_ai_simulator', 'AI Simulator')}</span>
+                            </button>
                             <Link to="/" onClick={() => setIsMenuOpen(false)}
                                 className="flex items-center gap-4 p-4 rounded-2xl text-white/50 hover:bg-white/5 hover:text-secondary transition-all">
                                 <ExternalLink className="w-4 h-4" /><span>{t('nav_client_view', 'Client View')}</span>
@@ -220,8 +233,12 @@ const Navbar = () => {
                     </div>
                 </div>
             )}
+
+            {/* AI Assistant Modal */}
+            <AiAssistantModal isOpen={showAiModal} onClose={() => setShowAiModal(false)} />
         </nav>
     );
 };
 
 export default Navbar;
+
