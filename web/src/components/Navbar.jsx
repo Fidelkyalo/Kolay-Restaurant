@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     Settings, RefreshCw, Shield, Menu, X, Home, LayoutGrid, Monitor,
     Package, ChevronRight, LogOut, Calendar, ExternalLink, Sparkles,
-    Briefcase, Users, ClipboardList
+    Briefcase, Users, ClipboardList, UserCheck
 } from 'lucide-react';
 import { getRole, clearRole } from '../hooks/useRole';
 import { useLanguage } from '../context/LanguageContext';
@@ -53,6 +53,7 @@ const Navbar = () => {
         { name: t('nav_specialties'), path: '/specialties',        icon: <Sparkles className="w-4 h-4" /> },
         { name: t('nav_careers'),     path: '/admin/careers',      icon: <Briefcase className="w-4 h-4" /> },
         { name: t('nav_employees'),   path: '/employees',          icon: <Users className="w-4 h-4" /> },
+        { name: t('nav_members', 'Members'), path: '/members',     icon: <UserCheck className="w-4 h-4" /> },
     ];
 
     const isAdmin = role === 'admin';

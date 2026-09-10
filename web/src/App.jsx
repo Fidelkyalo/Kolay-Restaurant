@@ -15,6 +15,7 @@ import Specialties from './pages/Specialties';
 import Careers from './pages/Careers';
 import AdminCareers from './pages/AdminCareers';
 import Employees from './pages/Employees';
+import Members from './pages/Members';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CustomerLogin from './pages/CustomerLogin';
@@ -50,6 +51,7 @@ function App() {
           <Route path="/careers" element={<Careers />} />
           <Route path="/admin/careers" element={<AdminCareers />} />
           <Route path="/employees" element={<Employees />} />
+          <Route path="/members" element={<Members />} />
           <Route path="/staff" element={<Login defaultPortal="staff" />} />
           <Route path="/admin-portal" element={<Login defaultPortal="admin" />} />
           <Route path="/login" element={<Login defaultPortal="staff" />} />
