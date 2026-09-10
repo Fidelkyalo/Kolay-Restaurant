@@ -331,7 +331,7 @@ export default function Members() {
         setTimeout(() => setToastMessage(''), 3500);
     };
 
-    // ── Computed AI Metrics & Dashboard Widget Numbers ──────────────────────
+    // ── Computed Metrics & Dashboard Widget Numbers ──────────────────────
     const totalMembers = members.length;
     const newMembersToday = members.filter(m => m.dateJoined === '2026-09-10').length;
     const membershipGrowthPct = 15.4; // % vs previous period
@@ -391,23 +391,23 @@ export default function Members() {
                         <div>
                             <div className="flex flex-wrap items-center gap-2 mb-2">
                                 <span className="px-2.5 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full text-[10px] sm:text-xs font-black tracking-widest uppercase flex items-center gap-1.5">
-                                    <Brain className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-pulse text-amber-300" /> {t('members_portal_badge', 'AI Member Intelligence Portal')}
+                                    <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-pulse text-amber-300" /> {t('members_portal_badge', 'Member Intelligence Portal')}
                                 </span>
                                 <span className="text-white/40 text-[10px] sm:text-xs font-semibold">Live Real-Time Sync</span>
                             </div>
                             <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-black tracking-tight text-white leading-tight">
-                                {t('members_portal_title', 'Members & AI Customer Analytics')}
+                                {t('members_portal_title', 'Members & Customer Analytics')}
                             </h1>
                             <p className="text-white/60 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-                                {t('members_portal_subtitle', 'Real-time customer growth, behavioral segmentation, automated churn prevention, spending trends, and predictive AI insights for registered Kolay members.')}
+                                {t('members_portal_subtitle', 'Real-time customer growth, behavioral segmentation, automated churn prevention, spending trends, and predictive insights for registered Kolay members.')}
                             </p>
                         </div>
                         <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2.5 sm:gap-3 shrink-0">
                             <button
-                                onClick={() => showNotification("AI Model recalculated customer intelligence & lifetime values.")}
+                                onClick={() => showNotification("Analytics Engine recalculated customer intelligence & lifetime values.")}
                                 className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all border border-white/10 active:scale-95"
                             >
-                                <RefreshCw className="w-3.5 h-3.5 text-amber-400" /> {t('members_refresh_engine', 'Refresh AI Engine')}
+                                <RefreshCw className="w-3.5 h-3.5 text-amber-400" /> {t('members_refresh_engine', 'Refresh Analytics Engine')}
                             </button>
                             <button
                                 onClick={() => setShowAddModal(true)}
@@ -419,7 +419,7 @@ export default function Members() {
                     </div>
                 </div>
 
-                {/* ── AI Dashboard Widgets Grid (12 Cards - Fully Responsive) ──────── */}
+                {/* ── Dashboard Widgets Grid (12 Cards - Fully Responsive) ──────── */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-3.5">
                     {/* 1. Total Members */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-amber-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
@@ -523,11 +523,11 @@ export default function Members() {
                         <p className="text-[9px] sm:text-[10px] text-pink-400 font-semibold mt-1 truncate">Send coupon today</p>
                     </div>
 
-                    {/* 11. AI Recommendations */}
+                    {/* 11. Smart Insights */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-cyan-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_ai_insights', 'AI Insights')}</span>
-                            <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400 shrink-0" />
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_ai_insights', 'Smart Insights')}</span>
+                            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-cyan-300">4 Active</div>
                         <p className="text-[9px] sm:text-[10px] text-cyan-400 font-semibold mt-1 truncate">Actionable alerts</p>
@@ -553,12 +553,12 @@ export default function Members() {
                         { id: 'spending', label: t('members_spending_analysis', '💰 3. Spending Analysis') },
                         { id: 'favorites', label: t('members_favorite_food', '🍔 4. Favorite Food Analysis') },
                         { id: 'segmentation', label: t('members_cust_segmentation', '🏷️ 5. Customer Segmentation') },
-                        { id: 'retention', label: t('members_retention_churn', '⚠️ 6. Retention & Churn AI') },
+                        { id: 'retention', label: t('members_retention_churn', '⚠️ 6. Retention & Churn Engine') },
                         { id: 'marketing', label: t('members_personalized_marketing', '🎯 7. Personalized Marketing') },
                         { id: 'loyalty', label: t('members_loyalty_intel', '⭐ 8. Loyalty Intelligence') },
                         { id: 'behavior', label: t('members_ordering_behavior', '🕒 9. Ordering Behavior') },
                         { id: 'feedback', label: t('members_feedback_analysis', '💬 10. Feedback Analysis') },
-                        { id: 'ai_recommendations', label: t('members_ai_recommendations', '🧠 11. AI Recommendations') },
+                        { id: 'ai_recommendations', label: t('members_ai_recommendations', '✨ 11. Recommendations') },
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -806,10 +806,10 @@ export default function Members() {
                 {/* ── TAB 2: Customer Growth ──────────────────────────────────────── */}
                 {activeTab === 'growth' && (
                     <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
-                        {/* AI Summary Box */}
+                        {/* Growth Summary Box */}
                         <div className="bg-gradient-to-r from-emerald-950/40 via-[#150F0A] to-[#150F0A] border border-emerald-500/30 rounded-2xl p-4 sm:p-6">
                             <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs sm:text-sm mb-1.5">
-                                <Sparkles className="w-4 h-4 shrink-0" /> AI Growth Intelligence Summary
+                                <Sparkles className="w-4 h-4 shrink-0" /> Growth Intelligence Summary
                             </div>
                             <p className="text-lg sm:text-xl font-display font-bold text-white leading-snug">
                                 "42 new members joined this week, a 15.4% increase compared to last week."
@@ -874,10 +874,10 @@ export default function Members() {
                 {/* ── TAB 3: Customer Activity ────────────────────────────────────── */}
                 {activeTab === 'activity' && (
                     <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
-                        {/* AI Insight */}
+                        {/* Insight Box */}
                         <div className="bg-gradient-to-r from-amber-950/40 via-[#150F0A] to-[#150F0A] border border-amber-500/30 rounded-2xl p-4 sm:p-6">
                             <div className="flex items-center gap-2 text-amber-400 font-bold text-xs sm:text-sm mb-1.5">
-                                <Brain className="w-4 h-4 shrink-0" /> AI Activity Insight
+                                <Sparkles className="w-4 h-4 shrink-0" /> Customer Activity Insights
                             </div>
                             <p className="text-lg sm:text-xl font-display font-bold text-white leading-snug">
                                 "18 loyal customers haven't placed an order in the last month. Consider sending them a discount."
@@ -939,10 +939,10 @@ export default function Members() {
                 {/* ── TAB 4: Spending Analysis ───────────────────────────────────── */}
                 {activeTab === 'spending' && (
                     <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
-                        {/* AI Example Insight */}
+                        {/* Example Insight */}
                         <div className="bg-gradient-to-r from-emerald-950/40 via-[#150F0A] to-[#150F0A] border border-emerald-500/30 rounded-2xl p-4 sm:p-6">
                             <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs sm:text-sm mb-1.5">
-                                <DollarSign className="w-4 h-4 shrink-0" /> AI Spending Analysis
+                                <DollarSign className="w-4 h-4 shrink-0" /> Spending Analysis
                             </div>
                             <p className="text-lg sm:text-xl font-display font-bold text-white leading-snug">
                                 "John Mwangi has spent $1,250 over the last 12 months, making him one of your top 10 customers."
@@ -998,10 +998,10 @@ export default function Members() {
                 {/* ── TAB 5: Favorite Food Analysis ──────────────────────────────── */}
                 {activeTab === 'favorites' && (
                     <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
-                        {/* AI Insight */}
+                        {/* Combination Insight */}
                         <div className="bg-gradient-to-r from-purple-950/40 via-[#150F0A] to-[#150F0A] border border-purple-500/30 rounded-2xl p-4 sm:p-6">
                             <div className="flex items-center gap-2 text-purple-400 font-bold text-xs sm:text-sm mb-1.5">
-                                <Brain className="w-4 h-4 shrink-0" /> AI Combination Intelligence
+                                <Sparkles className="w-4 h-4 shrink-0" /> Combination Intelligence
                             </div>
                             <p className="text-lg sm:text-xl font-display font-bold text-white leading-snug">
                                 "75% of members who order burgers also purchase fries."
@@ -1038,7 +1038,7 @@ export default function Members() {
                     <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
                         <div>
                             <h3 className="text-lg sm:text-xl font-bold text-white">Automated Customer Segmentation</h3>
-                            <p className="text-xs text-white/60 mt-0.5">AI groups members into dynamic cohorts based on purchasing frequency & behavior.</p>
+                            <p className="text-xs text-white/60 mt-0.5">Automated grouping of members into dynamic cohorts based on purchasing frequency & behavior.</p>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-4">
@@ -1069,13 +1069,13 @@ export default function Members() {
                     </div>
                 )}
 
-                {/* ── TAB 7: Retention & Churn AI ────────────────────────────────── */}
+                {/* ── TAB 7: Retention & Churn Engine ────────────────────────────── */}
                 {activeTab === 'retention' && (
                     <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
-                        {/* AI Prediction Header */}
+                        {/* Prediction Header */}
                         <div className="bg-gradient-to-r from-red-950/50 via-[#150F0A] to-[#150F0A] border border-red-500/30 rounded-2xl p-4 sm:p-6">
                             <div className="flex items-center gap-2 text-red-400 font-bold text-xs sm:text-sm mb-1.5">
-                                <AlertTriangle className="w-4 h-4 shrink-0" /> AI Predictive Churn Intelligence
+                                <AlertTriangle className="w-4 h-4 shrink-0" /> Predictive Churn Intelligence
                             </div>
                             <p className="text-lg sm:text-xl font-display font-bold text-white leading-snug">
                                 "23 members are likely to stop ordering within the next two weeks."
@@ -1117,10 +1117,10 @@ export default function Members() {
                 {/* ── TAB 8: Personalized Marketing Suggestions ──────────────────── */}
                 {activeTab === 'marketing' && (
                     <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
-                        {/* AI Example */}
+                        {/* Marketing Example */}
                         <div className="bg-gradient-to-r from-amber-950/40 via-[#150F0A] to-[#150F0A] border border-amber-500/30 rounded-2xl p-4 sm:p-6">
                             <div className="flex items-center gap-2 text-amber-400 font-bold text-xs sm:text-sm mb-1.5">
-                                <Gift className="w-4 h-4 shrink-0" /> AI Marketing Recommendation
+                                <Gift className="w-4 h-4 shrink-0" /> Smart Marketing Recommendation
                             </div>
                             <p className="text-lg sm:text-xl font-display font-bold text-white leading-snug">
                                 "Send a 10% discount to members who haven't ordered in 45 days."
@@ -1190,7 +1190,7 @@ export default function Members() {
                     <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
                         <div className="bg-gradient-to-r from-blue-950/40 via-[#150F0A] to-[#150F0A] border border-blue-500/30 rounded-2xl p-4 sm:p-6">
                             <div className="flex items-center gap-2 text-blue-400 font-bold text-xs sm:text-sm mb-1.5">
-                                <Clock className="w-4 h-4 shrink-0" /> AI Behavior Analytics
+                                <Clock className="w-4 h-4 shrink-0" /> Behavior Analytics
                             </div>
                             <p className="text-lg sm:text-xl font-display font-bold text-white leading-snug">
                                 "Most members place orders between 12:00 PM and 2:00 PM."
@@ -1233,7 +1233,7 @@ export default function Members() {
                     <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
                         <div className="bg-gradient-to-r from-pink-950/40 via-[#150F0A] to-[#150F0A] border border-pink-500/30 rounded-2xl p-4 sm:p-6">
                             <div className="flex items-center gap-2 text-pink-400 font-bold text-xs sm:text-sm mb-1.5">
-                                <MessageSquare className="w-4 h-4 shrink-0" /> AI Feedback Summary
+                                <MessageSquare className="w-4 h-4 shrink-0" /> Customer Feedback Summary
                             </div>
                             <p className="text-lg sm:text-xl font-display font-bold text-white leading-snug">
                                 "Customers frequently praise the pizza but mention slow delivery on weekends."
@@ -1264,7 +1264,7 @@ export default function Members() {
                     </div>
                 )}
 
-                {/* ── TAB 12: AI Recommendations ─────────────────────────────────── */}
+                {/* ── TAB 12: Recommendations ─────────────────────────────────── */}
                 {activeTab === 'ai_recommendations' && (
                     <div className="space-y-4 sm:space-y-6 animate-in fade-in duration-200">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -1279,7 +1279,7 @@ export default function Members() {
                                         <span className="px-2.5 py-1 bg-amber-500/20 text-amber-300 text-[10px] font-black rounded-full uppercase tracking-wider">
                                             {rec.type}
                                         </span>
-                                        <Brain className="w-5 h-5 text-amber-400 shrink-0" />
+                                        <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
                                     </div>
                                     <p className="text-base sm:text-lg font-bold text-white">{rec.title}</p>
                                     <button
