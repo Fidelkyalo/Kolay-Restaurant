@@ -391,15 +391,15 @@ export default function Members() {
                         <div>
                             <div className="flex flex-wrap items-center gap-2 mb-2">
                                 <span className="px-2.5 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-full text-[10px] sm:text-xs font-black tracking-widest uppercase flex items-center gap-1.5">
-                                    <Brain className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-pulse text-amber-300" /> AI Member Intelligence Portal
+                                    <Brain className="w-3 h-3 sm:w-3.5 sm:h-3.5 animate-pulse text-amber-300" /> {t('members_portal_badge', 'AI Member Intelligence Portal')}
                                 </span>
                                 <span className="text-white/40 text-[10px] sm:text-xs font-semibold">Live Real-Time Sync</span>
                             </div>
                             <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-black tracking-tight text-white leading-tight">
-                                Members & AI Customer Analytics
+                                {t('members_portal_title', 'Members & AI Customer Analytics')}
                             </h1>
                             <p className="text-white/60 text-xs sm:text-sm mt-1 max-w-2xl leading-relaxed">
-                                Real-time customer growth, behavioral segmentation, automated churn prevention, spending trends, and predictive AI insights for registered Kolay members.
+                                {t('members_portal_subtitle', 'Real-time customer growth, behavioral segmentation, automated churn prevention, spending trends, and predictive AI insights for registered Kolay members.')}
                             </p>
                         </div>
                         <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2.5 sm:gap-3 shrink-0">
@@ -407,13 +407,13 @@ export default function Members() {
                                 onClick={() => showNotification("AI Model recalculated customer intelligence & lifetime values.")}
                                 className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all border border-white/10 active:scale-95"
                             >
-                                <RefreshCw className="w-3.5 h-3.5 text-amber-400" /> Refresh AI Engine
+                                <RefreshCw className="w-3.5 h-3.5 text-amber-400" /> {t('members_refresh_engine', 'Refresh AI Engine')}
                             </button>
                             <button
                                 onClick={() => setShowAddModal(true)}
                                 className="px-5 py-2.5 bg-secondary hover:bg-orange-600 text-white rounded-xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95"
                             >
-                                <UserPlus className="w-3.5 h-3.5" /> Add New Member
+                                <UserPlus className="w-3.5 h-3.5" /> {t('members_add_new', 'Add New Member')}
                             </button>
                         </div>
                     </div>
@@ -424,7 +424,7 @@ export default function Members() {
                     {/* 1. Total Members */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-amber-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Total Members</span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_total_members', 'Total Members')}</span>
                             <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-white">{totalMembers}</div>
@@ -436,7 +436,7 @@ export default function Members() {
                     {/* 2. New Members Today */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-emerald-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">New Today</span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_new_today', 'New Today')}</span>
                             <UserPlus className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-white">{newMembersToday}</div>
@@ -446,7 +446,7 @@ export default function Members() {
                     {/* 3. Membership Growth */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-sky-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Growth Rate</span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_growth_rate', 'Growth Rate')}</span>
                             <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-white">+{membershipGrowthPct}%</div>
@@ -456,7 +456,7 @@ export default function Members() {
                     {/* 4. VIP Members */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-purple-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">VIP Members</span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_vip_members', 'VIP Members')}</span>
                             <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-purple-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-purple-300">{vipMembersCount}</div>
@@ -466,7 +466,7 @@ export default function Members() {
                     {/* 5. Most Active Customers */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-orange-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Most Active</span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_most_active', 'Most Active')}</span>
                             <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-orange-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-white">{mostActiveCount}</div>
@@ -476,7 +476,7 @@ export default function Members() {
                     {/* 6. Inactive Members */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-rose-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Inactive</span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_inactive', 'Inactive')}</span>
                             <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-rose-300">{inactiveMembersCount}</div>
@@ -486,7 +486,7 @@ export default function Members() {
                     {/* 7. Avg Spend Per Member */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-green-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Avg Spend</span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_avg_spend', 'Avg Spend')}</span>
                             <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-emerald-400">${avgSpendPerMember}</div>
@@ -496,7 +496,7 @@ export default function Members() {
                     {/* 8. Total Orders */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-indigo-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Member Orders</span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_member_orders', 'Member Orders')}</span>
                             <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-white">{totalOrdersCount}</div>
@@ -506,7 +506,7 @@ export default function Members() {
                     {/* 9. Loyalty Members */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-yellow-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Loyalty Stars</span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_loyalty_stars', 'Loyalty Stars')}</span>
                             <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-yellow-300">{loyaltyMembersCount}</div>
@@ -516,7 +516,7 @@ export default function Members() {
                     {/* 10. Birthdays This Week */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-pink-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">Birthdays</span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_birthdays', 'Birthdays')}</span>
                             <Cake className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-pink-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-pink-300">{birthdaysThisWeekCount}</div>
@@ -526,7 +526,7 @@ export default function Members() {
                     {/* 11. AI Recommendations */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-cyan-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">AI Insights</span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_ai_insights', 'AI Insights')}</span>
                             <Brain className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-cyan-300">4 Active</div>
@@ -536,7 +536,7 @@ export default function Members() {
                     {/* 12. Customers at Risk */}
                     <div className="bg-[#18110A] border border-white/10 hover:border-red-500/30 rounded-2xl p-3.5 sm:p-4 transition-all">
                         <div className="flex items-center justify-between text-white/50 mb-1.5">
-                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">At Risk Churn</span>
+                            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{t('members_at_risk_churn', 'At Risk Churn')}</span>
                             <AlertTriangle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-red-400 shrink-0" />
                         </div>
                         <div className="text-xl sm:text-2xl font-display font-black text-red-400">{churnRiskCount}</div>
@@ -547,18 +547,18 @@ export default function Members() {
                 {/* ── Navigation Tabs Bar (Scrollable on Mobile) ──────────────────── */}
                 <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-white/10 scrollbar-none -mx-3 px-3 sm:mx-0 sm:px-0">
                     {[
-                        { id: 'directory', label: '👥 Timeline & Directory', badge: members.length },
-                        { id: 'growth', label: '📈 1. Customer Growth' },
-                        { id: 'activity', label: '⚡ 2. Customer Activity' },
-                        { id: 'spending', label: '💰 3. Spending Analysis' },
-                        { id: 'favorites', label: '🍔 4. Favorite Food Analysis' },
-                        { id: 'segmentation', label: '🏷️ 5. Customer Segmentation' },
-                        { id: 'retention', label: '⚠️ 6. Retention & Churn AI' },
-                        { id: 'marketing', label: '🎯 7. Personalized Marketing' },
-                        { id: 'loyalty', label: '⭐ 8. Loyalty Intelligence' },
-                        { id: 'behavior', label: '🕒 9. Ordering Behavior' },
-                        { id: 'feedback', label: '💬 10. Feedback Analysis' },
-                        { id: 'ai_recommendations', label: '🧠 11. AI Recommendations' },
+                        { id: 'directory', label: t('members_timeline_directory', '👥 Timeline & Directory'), badge: members.length },
+                        { id: 'growth', label: t('members_cust_growth', '📈 1. Customer Growth') },
+                        { id: 'activity', label: t('members_cust_activity', '⚡ 2. Customer Activity') },
+                        { id: 'spending', label: t('members_spending_analysis', '💰 3. Spending Analysis') },
+                        { id: 'favorites', label: t('members_favorite_food', '🍔 4. Favorite Food Analysis') },
+                        { id: 'segmentation', label: t('members_cust_segmentation', '🏷️ 5. Customer Segmentation') },
+                        { id: 'retention', label: t('members_retention_churn', '⚠️ 6. Retention & Churn AI') },
+                        { id: 'marketing', label: t('members_personalized_marketing', '🎯 7. Personalized Marketing') },
+                        { id: 'loyalty', label: t('members_loyalty_intel', '⭐ 8. Loyalty Intelligence') },
+                        { id: 'behavior', label: t('members_ordering_behavior', '🕒 9. Ordering Behavior') },
+                        { id: 'feedback', label: t('members_feedback_analysis', '💬 10. Feedback Analysis') },
+                        { id: 'ai_recommendations', label: t('members_ai_recommendations', '🧠 11. AI Recommendations') },
                     ].map(tab => (
                         <button
                             key={tab.id}
@@ -588,7 +588,7 @@ export default function Members() {
                                 <Search className="w-4 h-4 text-white/40 absolute left-3.5 top-1/2 -translate-y-1/2" />
                                 <input
                                     type="text"
-                                    placeholder="Search members by name, email, phone or ID..."
+                                    placeholder={t('members_search_placeholder', 'Search members by name, email, phone or ID...')}
                                     value={searchQuery}
                                     onChange={e => setSearchQuery(e.target.value)}
                                     className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-xs text-white placeholder:text-white/40 focus:outline-none focus:border-secondary transition-all"
@@ -597,7 +597,7 @@ export default function Members() {
 
                             <div className="flex items-center gap-2.5 w-full sm:w-auto">
                                 <div className="flex items-center gap-1.5 text-xs text-white/60 font-bold shrink-0">
-                                    <Filter className="w-3.5 h-3.5 text-secondary" /> Segment:
+                                    <Filter className="w-3.5 h-3.5 text-secondary" /> {t('members_segment', 'Segment:')}
                                 </div>
                                 <select
                                     value={segmentFilter}
@@ -645,19 +645,19 @@ export default function Members() {
 
                                     <div className="grid grid-cols-2 gap-2 text-xs bg-white/5 p-2.5 rounded-xl border border-white/5">
                                         <div>
-                                            <span className="text-white/40 text-[10px] block">Loyalty Tier:</span>
+                                            <span className="text-white/40 text-[10px] block">{t('members_loyalty_tier', 'Loyalty Tier')}:</span>
                                             <span className="font-bold text-amber-300">{m.loyaltyLevel}</span>
                                         </div>
                                         <div>
-                                            <span className="text-white/40 text-[10px] block">Total Spent:</span>
+                                            <span className="text-white/40 text-[10px] block">{t('members_total_spent', 'Total Spent')}:</span>
                                             <span className="font-bold text-emerald-400">${m.totalSpent?.toFixed(2)}</span>
                                         </div>
                                         <div>
-                                            <span className="text-white/40 text-[10px] block">Total Orders:</span>
+                                            <span className="text-white/40 text-[10px] block">{t('members_total_orders', 'Total Orders')}:</span>
                                             <span className="font-bold text-white">{m.totalOrders} orders</span>
                                         </div>
                                         <div>
-                                            <span className="text-white/40 text-[10px] block">Favorite Meal:</span>
+                                            <span className="text-white/40 text-[10px] block">{t('members_favorite_meal', 'Favorite Meal')}:</span>
                                             <span className="font-bold text-white/80 truncate block">{m.favoriteMeal}</span>
                                         </div>
                                     </div>
@@ -667,12 +667,12 @@ export default function Members() {
                                             onClick={() => setSelectedMember(m)}
                                             className="flex-1 py-2 bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-white rounded-xl text-xs font-bold transition-all border border-amber-500/30 flex items-center justify-center gap-1.5"
                                         >
-                                            <Eye className="w-3.5 h-3.5" /> Timeline & Profile
+                                            <Eye className="w-3.5 h-3.5" /> {t('members_timeline', 'Timeline')} & {t('members_profile', 'Profile')}
                                         </button>
                                         <button
                                             onClick={() => handleSendPromo(m.fullName, "We Miss You Offer")}
                                             className="p-2 bg-white/10 hover:bg-secondary text-white rounded-xl transition-colors shrink-0"
-                                            title="Send Discount"
+                                            title={t('members_send_discount', 'Send Discount')}
                                         >
                                             <Send className="w-3.5 h-3.5" />
                                         </button>
@@ -693,13 +693,13 @@ export default function Members() {
                                 <table className="w-full text-left border-collapse min-w-[700px]">
                                     <thead>
                                         <tr className="border-b border-white/10 bg-white/5 text-[11px] font-black uppercase text-white/50 tracking-wider">
-                                            <th className="py-4 px-6">Member Profile</th>
-                                            <th className="py-4 px-4">Loyalty Tier</th>
-                                            <th className="py-4 px-4">Total Orders</th>
-                                            <th className="py-4 px-4">Total Spent</th>
-                                            <th className="py-4 px-4">Favorite Meal</th>
-                                            <th className="py-4 px-4">Status & Churn</th>
-                                            <th className="py-4 px-6 text-right">Actions</th>
+                                            <th className="py-4 px-6">{t('members_profile', 'Member Profile')}</th>
+                                            <th className="py-4 px-4">{t('members_loyalty_tier', 'Loyalty Tier')}</th>
+                                            <th className="py-4 px-4">{t('members_total_orders', 'Total Orders')}</th>
+                                            <th className="py-4 px-4">{t('members_total_spent', 'Total Spent')}</th>
+                                            <th className="py-4 px-4">{t('members_favorite_meal', 'Favorite Meal')}</th>
+                                            <th className="py-4 px-4">{t('members_status_churn', 'Status & Churn')}</th>
+                                            <th className="py-4 px-6 text-right">{t('members_actions', 'Actions')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/5 text-xs">
@@ -775,12 +775,12 @@ export default function Members() {
                                                             onClick={() => setSelectedMember(m)}
                                                             className="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-white rounded-lg text-xs font-bold transition-all border border-amber-500/30 flex items-center gap-1.5"
                                                         >
-                                                            <Eye className="w-3.5 h-3.5" /> Timeline
+                                                            <Eye className="w-3.5 h-3.5" /> {t('members_timeline', 'Timeline')}
                                                         </button>
                                                         <button
                                                             onClick={() => handleSendPromo(m.fullName, "We Miss You 10% Discount")}
                                                             className="p-1.5 bg-white/5 hover:bg-secondary text-white/60 hover:text-white rounded-lg transition-colors"
-                                                            title="Send Personalized Discount"
+                                                            title={t('members_send_discount', 'Send Discount')}
                                                         >
                                                             <Send className="w-3.5 h-3.5" />
                                                         </button>
@@ -821,7 +821,7 @@ export default function Members() {
 
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                             <div className="bg-[#150F0A] border border-white/10 p-4 sm:p-5 rounded-2xl text-center">
-                                <span className="text-[10px] sm:text-xs text-white/50 font-bold block mb-1">New Today</span>
+                                <span className="text-[10px] sm:text-xs text-white/50 font-bold block mb-1">{t('members_new_today', 'New Today')}</span>
                                 <span className="text-2xl sm:text-3xl font-display font-black text-emerald-400">{newMembersToday}</span>
                                 <span className="text-[9px] sm:text-[10px] text-white/40 block mt-1">First-time signups</span>
                             </div>
@@ -926,7 +926,7 @@ export default function Members() {
                                                 onClick={() => handleSendPromo(m.fullName, "15% Re-engagement Discount")}
                                                 className="w-full sm:w-auto px-3 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-xs font-bold transition-all shadow-md shrink-0"
                                             >
-                                                Send Discount
+                                                {t('members_send_discount', 'Send Discount')}
                                             </button>
                                         </div>
                                     ))}
@@ -981,7 +981,7 @@ export default function Members() {
                             {/* Summary Cards */}
                             <div className="space-y-4">
                                 <div className="bg-[#150F0A] border border-white/10 p-5 rounded-2xl">
-                                    <span className="text-xs text-white/50 font-bold block mb-1">Average Spend Per Member</span>
+                                    <span className="text-xs text-white/50 font-bold block mb-1">{t('members_avg_spend', 'Average Spend Per Member')}</span>
                                     <span className="text-3xl font-display font-black text-emerald-400">${avgSpendPerMember}</span>
                                     <p className="text-xs text-white/40 mt-2">Up 8.2% compared to last quarter</p>
                                 </div>
@@ -1336,19 +1336,19 @@ export default function Members() {
                                 <span className="font-bold text-white">{selectedMember.lastLogin}</span>
                             </div>
                             <div>
-                                <span className="text-white/40 block font-semibold text-[10px]">Total Orders:</span>
+                                <span className="text-white/40 block font-semibold text-[10px]">{t('members_total_orders', 'Total Orders')}:</span>
                                 <span className="font-bold text-white">{selectedMember.totalOrders}</span>
                             </div>
                             <div>
-                                <span className="text-white/40 block font-semibold text-[10px]">Total Amount Spent:</span>
+                                <span className="text-white/40 block font-semibold text-[10px]">{t('members_total_spent', 'Total Amount Spent')}:</span>
                                 <span className="font-bold text-emerald-400">${selectedMember.totalSpent?.toFixed(2)}</span>
                             </div>
                             <div>
-                                <span className="text-white/40 block font-semibold text-[10px]">Favorite Meal:</span>
+                                <span className="text-white/40 block font-semibold text-[10px]">{t('members_favorite_meal', 'Favorite Meal')}:</span>
                                 <span className="font-bold text-white">{selectedMember.favoriteMeal}</span>
                             </div>
                             <div>
-                                <span className="text-white/40 block font-semibold text-[10px]">Loyalty Level:</span>
+                                <span className="text-white/40 block font-semibold text-[10px]">{t('members_loyalty_tier', 'Loyalty Level')}:</span>
                                 <span className="font-bold text-purple-300">{selectedMember.loyaltyLevel}</span>
                             </div>
                             <div>
@@ -1392,7 +1392,7 @@ export default function Members() {
                     
                     <div className="relative bg-[#18110A] border border-white/10 rounded-2xl p-5 sm:p-6 max-w-md w-full space-y-4 z-10 shadow-2xl">
                         <div className="flex justify-between items-center border-b border-white/10 pb-3">
-                            <h3 className="font-bold text-white text-base sm:text-lg">Add New Member Account</h3>
+                            <h3 className="font-bold text-white text-base sm:text-lg">{t('members_add_account', 'Add New Member Account')}</h3>
                             <button onClick={() => setShowAddModal(false)} className="text-white/40 hover:text-white p-1"><X className="w-5 h-5" /></button>
                         </div>
                         <form onSubmit={(e) => {
@@ -1443,7 +1443,7 @@ export default function Members() {
                                 <input name="phone" className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white outline-none focus:border-secondary" placeholder="+254 712 345 678" />
                             </div>
                             <button type="submit" className="w-full py-3 bg-secondary hover:bg-orange-600 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-lg transition-all mt-2">
-                                Save Member
+                                {t('members_save_member', 'Save Member')}
                             </button>
                         </form>
                     </div>
