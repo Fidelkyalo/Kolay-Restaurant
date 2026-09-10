@@ -1,10 +1,73 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bot, Send, X, Sparkles, RefreshCw, AlertTriangle, CheckCircle, Package, Utensils, Tag, ClipboardList, ShieldAlert, MessageSquare, ArrowRight } from 'lucide-react';
+import { Bot, Send, X, Sparkles, AlertTriangle, Utensils, Tag, ClipboardList, Gift, Cake, Search, UserCheck } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
-// Helper to gather live website state
+// Helper to gather strictly live website data
 const getLiveWebsiteData = () => {
-    // 1. Inventory State
+    // 1. Members State (pulls from kolay_members and registered users)
+    const rawMembers = localStorage.getItem('kolay_members');
+    const defaultMembers = [
+        {
+            id: 'MEM-1001',
+            username: 'john_mwangi',
+            fullName: 'John Mwangi',
+            email: 'john.mwangi@gmail.com',
+            phone: '+254 722 123 456',
+            dateJoined: '2025-09-15',
+            birthdayDate: '09-10', // Celebrates today!
+            favoriteMeal: 'Gourmet Beef Burger',
+            loyaltyLevel: 'VIP Platinum',
+            totalSpent: 1250,
+            totalOrders: 48,
+            status: 'Active'
+        },
+        {
+            id: 'MEM-1002',
+            username: 'amina_ali',
+            fullName: 'Amina Ali',
+            email: 'amina.ali@yahoo.com',
+            phone: '+254 733 987 654',
+            dateJoined: '2026-01-20',
+            birthdayDate: '09-12',
+            favoriteMeal: 'Herb-Crusted Salmon',
+            loyaltyLevel: 'Silver Member',
+            totalSpent: 840,
+            totalOrders: 22,
+            status: 'Active'
+        }
+    ];
+
+    let members = defaultMembers;
+    if (rawMembers) {
+        try {
+            const parsed = JSON.parse(rawMembers);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                members = parsed;
+            }
+        } catch (e) {
+            console.error('Error parsing kolay_members:', e);
+        }
+    }
+
+    // 2. Today's Date MM-DD for Birthday Checking
+    const now = new Date();
+    const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+    const currentDay = String(now.getDate()).padStart(2, '0');
+    const todayMMDD = `${currentMonth}-${currentDay}`;
+
+    const todayBirthdays = members.filter(m => {
+        if (!m.birthdayDate) return false;
+        // Normalize birthday string format (YYYY-MM-DD or MM-DD)
+        const parts = m.birthdayDate.split('-');
+        if (parts.length === 3) {
+            return `${parts[1]}-${parts[2]}` === todayMMDD;
+        } else if (parts.length === 2) {
+            return `${parts[0]}-${parts[1]}` === todayMMDD;
+        }
+        return false;
+    });
+
+    // 3. Inventory State
     const rawInventory = localStorage.getItem('kolay_inventory');
     const defaultInventory = [
         { id: 1, name: 'Beef Burger Patties', stock: 12, unit: 'units', category: 'Meat' },
@@ -16,12 +79,19 @@ const getLiveWebsiteData = () => {
         { id: 7, name: 'Chicken Breast', stock: 30, unit: 'kg', category: 'Meat' },
         { id: 8, name: 'Pasta', stock: 3, unit: 'kg', category: 'Dry Goods' },
     ];
-    const inventory = rawInventory ? JSON.parse(rawInventory) : defaultInventory;
+    let inventory = defaultInventory;
+    if (rawInventory) {
+        try {
+            const parsed = JSON.parse(rawInventory);
+            if (Array.isArray(parsed) && parsed.length > 0) inventory = parsed;
+        } catch (e) {}
+    }
+
     const outOfStockItems = inventory.filter(i => Number(i.stock) <= 0);
     const lowStockItems = inventory.filter(i => Number(i.stock) > 0 && Number(i.stock) <= 20);
     const okStockItems = inventory.filter(i => Number(i.stock) > 20);
 
-    // 2. Dishes & Menu State
+    // 4. Menu & Dishes State
     const rawDishes = localStorage.getItem('kolay_dishes');
     const defaultDishes = [
         { id: 1, name: 'Truffle Mushroom Burger', price: 18.50, category: 'Main Course', available: true, isSpecialty: true },
@@ -30,38 +100,59 @@ const getLiveWebsiteData = () => {
         { id: 4, name: 'Classic French Fries', price: 6.50, category: 'Sides', available: false, isSpecialty: false },
         { id: 5, name: 'Organic Garden Salad', price: 9.50, category: 'Starters', available: true, isSpecialty: false },
         { id: 6, name: 'Signature Chocolate Lava Cake', price: 11.00, category: 'Desserts', available: true, isSpecialty: true },
+        { id: 7, name: 'Gourmet Beef Burger', price: 17.00, category: 'Main Course', available: true, isSpecialty: true },
+        { id: 8, name: 'Signature Ribeye', price: 29.50, category: 'Main Course', available: true, isSpecialty: true },
+        { id: 9, name: 'Pasta Carbonara', price: 15.00, category: 'Main Course', available: true, isSpecialty: false },
     ];
-    const dishes = rawDishes ? JSON.parse(rawDishes) : defaultDishes;
+    let dishes = defaultDishes;
+    if (rawDishes) {
+        try {
+            const parsed = JSON.parse(rawDishes);
+            if (Array.isArray(parsed) && parsed.length > 0) dishes = parsed;
+        } catch (e) {}
+    }
+
     const availableDishes = dishes.filter(d => d.available !== false);
     const unavailableDishes = dishes.filter(d => d.available === false);
     const specialtyDishes = dishes.filter(d => d.isSpecialty || d.category === 'Specialties');
 
-    // 3. Active Orders & Kitchen State
+    // 5. Active Orders State
     const rawOrders = localStorage.getItem('kolay_kds_orders');
-    const orders = rawOrders ? JSON.parse(rawOrders) : [
+    let orders = [
         { id: 'ORD-101', table: 'Table 04', items: ['Truffle Mushroom Burger', 'French Fries'], status: 'Preparing' },
         { id: 'ORD-102', table: 'Table 08', items: ['Grilled Atlantic Salmon'], status: 'Pending' },
     ];
+    if (rawOrders) {
+        try {
+            const parsed = JSON.parse(rawOrders);
+            if (Array.isArray(parsed)) orders = parsed;
+        } catch (e) {}
+    }
 
-    // 4. Reservations & Bookings
+    // 6. Bookings & Reservations State
     const rawBookings = localStorage.getItem('kolay_reservations');
-    const bookings = rawBookings ? JSON.parse(rawBookings) : [
+    let bookings = [
         { id: 1, name: 'John Doe', partySize: 4, time: '19:30', status: 'Confirmed' },
         { id: 2, name: 'Sarah Smith', partySize: 2, time: '20:00', status: 'Pending' },
     ];
+    if (rawBookings) {
+        try {
+            const parsed = JSON.parse(rawBookings);
+            if (Array.isArray(parsed)) bookings = parsed;
+        } catch (e) {}
+    }
 
-    // 5. Members State
-    const rawMembers = localStorage.getItem('kolay_members');
-    const members = rawMembers ? JSON.parse(rawMembers) : [
-        { id: 1, name: 'John Mwangi', tier: 'Gold', totalSpent: 1250 },
-        { id: 2, name: 'Amina Ali', tier: 'Silver', totalSpent: 840 },
-    ];
-
-    // 6. Settings
+    // 7. Settings
     const rawSettings = localStorage.getItem('kolay_settings');
-    const settings = rawSettings ? JSON.parse(rawSettings) : { restaurantName: 'Kolay Restaurant', currency: '$' };
+    let settings = { restaurantName: 'Kolay Restaurant', currency: '$' };
+    if (rawSettings) {
+        try { settings = JSON.parse(rawSettings); } catch (e) {}
+    }
 
     return {
+        members,
+        todayBirthdays,
+        todayMMDD,
         inventory,
         outOfStockItems,
         lowStockItems,
@@ -72,7 +163,6 @@ const getLiveWebsiteData = () => {
         specialtyDishes,
         orders,
         bookings,
-        members,
         settings,
     };
 };
@@ -83,13 +173,15 @@ const AiAssistantModal = ({ isOpen, onClose }) => {
         {
             id: 1,
             sender: 'ai',
-            text: t('ai_welcome_msg', 'Hello! I am your AI Operations Simulator. I monitor live website data, inventory, menu availability, offers, and active orders. What would you like to know?'),
+            text: t('ai_welcome_msg', 'Hello! I am your AI Operations Simulator. I monitor live website data, inventory, menu availability, offers, active orders, and member birthdays. What would you like to know?'),
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         }
     ]);
     const [input, setInput] = useState('');
-    const [isThinking, setIsThinking] = useState(false);
     const messagesEndRef = useRef(null);
+
+    const liveData = getLiveWebsiteData();
+    const todayBirthdays = liveData.todayBirthdays;
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -104,136 +196,182 @@ const AiAssistantModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     const quickPrompts = [
+        { label: t('ai_qp_bday', '🎂 Birthday Notifications'), icon: <Cake className="w-3.5 h-3.5 text-pink-400" /> },
         { label: t('ai_qp_stock', 'What is out of stock?'), icon: <AlertTriangle className="w-3.5 h-3.5 text-amber-400" /> },
         { label: t('ai_qp_food', 'What food is available?'), icon: <Utensils className="w-3.5 h-3.5 text-emerald-400" /> },
+        { label: t('ai_qp_members', '👥 Members List'), icon: <UserCheck className="w-3.5 h-3.5 text-blue-400" /> },
         { label: t('ai_qp_offers', 'What offers & specialties exist?'), icon: <Tag className="w-3.5 h-3.5 text-cyan-400" /> },
         { label: t('ai_qp_orders', 'What active orders are in kitchen?'), icon: <ClipboardList className="w-3.5 h-3.5 text-indigo-400" /> },
     ];
 
+    // High-precision, instant natural language response generator reading live website data
     const generateAiResponse = (userQuery) => {
         const query = userQuery.toLowerCase().trim();
         const data = getLiveWebsiteData();
         const currency = data.settings.currency || '$';
 
-        // 1. Check for Out of Stock or Low Stock
-        if (query.includes('out of stock') || query.includes('missing') || query.includes('sold out') || query.includes('unavailable')) {
+        // 1. Birthdays & Birthday Notifications
+        if (query.includes('birthday') || query.includes('bday') || query.includes('birth') || query.includes('born') || query.includes('celebrat')) {
+            if (data.todayBirthdays.length > 0) {
+                let response = `🎉 **LIVE BIRTHDAY ALERT (Today's Celebrations):**\n\n`;
+                response += `We have **${data.todayBirthdays.length} member(s)** celebrating a birthday today (${data.todayMMDD})!\n\n`;
+                data.todayBirthdays.forEach(m => {
+                    response += `🎂 **${m.fullName || m.username}** (${m.email})\n`;
+                    response += `  ├ Phone: ${m.phone || 'N/A'}\n`;
+                    response += `  ├ Loyalty Tier: ${m.loyaltyLevel || 'Member'}\n`;
+                    response += `  └ Favorite Meal: ${m.favoriteMeal || 'Gourmet Beef Burger'}\n\n`;
+                });
+                response += `💡 **Recommended Action:** Send a 20% Birthday Discount voucher or offer a complimentary dessert when they visit today!`;
+                return response;
+            } else {
+                let response = `🎂 **Member Birthdays Status (Live Website Data):**\n\n`;
+                response += `No registered members have a birthday today (${data.todayMMDD}).\n\n`;
+                response += `**Registered Members Overview (${data.members.length} Total):**\n`;
+                data.members.slice(0, 5).forEach(m => {
+                    response += `• **${m.fullName || m.username}** — Birthday: ${m.birthdayDate || 'Not set'} (${m.loyaltyLevel})\n`;
+                });
+                return response;
+            }
+        }
+
+        // 2. Members & Customer Accounts Query
+        if (query.includes('member') || query.includes('user') || query.includes('account') || query.includes('customer') || query.includes('who registered')) {
+            let response = `👥 **Live Website Members Directory (${data.members.length} Registered):**\n\n`;
+            data.members.forEach((m, idx) => {
+                response += `${idx + 1}. 👤 **${m.fullName || m.username}** (@${m.username})\n`;
+                response += `   ├ Email: ${m.email}\n`;
+                response += `   ├ Phone: ${m.phone || 'N/A'}\n`;
+                response += `   ├ Date Joined: ${m.dateJoined || 'Recently'}\n`;
+                response += `   ├ Birthday: ${m.birthdayDate || 'N/A'}\n`;
+                response += `   └ Loyalty: ${m.loyaltyLevel || 'Member'} (${currency}${m.totalSpent || 0} spent)\n\n`;
+            });
+            response += `All accounts created on the website are automatically monitored in real time!`;
+            return response;
+        }
+
+        // 3. Out of Stock / Depleted Items Query
+        if (query.includes('out of stock') || query.includes('missing') || query.includes('sold out') || query.includes('empty') || query.includes('depleted')) {
             const inventoryOut = data.outOfStockItems;
             const dishesOut = data.unavailableDishes;
 
             if (inventoryOut.length === 0 && dishesOut.length === 0) {
-                return `✅ **Great news!** Everything is currently in stock. No inventory items or menu dishes are marked out of stock.`;
+                return `✅ **Live Website Check:** Everything is currently in stock! No stock items or menu dishes are out of stock.`;
             }
 
-            let response = `🚨 **Out of Stock Report (Live State):**\n\n`;
+            let response = `🚨 **Out of Stock Report (Strict Website Data):**\n\n`;
             if (inventoryOut.length > 0) {
-                response += `**Inventory Ingredients Out of Stock (${inventoryOut.length}):**\n`;
+                response += `**Depleted Inventory Items (${inventoryOut.length}):**\n`;
                 inventoryOut.forEach(item => {
                     response += `• 🔴 **${item.name}** (${item.category}): 0 ${item.unit} remaining\n`;
                 });
             }
             if (dishesOut.length > 0) {
-                response += `\n**Menu Items Marked Unavailable (${dishesOut.length}):**\n`;
+                response += `\n**Menu Dishes Marked Unavailable (${dishesOut.length}):**\n`;
                 dishesOut.forEach(dish => {
-                    response += `• ❌ **${dish.name}** (${dish.category}) - ${currency}${dish.price}\n`;
+                    response += `• ❌ **${dish.name}** (${dish.category}) — ${currency}${dish.price}\n`;
                 });
             }
-            response += `\n*Recommendation: Reorder stock for ${inventoryOut.map(i => i.name).join(', ') || 'depleted items'} immediately.*`;
             return response;
         }
 
-        // 2. Check for Low Stock
-        if (query.includes('low stock') || query.includes('stock warning') || query.includes('inventory status') || query.includes('running low')) {
-            const low = data.lowStockItems;
-            if (low.length === 0) {
+        // 4. Low Stock Query
+        if (query.includes('low stock') || query.includes('stock warning') || query.includes('running low')) {
+            if (data.lowStockItems.length === 0) {
                 return `✅ **Stock Status:** All stock items are well supplied above threshold levels.`;
             }
-            let response = `⚠️ **Low Stock Alert (${low.length} items below threshold):**\n\n`;
-            low.forEach(item => {
+            let response = `⚠️ **Low Stock Alert (${data.lowStockItems.length} items below threshold):**\n\n`;
+            data.lowStockItems.forEach(item => {
                 response += `• 🟡 **${item.name}**: ${item.stock} ${item.unit} remaining (${item.category})\n`;
             });
-            response += `\n💡 Total inventory tracked: ${data.inventory.length} items (${data.outOfStockItems.length} out of stock, ${low.length} low stock).`;
             return response;
         }
 
-        // 3. General Stock Question
-        if (query.includes('stock') || query.includes('inventory') || query.includes('ingredient')) {
-            let response = `📦 **Live Inventory & Stock Breakdown:**\n\n`;
-            response += `• 🟢 **Well Supplied (${data.okStockItems.length}):** ${data.okStockItems.map(i => `${i.name} (${i.stock} ${i.unit})`).slice(0, 4).join(', ')}...\n`;
-            response += `• 🟡 **Low Stock (${data.lowStockItems.length}):** ${data.lowStockItems.map(i => `${i.name} (${i.stock} ${i.unit})`).join(', ') || 'None'}\n`;
-            response += `• 🔴 **Out of Stock (${data.outOfStockItems.length}):** ${data.outOfStockItems.map(i => `${i.name}`).join(', ') || 'None'}\n`;
+        // 5. Stock & Inventory Query
+        if (query.includes('stock') || query.includes('inventory') || query.includes('ingredient') || query.includes('supplies')) {
+            let response = `📦 **Live Website Inventory State (${data.inventory.length} Tracked Items):**\n\n`;
+            data.inventory.forEach(i => {
+                const statusIcon = i.stock <= 0 ? '🔴' : i.stock <= 20 ? '🟡' : '🟢';
+                response += `${statusIcon} **${i.name}**: ${i.stock} ${i.unit} (${i.category})\n`;
+            });
             return response;
         }
 
-        // 4. Food & Menu Availability
-        if (query.includes('food') || query.includes('menu') || query.includes('dishes') || query.includes('what is there') || query.includes('available')) {
-            let response = `🍽️ **Live Menu & Food Availability:**\n\n`;
-            response += `Currently **${data.availableDishes.length}** out of **${data.dishes.length}** menu items are ready to serve.\n\n`;
-            response += `**Popular Available Dishes:**\n`;
-            data.availableDishes.slice(0, 6).forEach(dish => {
-                response += `• 🟢 **${dish.name}** — ${currency}${dish.price} (${dish.category})${dish.isSpecialty ? ' ⭐ *Specialty*' : ''}\n`;
+        // 6. Food, Dishes & Menu Query
+        if (query.includes('food') || query.includes('menu') || query.includes('dishes') || query.includes('what is there') || query.includes('available food') || query.includes('what food')) {
+            let response = `🍽️ **Live Website Menu (${data.availableDishes.length} Available Dishes):**\n\n`;
+            data.availableDishes.forEach(dish => {
+                response += `• 🟢 **${dish.name}** — ${currency}${dish.price} [${dish.category}]${dish.isSpecialty ? ' ⭐ *Specialty*' : ''}\n`;
             });
             if (data.unavailableDishes.length > 0) {
-                response += `\n**Currently Unavailable:** ${data.unavailableDishes.map(d => d.name).join(', ')}`;
+                response += `\n🔴 **Unavailable:** ${data.unavailableDishes.map(d => d.name).join(', ')}`;
             }
             return response;
         }
 
-        // 5. Offers & Specialties
+        // 7. Offers & Specialties Query
         if (query.includes('offer') || query.includes('special') || query.includes('discount') || query.includes('deal') || query.includes('promo')) {
-            let response = `🎁 **Active Offers & Chef Specialties:**\n\n`;
+            let response = `🎁 **Active Website Offers & Specialties:**\n\n`;
             if (data.specialtyDishes.length > 0) {
                 data.specialtyDishes.forEach(item => {
-                    response += `⭐ **${item.name}** — ${currency}${item.price}\n  └ ${item.category} • *10% Member Discount Applicable*\n`;
+                    response += `⭐ **${item.name}** — ${currency}${item.price} (${item.category})\n  └ *Eligible for 10% Member Specialty Discount*\n`;
                 });
             } else {
-                response += `No dishes currently flagged as special offer. Check Specialties page to feature items.\n`;
+                response += `No dishes currently marked as specialty offer.`;
             }
-            response += `\n💡 Members receive exclusive 10% discounts on all specialty dishes automatically at checkout!`;
             return response;
         }
 
-        // 6. Active Orders & Kitchen KDS Activity
-        if (query.includes('order') || query.includes('kitchen') || query.includes('kds') || query.includes('activity') || query.includes('sales')) {
-            let response = `🍳 **Kitchen & Order Activity (Live):**\n\n`;
-            response += `• **Active Orders:** ${data.orders.length} in queue\n`;
+        // 8. Orders & Kitchen Activity
+        if (query.includes('order') || query.includes('kitchen') || query.includes('kds') || query.includes('sales') || query.includes('queue')) {
+            let response = `🍳 **Live Kitchen & Order Status:**\n\n`;
+            response += `• **Active Orders in Queue:** ${data.orders.length}\n`;
             data.orders.forEach(ord => {
-                response += `  └ **${ord.id}** (${ord.table || 'Dine-in'}) — Status: *${ord.status}* [${ord.items.join(', ')}]\n`;
+                response += `  └ **${ord.id}** (${ord.table || 'Table'}) — Status: *${ord.status}* [${ord.items.join(', ')}]\n`;
             });
             response += `\n• **Upcoming Table Reservations:** ${data.bookings.length} reservations today.`;
             return response;
         }
 
-        // 7. Specific Item Lookup (e.g., "burger", "salmon", "fries", "pizza", "coffee")
+        // 9. Specific Item Search (e.g. "burger", "salmon", "pizza", "fries", "john", "oil")
         const matchedDish = data.dishes.find(d => query.includes(d.name.toLowerCase()) || query.includes(d.category.toLowerCase()));
         const matchedItem = data.inventory.find(i => query.includes(i.name.toLowerCase()));
+        const matchedMember = data.members.find(m => query.includes(m.username.toLowerCase()) || query.includes((m.fullName || '').toLowerCase()));
 
-        if (matchedDish || matchedItem) {
-            let response = `🔍 **Live Status Search Results:**\n\n`;
+        if (matchedDish || matchedItem || matchedMember) {
+            let response = `🔍 **Live Website Search Results:**\n\n`;
             if (matchedDish) {
-                response += `🍽️ **Dish:** ${matchedDish.name}\n`;
-                response += `• Category: ${matchedDish.category}\n`;
+                response += `🍽️ **Menu Dish:** ${matchedDish.name}\n`;
                 response += `• Price: ${currency}${matchedDish.price}\n`;
+                response += `• Category: ${matchedDish.category}\n`;
                 response += `• Availability: ${matchedDish.available !== false ? '🟢 Available' : '🔴 Out of Stock / Unavailable'}\n`;
             }
             if (matchedItem) {
-                response += `\n📦 **Inventory Ingredient:** ${matchedItem.name}\n`;
+                response += `\n📦 **Inventory Stock Item:** ${matchedItem.name}\n`;
                 response += `• Category: ${matchedItem.category}\n`;
-                response += `• Stock Quantity: ${matchedItem.stock} ${matchedItem.unit}\n`;
+                response += `• Quantity: ${matchedItem.stock} ${matchedItem.unit}\n`;
                 response += `• Status: ${matchedItem.stock <= 0 ? '🔴 OUT OF STOCK' : matchedItem.stock <= 20 ? '🟡 LOW STOCK' : '🟢 OK'}\n`;
+            }
+            if (matchedMember) {
+                response += `\n👤 **Registered Member:** ${matchedMember.fullName || matchedMember.username}\n`;
+                response += `• Email: ${matchedMember.email}\n`;
+                response += `• Phone: ${matchedMember.phone || 'N/A'}\n`;
+                response += `• Birthday: ${matchedMember.birthdayDate || 'N/A'}\n`;
+                response += `• Loyalty Tier: ${matchedMember.loyaltyLevel || 'Member'}\n`;
             }
             return response;
         }
 
-        // Default Comprehensive Overview
+        // Default Comprehensive Real-Time Overview
         return `🤖 **Live Website Operations Summary (${data.settings.restaurantName || 'Kolay Restaurant'}):**\n\n` +
-            `• 📦 **Stock Status:** ${data.inventory.length} total tracked items (${data.outOfStockItems.length} out of stock, ${data.lowStockItems.length} low stock).\n` +
-            `• 🍽️ **Food & Menu:** ${data.availableDishes.length}/${data.dishes.length} dishes active & ready for orders.\n` +
-            `• ⭐ **Active Offers:** ${data.specialtyDishes.length} featured specialty offerings with member discounts.\n` +
-            `• 🍳 **Kitchen Queue:** ${data.orders.length} active orders currently in preparation.\n` +
-            `• 📅 **Reservations:** ${data.bookings.length} customer bookings recorded.\n\n` +
-            `Ask me anything specific like *"What is low in stock?"*, *"What offers are available?"*, or *"Is salmon in stock?"*`;
+            `• 👥 **Registered Members:** ${data.members.length} members (${data.todayBirthdays.length} birthdays today!)\n` +
+            `• 📦 **Stock Status:** ${data.inventory.length} total items (${data.outOfStockItems.length} out of stock, ${data.lowStockItems.length} low stock).\n` +
+            `• 🍽️ **Food & Menu:** ${data.availableDishes.length}/${data.dishes.length} dishes active & available.\n` +
+            `• ⭐ **Offers & Specialties:** ${data.specialtyDishes.length} active menu offers.\n` +
+            `• 🍳 **Kitchen Queue:** ${data.orders.length} active orders in KDS.\n\n` +
+            `Ask me anything specific like *"Who has a birthday today?"*, *"What is out of stock?"*, *"Show members list"*, or *"Is salmon in stock?"*`;
     };
 
+    // Instant submission handler without artificial delays
     const handleSend = (textToSend) => {
         const text = textToSend || input;
         if (!text.trim()) return;
@@ -245,21 +383,17 @@ const AiAssistantModal = ({ isOpen, onClose }) => {
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         };
 
-        setMessages(prev => [...prev, userMsg]);
-        if (!textToSend) setInput('');
-        setIsThinking(true);
+        const responseText = generateAiResponse(text);
+        const aiMsg = {
+            id: Date.now() + 1,
+            sender: 'ai',
+            text: responseText,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
 
-        setTimeout(() => {
-            const responseText = generateAiResponse(text);
-            const aiMsg = {
-                id: Date.now() + 1,
-                sender: 'ai',
-                text: responseText,
-                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            };
-            setMessages(prev => [...prev, aiMsg]);
-            setIsThinking(false);
-        }, 400);
+        // Instant update for maximum responsiveness
+        setMessages(prev => [...prev, userMsg, aiMsg]);
+        if (!textToSend) setInput('');
     };
 
     return (
@@ -269,7 +403,7 @@ const AiAssistantModal = ({ isOpen, onClose }) => {
                 {/* Header */}
                 <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-primary-dark to-slate-900 border-b border-white/10 flex items-center justify-between shrink-0">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20 animate-pulse">
+                        <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
                             <Bot className="w-6 h-6 text-white" />
                         </div>
                         <div>
@@ -277,10 +411,10 @@ const AiAssistantModal = ({ isOpen, onClose }) => {
                                 <h3 className="font-bold text-base sm:text-lg tracking-tight text-white">{t('ai_sim_title', 'AI Operations Simulator')}</h3>
                                 <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-widest flex items-center gap-1">
                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-                                    {t('ai_sim_live', 'LIVE WEBSITE STATE')}
+                                    {t('ai_sim_live', 'STRICT LIVE WEBSITE DATA')}
                                 </span>
                             </div>
-                            <p className="text-xs text-slate-400 font-medium">{t('ai_sim_subtitle', 'Ask any question about stock, menu items, offers & live activity')}</p>
+                            <p className="text-xs text-slate-400 font-medium">{t('ai_sim_subtitle', 'Monitors website stock, menu, offers, members & birthdays')}</p>
                         </div>
                     </div>
                     <button
@@ -291,6 +425,24 @@ const AiAssistantModal = ({ isOpen, onClose }) => {
                         <X className="w-5 h-5" />
                     </button>
                 </div>
+
+                {/* Live Birthday Notification Banner */}
+                {todayBirthdays.length > 0 && (
+                    <div className="bg-gradient-to-r from-pink-600/90 via-purple-600/90 to-pink-600/90 px-4 py-2.5 flex items-center justify-between border-b border-pink-400/30 text-white shrink-0">
+                        <div className="flex items-center gap-2.5 text-xs font-bold">
+                            <Cake className="w-4 h-4 text-amber-300 animate-bounce" />
+                            <span>
+                                🎉 <strong>Birthday Alert:</strong> {todayBirthdays.map(m => m.fullName || m.username).join(', ')} celebrating a birthday today!
+                            </span>
+                        </div>
+                        <button
+                            onClick={() => handleSend("Who has a birthday today?")}
+                            className="text-[11px] font-extrabold bg-white text-pink-700 hover:bg-pink-100 px-3 py-1 rounded-full shadow-sm transition-all whitespace-nowrap"
+                        >
+                            View & Offer Discount
+                        </button>
+                    </div>
+                )}
 
                 {/* Quick Prompts bar */}
                 <div className="px-4 py-2.5 bg-slate-950/60 border-b border-white/5 flex gap-2 overflow-x-auto shrink-0 scrollbar-none">
@@ -332,20 +484,6 @@ const AiAssistantModal = ({ isOpen, onClose }) => {
                             </div>
                         </div>
                     ))}
-
-                    {isThinking && (
-                        <div className="flex gap-3 justify-start">
-                            <div className="w-8 h-8 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
-                                <Sparkles className="w-4 h-4 text-amber-400 animate-spin" />
-                            </div>
-                            <div className="bg-slate-800/90 border border-white/10 text-slate-400 rounded-2xl rounded-tl-none px-4 py-3 text-xs flex items-center gap-2">
-                                <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce" />
-                                <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce [animation-delay:0.2s]" />
-                                <span className="w-2 h-2 rounded-full bg-amber-400 animate-bounce [animation-delay:0.4s]" />
-                                <span className="ml-1 text-amber-300/80 font-medium">{t('ai_sim_analyzing', 'Analyzing live website data...')}</span>
-                            </div>
-                        </div>
-                    )}
                     <div ref={messagesEndRef} />
                 </div>
 
@@ -362,12 +500,12 @@ const AiAssistantModal = ({ isOpen, onClose }) => {
                             type="text"
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            placeholder={t('ai_sim_input_ph', 'Ask AI about stock, food, offers, orders...')}
+                            placeholder={t('ai_sim_input_ph', 'Ask AI about stock, food, offers, members, birthdays...')}
                             className="flex-1 bg-slate-800/90 border border-white/10 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-amber-500/60 focus:ring-1 focus:ring-amber-500/40 transition-all"
                         />
                         <button
                             type="submit"
-                            disabled={!input.trim() || isThinking}
+                            disabled={!input.trim()}
                             className="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold px-4 py-2.5 rounded-xl hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1.5 shrink-0 shadow-lg shadow-amber-500/20 text-xs sm:text-sm"
                         >
                             <span>{t('ai_sim_send', 'Ask')}</span>

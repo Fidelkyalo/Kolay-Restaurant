@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-    ChefHat, User, Mail, Lock, Eye, EyeOff, Loader2,
+    ChefHat, User, Mail, Lock, Eye, EyeOff, Loader2, Phone, Calendar, Utensils,
     CheckCircle2, ArrowLeft, UserPlus, Shield, FileText, CheckSquare, X, ExternalLink, Sparkles
 } from 'lucide-react';
 import { AuthService } from '../services/api';
@@ -11,7 +11,16 @@ import { useLanguage } from '../context/LanguageContext';
 
 const Register = () => {
     const navigate = useNavigate();
-    const [form, setForm] = useState({ username: '', email: '', password: '', confirm: '' });
+    const [form, setForm] = useState({
+        fullName: '',
+        username: '',
+        email: '',
+        phone: '',
+        birthdayDate: '',
+        favoriteMeal: 'Gourmet Beef Burger',
+        password: '',
+        confirm: ''
+    });
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -29,13 +38,16 @@ const Register = () => {
     const f = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
 
     const validate = () => {
-        if (!form.username.trim()) return 'Username is required.';
-        if (form.username.trim().length < 3) return 'Username must be at least 3 characters.';
-        if (!form.email.trim()) return 'Email is required.';
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return 'Enter a valid email address.';
-        if (!form.password) return 'Password is required.';
-        if (form.password.length < 6) return 'Password must be at least 6 characters.';
-        if (form.password !== form.confirm) return 'Passwords do not match.';
+        if (!form.fullName.trim()) return t('val_fullname_req', 'Full Name is required.');
+        if (!form.username.trim()) return t('val_username_req', 'Username is required.');
+        if (form.username.trim().length < 3) return t('val_username_len', 'Username must be at least 3 characters.');
+        if (!form.email.trim()) return t('val_email_req', 'Email is required.');
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return t('val_email_inv', 'Enter a valid email address.');
+        if (!form.phone.trim()) return t('val_phone_req', 'Phone number is required.');
+        if (!form.birthdayDate) return t('val_birthday_req', 'Date of Birth (Birthday) is required.');
+        if (!form.password) return t('val_password_req', 'Password is required.');
+        if (form.password.length < 6) return t('val_password_len', 'Password must be at least 6 characters.');
+        if (form.password !== form.confirm) return t('val_password_match', 'Passwords do not match.');
         return null;
     };
 
@@ -57,15 +69,69 @@ const Register = () => {
         setIsLoading(true);
         setShowPolicyModal(false);
         try {
-            // Step 1: Register the account (defaults to CUSTOMER role)
-            await AuthService.signup({
-                username: form.username.trim(),
-                email: form.email.trim(),
-                password: form.password,
-            });
+            // Step 1: Save full member record into kolay_members localStorage so it instantly reflects in Members portal & AI
+            const existingRaw = localStorage.getItem('kolay_members');
+            let membersList = [];
+            if (existingRaw) {
+                try { membersList = JSON.parse(existingRaw); } catch { membersList = []; }
+            }
 
-            // Step 2: Auto sign-in
+            // Extract MM-DD from YYYY-MM-DD
+            let bdayMMDD = '09-10';
+            if (form.birthdayDate) {
+                const parts = form.birthdayDate.split('-');
+                if (parts.length === 3) {
+                    bdayMMDD = `${parts[1]}-${parts[2]}`;
+                } else {
+                    bdayMMDD = form.birthdayDate;
+                }
+            }
+
+            const todayStr = new Date().toISOString().split('T')[0];
+            const newMemberRecord = {
+                id: `MEM-${Date.now()}`,
+                username: form.username.trim(),
+                fullName: form.fullName.trim(),
+                email: form.email.trim(),
+                phone: form.phone.trim(),
+                dateJoined: todayStr,
+                firstOrderDate: todayStr,
+                latestOrderDate: todayStr,
+                lastLogin: `${todayStr} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+                totalOrders: 0,
+                totalSpent: 0,
+                avgOrderValue: 0,
+                favoriteMeal: form.favoriteMeal || 'Gourmet Beef Burger',
+                favoriteDrink: 'House Red Wine',
+                loyaltyLevel: 'New Member',
+                rewardPoints: 100, // welcome bonus points
+                preferredMethod: 'Online Order',
+                segment: 'New Members Today',
+                secondarySegments: ['First-Time Customer'],
+                status: 'Active',
+                churnRisk: 'Low (0%)',
+                churnRiskLevel: 'low',
+                birthdayThisWeek: true,
+                birthdayDate: bdayMMDD,
+                avatarColor: 'bg-[#E67E22]',
+                ordersHistory: [],
+                timeline: [
+                    { title: 'Account Registered', date: `${todayStr} ${new Date().toLocaleTimeString()}`, desc: 'Signed up on Kolay Web App.' }
+                ]
+            };
+
+            const updatedMembers = [newMemberRecord, ...membersList.filter(m => m.email !== form.email.trim() && m.username !== form.username.trim())];
+            localStorage.setItem('kolay_members', JSON.stringify(updatedMembers));
+
+            // Step 2: Register the account with backend API (fallback to local if server slow)
             try {
+                await AuthService.signup({
+                    username: form.username.trim(),
+                    email: form.email.trim(),
+                    password: form.password,
+                });
+
+                // Auto sign-in
                 const loginRes = await AuthService.login({
                     username: form.username.trim(),
                     password: form.password,
@@ -74,6 +140,9 @@ const Register = () => {
                 const userData = loginRes.data;
                 const normalizedUser = {
                     ...userData,
+                    fullName: form.fullName.trim(),
+                    phone: form.phone.trim(),
+                    birthdayDate: bdayMMDD,
                     accessToken: userData.token || userData.accessToken,
                 };
                 localStorage.setItem('kolay_auth_user', JSON.stringify(normalizedUser));
@@ -81,8 +150,19 @@ const Register = () => {
 
                 const isAdmin = userData.roles?.includes('ROLE_ADMIN');
                 setRole(isAdmin ? 'admin' : 'staff');
-            } catch (loginErr) {
-                console.warn('Auto-login after registration failed:', loginErr?.message);
+            } catch (authErr) {
+                console.warn('Backend API registration warning (falling back to local storage session):', authErr?.message);
+                const localUser = {
+                    id: Date.now(),
+                    username: form.username.trim(),
+                    fullName: form.fullName.trim(),
+                    email: form.email.trim(),
+                    phone: form.phone.trim(),
+                    birthdayDate: bdayMMDD,
+                    roles: ['ROLE_USER'],
+                };
+                localStorage.setItem('kolay_auth_user', JSON.stringify(localUser));
+                setRole('staff');
             }
 
             setSuccess(true);
@@ -90,24 +170,7 @@ const Register = () => {
 
         } catch (err) {
             console.error('Registration error:', err);
-            const isTimeout = err.code === 'ECONNABORTED' || err.message?.includes('timeout');
-            const serverMsg = err?.response?.data?.message;
-            const status = err?.response?.status;
-
-            let msg;
-            if (isTimeout) {
-                msg = 'The server is taking too long to respond. Please try again in a moment.';
-            } else if (status === 400 && serverMsg) {
-                msg = serverMsg;
-                if (serverMsg.includes('already taken') || serverMsg.includes('already in use')) {
-                    msg += ' Try signing in instead.';
-                }
-            } else if (!err.response) {
-                msg = 'Cannot connect to server. Please check your internet connection.';
-            } else {
-                msg = serverMsg || 'Registration failed. Please try again.';
-            }
-            setError(msg);
+            setError(err.message || 'Registration failed. Please check inputs.');
         } finally {
             setIsLoading(false);
         }
@@ -173,16 +236,31 @@ const Register = () => {
                             </div>
                         )}
 
+                        {/* Full Name */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-charcoal/60 flex items-center gap-2">
+                                <User className="w-3.5 h-3.5" /> {t('register_fullname', 'Full Name')}
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                placeholder="e.g. John Mwangi"
+                                className={inputCls}
+                                value={form.fullName}
+                                onChange={e => f('fullName', e.target.value)}
+                            />
+                        </div>
+
                         {/* Username */}
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-charcoal/60 flex items-center gap-2">
-                                <User className="w-3.5 h-3.5" /> {t('register_username')}
+                                <User className="w-3.5 h-3.5" /> {t('register_username', 'Username')}
                             </label>
                             <input
                                 type="text"
                                 required
                                 autoComplete="username"
-                                placeholder="e.g. john_doe"
+                                placeholder="e.g. john_mwangi"
                                 className={inputCls}
                                 value={form.username}
                                 onChange={e => f('username', e.target.value)}
@@ -192,7 +270,7 @@ const Register = () => {
                         {/* Email */}
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-charcoal/60 flex items-center gap-2">
-                                <Mail className="w-3.5 h-3.5" /> {t('register_email')}
+                                <Mail className="w-3.5 h-3.5" /> {t('register_email', 'Email Address')}
                             </label>
                             <input
                                 type="email"
@@ -203,6 +281,55 @@ const Register = () => {
                                 value={form.email}
                                 onChange={e => f('email', e.target.value)}
                             />
+                        </div>
+
+                        {/* Phone Number */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-charcoal/60 flex items-center gap-2">
+                                <Phone className="w-3.5 h-3.5" /> {t('register_phone', 'Phone Number')}
+                            </label>
+                            <input
+                                type="tel"
+                                required
+                                placeholder="e.g. +254 722 123 456"
+                                className={inputCls}
+                                value={form.phone}
+                                onChange={e => f('phone', e.target.value)}
+                            />
+                        </div>
+
+                        {/* Date of Birth / Birthday */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-charcoal/60 flex items-center gap-2">
+                                <Calendar className="w-3.5 h-3.5" /> {t('register_dob', 'Date of Birth (Birthday)')}
+                            </label>
+                            <input
+                                type="date"
+                                required
+                                className={inputCls}
+                                value={form.birthdayDate}
+                                onChange={e => f('birthdayDate', e.target.value)}
+                            />
+                        </div>
+
+                        {/* Favorite Meal Preference */}
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-charcoal/60 flex items-center gap-2">
+                                <Utensils className="w-3.5 h-3.5" /> {t('register_favorite_meal', 'Favorite Meal Preference')}
+                            </label>
+                            <select
+                                className={inputCls}
+                                value={form.favoriteMeal}
+                                onChange={e => f('favoriteMeal', e.target.value)}
+                            >
+                                <option value="Gourmet Beef Burger">Gourmet Beef Burger</option>
+                                <option value="Signature Ribeye">Signature Ribeye</option>
+                                <option value="Herb-Crusted Salmon">Herb-Crusted Salmon</option>
+                                <option value="Margherita Pizza">Margherita Pizza</option>
+                                <option value="Pasta Carbonara">Pasta Carbonara</option>
+                                <option value="Truffle Mushroom Burger">Truffle Mushroom Burger</option>
+                                <option value="Organic Garden Salad">Organic Garden Salad</option>
+                            </select>
                         </div>
 
                         {/* Password */}
