@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, UserPlus, LogIn, ChevronRight, Star, BookOpen, LogOut, User } from 'lucide-react';
+import { Menu, X, UserPlus, LogIn, ChevronRight, Star, BookOpen, LogOut, User, Zap } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { getLoyaltyRecord } from '../utils/loyaltyUtils';
 
 const PublicNavbar = () => {
     const { t } = useLanguage();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [loyaltyBalance, setLoyaltyBalance] = useState(0);
     const profileRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
@@ -22,6 +24,15 @@ const PublicNavbar = () => {
     const isCustomer = !!(authUser?.username);
     const isLoggedIn = !!(authUser?.username);
     const loggedInUsername = authUser?.username || null;
+
+    // Load live points balance
+    useEffect(() => {
+        if (!loggedInUsername) return;
+        const load = () => setLoyaltyBalance(getLoyaltyRecord(loggedInUsername).balance);
+        load();
+        window.addEventListener('storage', load);
+        return () => window.removeEventListener('storage', load);
+    }, [loggedInUsername]);
 
     const handleLogout = () => {
         localStorage.removeItem('kolay_auth_user');
@@ -148,6 +159,17 @@ const PublicNavbar = () => {
                                     className="flex items-center gap-1.5 text-white/75 hover:text-white text-[11px] font-bold uppercase tracking-widest px-4 py-2 rounded-full border border-white/15 hover:border-white/30 hover:bg-white/8 transition-all duration-200"
                                 >
                                     <BookOpen className="w-3.5 h-3.5" /> {t('nav_my_bookings')}
+                                </Link>
+
+                                {/* Points badge pill */}
+                                <Link
+                                    to="/profile"
+                                    onClick={() => setShowProfileMenu(false)}
+                                    className="flex items-center gap-1.5 bg-[#E67E22]/15 hover:bg-[#E67E22]/25 border border-[#E67E22]/30 text-[#E67E22] text-[11px] font-black uppercase tracking-widest px-3 py-2 rounded-full transition-all duration-200"
+                                    title="Deliciously Earned"
+                                >
+                                    <Zap className="w-3.5 h-3.5 fill-[#E67E22]" />
+                                    {loyaltyBalance.toLocaleString()} pts
                                 </Link>
 
                                 {/* Avatar pill with dropdown */}
@@ -302,6 +324,13 @@ const PublicNavbar = () => {
                                             <p className="text-white/30 text-[10px] font-semibold uppercase tracking-wider">Member</p>
                                         </div>
                                     </div>
+                                    <Link
+                                        to="/profile"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-2 bg-[#E67E22]/15 border border-[#E67E22]/30 text-[#E67E22] font-black text-sm py-3 rounded-2xl transition-all"
+                                    >
+                                        <Zap className="w-4 h-4 fill-[#E67E22]" /> {loyaltyBalance.toLocaleString()} pts — Deliciously Earned
+                                    </Link>
                                     <Link
                                         to="/profile"
                                         onClick={() => setIsMobileMenuOpen(false)}

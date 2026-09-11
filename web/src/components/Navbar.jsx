@@ -56,6 +56,7 @@ const Navbar = () => {
         { name: t('nav_careers'),     path: '/admin/careers',      icon: <Briefcase className="w-4 h-4" /> },
         { name: t('nav_employees'),   path: '/employees',          icon: <Users className="w-4 h-4" /> },
         { name: t('nav_members', 'Members'), path: '/members',     icon: <UserCheck className="w-4 h-4" /> },
+        { name: 'Loyalty Points',            path: '/admin/loyalty', icon: <Zap className="w-4 h-4" /> },
     ];
 
     const isAdmin = role === 'admin';
@@ -152,6 +153,12 @@ const Navbar = () => {
                                     <Link to="/admin" onClick={() => setShowProfileMenu(false)}
                                         className="w-full text-left px-5 py-3 text-sm hover:bg-bg-cream transition-colors text-charcoal font-bold flex items-center gap-3">
                                         <Settings className="w-4 h-4 text-secondary" /> {t('nav_settings', 'Settings')}
+                                    </Link>
+                                )}
+                                {isAdmin && (
+                                    <Link to="/admin/loyalty" onClick={() => setShowProfileMenu(false)}
+                                        className="w-full text-left px-5 py-3 text-sm hover:bg-bg-cream transition-colors text-charcoal font-bold flex items-center gap-3">
+                                        <Zap className="w-4 h-4 text-secondary" /> Loyalty Points
                                     </Link>
                                 )}
                                 {isAdmin && (

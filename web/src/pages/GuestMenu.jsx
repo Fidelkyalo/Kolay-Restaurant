@@ -250,6 +250,15 @@ const GuestMenu = () => {
         localStorage.setItem('kolay_orders', JSON.stringify([...existingOrders, newOrder]));
         window.dispatchEvent(new Event('storage'));
 
+        // Award loyalty points to logged-in customers
+        try {
+            const authUser = JSON.parse(localStorage.getItem('kolay_auth_user'));
+            if (authUser?.username) {
+                const earned = ptsForOrder(total);
+                if (earned > 0) awardPoints(authUser.username, earned, `Order placed – KES ${total.toLocaleString()}`, String(newOrder.id));
+            }
+        } catch { /* silent */ }
+
         setOrderSuccess(true);
         setCart([]);
         setIsCheckoutOpen(false);
