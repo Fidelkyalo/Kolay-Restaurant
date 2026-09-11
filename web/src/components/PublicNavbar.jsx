@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Menu, X, UserPlus, LogIn, ChevronRight, Star, BookOpen } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Menu, X, UserPlus, LogIn, ChevronRight, Star, BookOpen, LogOut, User } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -7,6 +7,8 @@ const PublicNavbar = () => {
     const { t } = useLanguage();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const profileRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -16,15 +18,34 @@ const PublicNavbar = () => {
         catch { return null; }
     })();
 
-    // Customer = registered via backend (has accessToken); staff/admin do not
-    const isCustomer = !!(authUser?.accessToken && authUser?.username);
+    // Accept both JWT users and offline-registered users (have username)
+    const isCustomer = !!(authUser?.username);
     const isLoggedIn = !!(authUser?.username);
     const loggedInUsername = authUser?.username || null;
+
+    const handleLogout = () => {
+        localStorage.removeItem('kolay_auth_user');
+        setShowProfileMenu(false);
+        setIsMobileMenuOpen(false);
+        navigate('/');
+        window.dispatchEvent(new Event('storage'));
+    };
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 50);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    // Close profile menu on outside click
+    useEffect(() => {
+        const handler = (e) => {
+            if (profileRef.current && !profileRef.current.contains(e.target)) {
+                setShowProfileMenu(false);
+            }
+        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
     }, []);
 
     const navLinks = [
@@ -120,7 +141,7 @@ const PublicNavbar = () => {
                     {/* ── RIGHT: Actions ── */}
                     <div className="hidden md:flex items-center gap-3 shrink-0">
                         {isCustomer ? (
-                            /* Customer logged in - show My Bookings + avatar + Rate Us */
+                            /* Customer logged in - avatar dropdown with profile/logout */
                             <>
                                 <Link
                                     to="/my-bookings"
@@ -128,14 +149,70 @@ const PublicNavbar = () => {
                                 >
                                     <BookOpen className="w-3.5 h-3.5" /> {t('nav_my_bookings')}
                                 </Link>
-                                <div className="flex items-center gap-2 bg-white/8 border border-white/15 rounded-full pl-1.5 pr-4 py-1.5">
-                                    <span className="w-7 h-7 bg-[#E67E22] rounded-full flex items-center justify-center text-[11px] font-black text-white shrink-0">
-                                        {loggedInUsername?.[0]?.toUpperCase() || '?'}
-                                    </span>
-                                    <span className="text-white/80 text-xs font-bold truncate max-w-[80px]">
-                                        {loggedInUsername}
-                                    </span>
+
+                                {/* Avatar pill with dropdown */}
+                                <div className="relative" ref={profileRef}>
+                                    <button
+                                        onClick={() => setShowProfileMenu(v => !v)}
+                                        className="flex items-center gap-2 bg-white/8 border border-white/15 hover:border-[#E67E22]/50 rounded-full pl-1.5 pr-4 py-1.5 transition-all duration-200 cursor-pointer"
+                                        aria-label="Profile menu"
+                                    >
+                                        <span className="w-7 h-7 bg-[#E67E22] rounded-full flex items-center justify-center text-[11px] font-black text-white shrink-0">
+                                            {loggedInUsername?.[0]?.toUpperCase() || '?'}
+                                        </span>
+                                        <span className="text-white/80 text-xs font-bold truncate max-w-[80px]">
+                                            {loggedInUsername}
+                                        </span>
+                                    </button>
+
+                                    {showProfileMenu && (
+                                        <div className="absolute right-0 mt-3 w-52 bg-[#1a0e08] border border-white/10 rounded-2xl shadow-2xl py-2 z-[200] animate-in fade-in slide-in-from-top-2 duration-150">
+                                            {/* User info */}
+                                            <div className="px-4 py-3 border-b border-white/8 mb-1">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="w-8 h-8 bg-[#E67E22] rounded-full flex items-center justify-center text-sm font-black text-white shrink-0">
+                                                        {loggedInUsername?.[0]?.toUpperCase() || '?'}
+                                                    </span>
+                                                    <div>
+                                                        <p className="text-white font-black text-sm">{loggedInUsername}</p>
+                                                        <p className="text-white/30 text-[10px] font-semibold uppercase tracking-wider">Member</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <Link
+                                                to="/profile"
+                                                onClick={() => setShowProfileMenu(false)}
+                                                className="flex items-center gap-3 px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/5 text-xs font-bold uppercase tracking-widest transition-all"
+                                            >
+                                                <User className="w-3.5 h-3.5 text-[#E67E22]" /> My Profile
+                                            </Link>
+                                            <Link
+                                                to="/my-bookings"
+                                                onClick={() => setShowProfileMenu(false)}
+                                                className="flex items-center gap-3 px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/5 text-xs font-bold uppercase tracking-widest transition-all"
+                                            >
+                                                <BookOpen className="w-3.5 h-3.5 text-[#E67E22]" /> My Bookings
+                                            </Link>
+                                            <a
+                                                href="#ratings"
+                                                onClick={(e) => { handleRateUs(e); setShowProfileMenu(false); }}
+                                                className="flex items-center gap-3 px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/5 text-xs font-bold uppercase tracking-widest transition-all"
+                                            >
+                                                <Star className="w-3.5 h-3.5 text-[#E67E22]" /> Rate Us
+                                            </a>
+                                            <div className="border-t border-white/8 mt-1 pt-1">
+                                                <button
+                                                    onClick={handleLogout}
+                                                    className="w-full flex items-center gap-3 px-4 py-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/5 text-xs font-black uppercase tracking-widest transition-all"
+                                                >
+                                                    <LogOut className="w-3.5 h-3.5" /> Sign Out
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
+
                                 <a
                                     href="#ratings"
                                     onClick={handleRateUs}
@@ -220,8 +297,18 @@ const PublicNavbar = () => {
                                         <span className="w-8 h-8 bg-[#E67E22] rounded-full flex items-center justify-center text-sm font-black text-white shrink-0">
                                             {loggedInUsername?.[0]?.toUpperCase() || '?'}
                                         </span>
-                                        <span className="text-white font-bold text-sm">{loggedInUsername}</span>
+                                        <div>
+                                            <span className="text-white font-bold text-sm">{loggedInUsername}</span>
+                                            <p className="text-white/30 text-[10px] font-semibold uppercase tracking-wider">Member</p>
+                                        </div>
                                     </div>
+                                    <Link
+                                        to="/profile"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-2 bg-white/8 hover:bg-white/12 border border-white/15 text-white font-bold text-sm py-3 rounded-2xl transition-all"
+                                    >
+                                        <User className="w-4 h-4" /> My Profile
+                                    </Link>
                                     <Link
                                         to="/my-bookings"
                                         onClick={() => setIsMobileMenuOpen(false)}
@@ -236,6 +323,12 @@ const PublicNavbar = () => {
                                     >
                                         <Star className="w-4 h-4" /> {t('nav_rate_us')}
                                     </a>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full flex items-center justify-center gap-2 border border-red-500/30 hover:border-red-500/60 text-red-400 hover:text-red-300 hover:bg-red-500/5 font-black text-sm py-3 rounded-2xl transition-all"
+                                    >
+                                        <LogOut className="w-4 h-4" /> Sign Out
+                                    </button>
                                 </>
                             ) : isLoggedIn ? (
                                 <div className="flex items-center gap-3 bg-white/5 rounded-2xl px-4 py-3">

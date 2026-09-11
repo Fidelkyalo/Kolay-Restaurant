@@ -16,7 +16,7 @@ const loadLocal = () => { try { return JSON.parse(localStorage.getItem(LS_KEY) |
 const saveLocal = (list) => { localStorage.setItem(LS_KEY, JSON.stringify(list)); window.dispatchEvent(new Event('storage')); };
 
 const getCustomer = () => {
-    try { const u = JSON.parse(localStorage.getItem('kolay_auth_user')); return (u && u.accessToken && u.username) ? u : null; }
+    try { const u = JSON.parse(localStorage.getItem('kolay_auth_user')); return (u && u.username) ? u : null; }
     catch { return null; }
 };
 

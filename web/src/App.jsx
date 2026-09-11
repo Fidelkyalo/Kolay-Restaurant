@@ -21,6 +21,7 @@ import Register from './pages/Register';
 import CustomerLogin from './pages/CustomerLogin';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfUse from './pages/TermsOfUse';
+import Profile from './pages/Profile';
 import './index.css';
 
 function ScrollToTop() {
@@ -59,6 +60,7 @@ function App() {
           <Route path="/customer-login" element={<CustomerLogin />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-use" element={<TermsOfUse />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </Router>
     </LanguageProvider>
