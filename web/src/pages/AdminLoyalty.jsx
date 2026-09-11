@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Zap, Users, TrendingUp, Gift, Search, RefreshCw,
     Crown, Award, ChevronDown, ChevronUp, Download, ArrowUpCircle, ArrowDownCircle, History
@@ -7,7 +7,8 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useLanguage } from '../context/LanguageContext';
 import {
-    getAllLoyalty, getLoyaltyRecord, awardPoints, getTier, TIERS, ptsToKES, REDEEM
+    getAllLoyalty, getLoyaltyRecord, awardPoints, getTier, TIERS, ptsToKES, REDEEM,
+    seedWelcomePtsToAllMembers
 } from '../utils/loyaltyUtils';
 
 // ── merge loyalty store with kolay_members for full name display ──────────────
@@ -55,37 +56,20 @@ function getMergedMembers() {
     return merged.sort((a, b) => b.balance - a.balance);
 }
 
-// ── Tiny QR canvas per member ─────────────────────────────────────────────────
-function MiniQR({ username, size = 60 }) {
-    const ref = useRef(null);
+// ── Real scannable QR via qrserver.com API ────────────────────────────────
+function MiniQR({ username, size = 80 }) {
+    const [url, setUrl] = useState('');
     useEffect(() => {
-        const canvas = ref.current;
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        canvas.width = size; canvas.height = size;
-        ctx.fillStyle = '#1a0e08';
-        ctx.fillRect(0, 0, size, size);
-        const seed = username.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-        const cell = 4;
-        const cols = Math.floor(size / cell);
-        ctx.fillStyle = '#E67E22';
-        for (let r = 0; r < cols; r++) {
-            for (let c = 0; c < cols; c++) {
-                if (((seed * (r + 1) * 31 + c * 17) ^ (r * 13)) % 3 === 0)
-                    ctx.fillRect(c * cell, r * cell, cell - 1, cell - 1);
-            }
-        }
-        // corner squares
-        [[0,0],[size - cell*5, 0],[0, size - cell*5]].forEach(([x,y]) => {
-            ctx.fillStyle = '#E67E22';
-            ctx.fillRect(x, y, cell*5, cell*5);
-            ctx.fillStyle = '#1a0e08';
-            ctx.fillRect(x+cell, y+cell, cell*3, cell*3);
-            ctx.fillStyle = '#E67E22';
-            ctx.fillRect(x+cell*1.5, y+cell*1.5, cell*2, cell*2);
-        });
+        try {
+            const token = btoa(`${username}:0:kolay`).replace(/=/g, '');
+            const base = window?.location?.origin || 'https://kolay-restaurant.vercel.app';
+            const redeemUrl = `${base}/redeem?user=${encodeURIComponent(username)}&pts=0&token=${token}`;
+            setUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(redeemUrl)}&size=${size}x${size}&bgcolor=ffffff&color=E67E22&margin=4&format=png`);
+        } catch { setUrl(''); }
     }, [username]);
-    return <canvas ref={ref} style={{ width: size, height: size, imageRendering: 'pixelated' }} className="rounded" />;
+    return url
+        ? <img src={url} alt="QR" style={{ width: size, height: size }} className="rounded" />
+        : <div style={{ width: size, height: size }} className="bg-cream rounded flex items-center justify-center text-charcoal/20 text-[8px]">QR</div>;
 }
 
 export default function AdminLoyalty() {
@@ -102,6 +86,7 @@ export default function AdminLoyalty() {
     const load = () => setMembers(getMergedMembers());
 
     useEffect(() => {
+        seedWelcomePtsToAllMembers(); // give 100 pts to any member who doesn't have them yet
         load();
         window.addEventListener('storage', load);
         return () => window.removeEventListener('storage', load);

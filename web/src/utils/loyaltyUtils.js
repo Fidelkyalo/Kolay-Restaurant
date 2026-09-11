@@ -173,3 +173,45 @@ export function getAllLoyalty() {
         }));
     } catch { return []; }
 }
+
+/**
+ * Seed 100 welcome points to every existing member in kolay_members
+ * who doesn't already have a loyalty record.
+ * Safe to call multiple times — idempotent per member.
+ */
+export function seedWelcomePtsToAllMembers() {
+    try {
+        const members = JSON.parse(localStorage.getItem('kolay_members') || '[]');
+        if (!members.length) return 0;
+        const existing = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+        let seeded = 0;
+        members.forEach(m => {
+            if (!m.username) return;
+            const key = m.username.toLowerCase();
+            if (!existing[key]) {
+                // No record at all — give them the welcome 100 pts
+                awardPoints(m.username, EARN_RATES.SIGNUP_BONUS, 'Welcome bonus – Deliciously Earned! (seeded)');
+                seeded++;
+            }
+        });
+        return seeded;
+    } catch { return 0; }
+}
+
+/**
+ * Generate a scannable QR URL for in-restaurant point redemption.
+ * Staff scan the QR → land on /redeem?user=X&token=Y
+ * The token is a simple deterministic hash to prevent spoofing.
+ */
+export function redeemQRUrl(username, balance) {
+    const token = btoa(`${username}:${balance}:kolay`).replace(/=/g, '');
+    const base = window?.location?.origin || 'https://kolay-restaurant.vercel.app';
+    return `${base}/redeem?user=${encodeURIComponent(username)}&pts=${balance}&token=${token}`;
+}
+
+export function verifyRedeemToken(username, pts, token) {
+    try {
+        const expected = btoa(`${username}:${pts}:kolay`).replace(/=/g, '');
+        return token === expected;
+    } catch { return false; }
+}

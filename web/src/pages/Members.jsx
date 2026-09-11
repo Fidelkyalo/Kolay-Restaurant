@@ -11,6 +11,7 @@ import {
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useLanguage } from '../context/LanguageContext';
+import { seedWelcomePtsToAllMembers } from '../utils/loyaltyUtils';
 
 // ── Persistence Key ─────────────────────────────────────────────────────────
 const LS_MEMBERS_KEY = 'kolay_members';
@@ -311,8 +312,10 @@ const loadMembers = () => {
 export default function Members() {
     const { t } = useLanguage();
     const [members, setMembers] = useState(loadMembers);
-    const [activeTab, setActiveTab] = useState('directory'); 
-    // Tabs: 'directory' | 'growth' | 'activity' | 'spending' | 'favorites' | 'segmentation' | 'retention' | 'marketing' | 'loyalty' | 'behavior' | 'feedback' | 'ai_recommendations'
+    const [activeTab, setActiveTab] = useState('directory');
+
+    // Seed 100 welcome pts to all existing members who don't have loyalty records yet
+    useEffect(() => { seedWelcomePtsToAllMembers(); }, []);
 
     const [searchQuery, setSearchQuery] = useState('');
     const [segmentFilter, setSegmentFilter] = useState('All');
