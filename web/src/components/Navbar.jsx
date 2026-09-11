@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     Settings, RefreshCw, Shield, Menu, X, Home, LayoutGrid, Monitor,
     Package, ChevronRight, LogOut, Calendar, ExternalLink, Sparkles,
-    Briefcase, Users, ClipboardList, UserCheck, Bot
+    Briefcase, Users, ClipboardList, UserCheck, Bot, Zap
 } from 'lucide-react';
 import { getRole, clearRole } from '../hooks/useRole';
 import { useLanguage } from '../context/LanguageContext';
