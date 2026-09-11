@@ -10,6 +10,13 @@ import { awardPoints, EARN_RATES } from '../utils/loyaltyUtils';
 import LanguageSelector from '../components/LanguageSelector';
 import { useLanguage } from '../context/LanguageContext';
 
+// SHA-256 hash via Web Crypto API — used to store a verifiable password hash
+// locally so offline login works when the backend is unreachable
+async function hashPassword(password) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 const Register = () => {
     const navigate = useNavigate();
     const [form, setForm] = useState({
@@ -70,6 +77,9 @@ const Register = () => {
         setIsLoading(true);
         setShowPolicyModal(false);
         try {
+            // Hash the password for offline login fallback
+            const pwdHash = await hashPassword(form.password);
+
             // Step 1: Save full member record into kolay_members localStorage so it instantly reflects in Members portal & AI
             const existingRaw = localStorage.getItem('kolay_members');
             let membersList = [];
@@ -95,6 +105,7 @@ const Register = () => {
                 fullName: form.fullName.trim(),
                 email: form.email.trim(),
                 phone: form.phone.trim(),
+                passwordHash: pwdHash,  // stored for offline login verification
                 dateJoined: todayStr,
                 firstOrderDate: todayStr,
                 latestOrderDate: todayStr,
