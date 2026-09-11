@@ -1,10 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Zap, Gift, CheckCircle2, XCircle, ArrowLeft, User } from 'lucide-react';
+import { Zap, Gift, CheckCircle2, XCircle, ArrowLeft } from 'lucide-react';
+import JsBarcode from 'jsbarcode';
 import {
     getLoyaltyRecord, redeemPoints, getTier,
     ptsToKES, REDEEM, verifyRedeemToken
 } from '../utils/loyaltyUtils';
+
+// ── Small barcode preview on the redeem page ──────────────────────────────────
+function BarcodePreview({ value }) {
+    const ref = useRef(null);
+    useEffect(() => {
+        if (!ref.current || !value) return;
+        try {
+            JsBarcode(ref.current, value, {
+                format: 'CODE128', width: 2, height: 60,
+                displayValue: true, font: 'monospace', fontSize: 10,
+                background: '#1a0e08', lineColor: '#E67E22',
+                textPosition: 'bottom', textMargin: 4, margin: 8,
+            });
+        } catch { /* silent */ }
+    }, [value]);
+    return (
+        <div className="bg-[#1a0e08] rounded-xl border border-[#E67E22]/20 px-3 py-2 flex justify-center">
+            <canvas ref={ref} style={{ maxWidth: '100%' }} />
+        </div>
+    );
+}
 
 /**
  * /redeem?user=USERNAME&pts=BALANCE&token=TOKEN
@@ -38,11 +60,11 @@ export default function RedeemScan() {
     }, [username]);
 
     if (!username) {
-        return <ErrorScreen msg="No member data in this QR. Please ask the customer to refresh their QR code." />;
+        return <ErrorScreen msg="No member data in this barcode. Please ask the customer to show their loyalty barcode from their Profile." />;
     }
 
     if (!valid) {
-        return <ErrorScreen msg="This QR code is invalid or expired. Ask the customer to open their Profile and scan the fresh QR." />;
+        return <ErrorScreen msg="This barcode is invalid or expired. Ask the customer to open their Profile → Points tab and show the fresh barcode." />;
     }
 
     if (!loyalty) return null;
@@ -90,6 +112,10 @@ export default function RedeemScan() {
                     <div className="mt-3 pt-3 border-t border-white/10 flex justify-between text-xs">
                         <span className="text-white/30 font-semibold">Worth</span>
                         <span className="text-green-400 font-black">KES {ptsToKES(loyalty.balance).toLocaleString()}</span>
+                    </div>
+                    {/* Barcode */}
+                    <div className="mt-4">
+                        <BarcodePreview value={`KOLAY-${username.toUpperCase().replace(/[^A-Z0-9]/g,'')}-${String(loyalty.balance).padStart(6,'0')}`} />
                     </div>
                 </div>
 
@@ -181,7 +207,7 @@ function ErrorScreen({ msg }) {
                 <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <XCircle className="w-8 h-8 text-red-400" />
                 </div>
-                <h2 className="text-white font-black text-xl mb-2">Invalid QR Code</h2>
+                <h2 className="text-white font-black text-xl mb-2">Invalid Barcode</h2>
                 <p className="text-white/40 text-sm leading-relaxed mb-6">{msg}</p>
                 <Link to="/" className="inline-flex items-center gap-2 bg-white/8 border border-white/15 text-white font-black text-xs uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all">
                     <ArrowLeft className="w-3.5 h-3.5" /> Go Home

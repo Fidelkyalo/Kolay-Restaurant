@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     User, LogOut, Calendar, ShoppingBag, Star, ArrowLeft,
     Clock, Users, CheckCircle2, XCircle, Clock3,
     BookOpen, Utensils, TrendingUp, Zap, Gift, QrCode,
     ChevronUp, ChevronDown, History, ArrowDownCircle, ArrowUpCircle, ExternalLink
 } from 'lucide-react';
+import JsBarcode from 'jsbarcode';
 import { Link, useNavigate } from 'react-router-dom';
 import PublicNavbar from '../components/PublicNavbar';
 import Footer from '../components/Footer';
@@ -37,47 +38,50 @@ const ORDER_STATUS = {
     DELIVERED: { cls: 'bg-white/5 text-white/40 border-white/10',           label: 'Delivered' },
 };
 
-// ── Real scannable QR via qrserver.com API ────────────────────────────────
-function LoyaltyQR({ username, points, tier }) {
-    const [url, setUrl] = useState('');
-    const [loaded, setLoaded] = useState(false);
+// ── Unique loyalty barcode rendered via JsBarcode on a canvas ──────────────
+function LoyaltyBarcode({ username, points, tier }) {
+    const canvasRef = useRef(null);
+    const [error, setError] = useState(false);
+
+    // Build a unique barcode value: KOLAY-{uppercased username}-{zero-padded pts}
+    const barcodeValue = `KOLAY-${username.toUpperCase().replace(/[^A-Z0-9]/g, '')}-${String(points).padStart(6, '0')}`;
 
     useEffect(() => {
-        // Build the redemption URL the QR encodes
+        const canvas = canvasRef.current;
+        if (!canvas) return;
         try {
-            const redeemUrl = redeemQRUrl(username, points);
-            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(redeemUrl)}&size=180x180&bgcolor=1a0e08&color=E67E22&margin=8&format=png`;
-            setUrl(qrApiUrl);
-        } catch {
-            setUrl('');
+            JsBarcode(canvas, barcodeValue, {
+                format:       'CODE128',
+                width:         2,
+                height:        70,
+                displayValue:  true,
+                text:          barcodeValue,
+                fontOptions:   'bold',
+                font:          'monospace',
+                textAlign:     'center',
+                textPosition:  'bottom',
+                textMargin:    4,
+                fontSize:      11,
+                background:    '#1a0e08',
+                lineColor:     '#E67E22',
+                margin:        10,
+            });
+            setError(false);
+        } catch (e) {
+            console.error('Barcode render failed:', e);
+            setError(true);
         }
-    }, [username, points]);
+    }, [barcodeValue]);
 
     return (
         <div className="flex flex-col items-center gap-3">
-            <div className="p-3 bg-[#1a0e08] rounded-2xl border border-[#E67E22]/30 shadow-[0_0_30px_#E67E2220] w-[196px] h-[196px] flex items-center justify-center">
-                {url ? (
-                    <>
-                        {!loaded && (
-                            <div className="flex flex-col items-center gap-2">
-                                <div className="w-8 h-8 border-2 border-[#E67E22]/30 border-t-[#E67E22] rounded-full animate-spin" />
-                                <p className="text-white/20 text-[10px]">Generating QR…</p>
-                            </div>
-                        )}
-                        <img
-                            src={url}
-                            alt="Loyalty QR Code"
-                            className={`rounded-lg transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0 w-0 h-0'}`}
-                            style={{ width: 180, height: 180 }}
-                            onLoad={() => setLoaded(true)}
-                            onError={() => setLoaded(true)}
-                        />
-                    </>
-                ) : (
-                    <div className="text-white/20 text-xs text-center px-3">QR unavailable offline</div>
-                )}
+            <div className="bg-[#1a0e08] rounded-2xl border border-[#E67E22]/30 shadow-[0_0_30px_#E67E2220] px-4 py-4 flex items-center justify-center">
+                {error
+                    ? <p className="text-white/20 text-xs text-center px-4">Barcode unavailable</p>
+                    : <canvas ref={canvasRef} style={{ maxWidth: 260 }} />
+                }
             </div>
-            <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">Scan to Redeem at Restaurant</p>
+            <p className="text-white/30 text-[10px] font-black uppercase tracking-widest">Scan at Restaurant to Redeem</p>
             <div className="text-center">
                 <p className="text-[#E67E22] font-black text-sm">{username}</p>
                 <p className="text-white/40 text-xs">{tier.icon} {tier.name} · {points.toLocaleString()} pts</p>
@@ -445,14 +449,13 @@ export default function Profile() {
 
                         {/* QR Code */}
                         <div className="bg-white/3 border border-white/8 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-8">
-                            <LoyaltyQR username={customer.username} points={loyalty.balance} tier={tier} />
+                            <LoyaltyBarcode username={customer.username} points={loyalty.balance} tier={tier} />
                             <div className="flex-1">
                                 <p className="text-[10px] font-black uppercase text-white/30 tracking-widest mb-3 flex items-center gap-2">
-                                    <QrCode className="w-4 h-4 text-[#E67E22]" /> Your Loyalty Card
+                                    <QrCode className="w-4 h-4 text-[#E67E22]" /> Your Loyalty Barcode
                                 </p>
                                 <p className="text-white/50 text-sm leading-relaxed mb-4">
-                                    Show this QR to restaurant staff to scan and instantly redeem your points as a discount at checkout.
-                                    The QR refreshes with your current balance.
+                                    Show this barcode to staff at the restaurant. They scan it to instantly apply your points as a discount at checkout.
                                 </p>
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-xs">

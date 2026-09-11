@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Zap, Users, TrendingUp, Gift, Search, RefreshCw,
     Crown, Award, ChevronDown, ChevronUp, Download, ArrowUpCircle, ArrowDownCircle, History
 } from 'lucide-react';
+import JsBarcode from 'jsbarcode';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useLanguage } from '../context/LanguageContext';
@@ -56,20 +57,25 @@ function getMergedMembers() {
     return merged.sort((a, b) => b.balance - a.balance);
 }
 
-// ── Real scannable QR via qrserver.com API ────────────────────────────────
-function MiniQR({ username, size = 80 }) {
-    const [url, setUrl] = useState('');
+// ── Mini barcode per member using JsBarcode ──────────────────────────────────
+function MiniBarcode({ username, size = 80 }) {
+    const ref = useRef(null);
     useEffect(() => {
+        if (!ref.current || !username) return;
+        const value = `KOLAY-${username.toUpperCase().replace(/[^A-Z0-9]/g, '')}-000000`;
         try {
-            const token = btoa(`${username}:0:kolay`).replace(/=/g, '');
-            const base = window?.location?.origin || 'https://kolay-restaurant.vercel.app';
-            const redeemUrl = `${base}/redeem?user=${encodeURIComponent(username)}&pts=0&token=${token}`;
-            setUrl(`https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(redeemUrl)}&size=${size}x${size}&bgcolor=ffffff&color=E67E22&margin=4&format=png`);
-        } catch { setUrl(''); }
+            JsBarcode(ref.current, value, {
+                format:       'CODE128',
+                width:         1.2,
+                height:        size * 0.6,
+                displayValue:  false,
+                background:    '#ffffff',
+                lineColor:     '#1a1a1a',
+                margin:        4,
+            });
+        } catch { /* silent */ }
     }, [username]);
-    return url
-        ? <img src={url} alt="QR" style={{ width: size, height: size }} className="rounded" />
-        : <div style={{ width: size, height: size }} className="bg-cream rounded flex items-center justify-center text-charcoal/20 text-[8px]">QR</div>;
+    return <canvas ref={ref} className="rounded" />;
 }
 
 export default function AdminLoyalty() {
@@ -261,7 +267,7 @@ export default function AdminLoyalty() {
                                         <div className="border-t border-cream px-5 pb-5 pt-4 grid md:grid-cols-2 gap-6">
                                             {/* QR + card info */}
                                             <div className="flex items-start gap-4">
-                                                <MiniQR username={m.username} size={80} />
+                                                <MiniBarcode username={m.username} size={80} />
                                                 <div className="space-y-1.5 text-xs">
                                                     <div className="flex gap-2"><span className="text-charcoal/40 font-semibold w-20">Username</span><span className="font-black text-primary">{m.username}</span></div>
                                                     <div className="flex gap-2"><span className="text-charcoal/40 font-semibold w-20">Balance</span><span className="font-black text-secondary">{m.balance.toLocaleString()} pts</span></div>
