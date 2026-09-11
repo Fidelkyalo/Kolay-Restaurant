@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, ArrowRight, CreditCard, Check, Clock, Lock, UserPlus, LogIn } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MenuService, OrderService } from '../services/api';
+import { awardPoints, ptsForOrder, getLoyaltyRecord } from '../utils/loyaltyUtils';
 import Footer from '../components/Footer';
 import { useLanguage } from '../context/LanguageContext';
 

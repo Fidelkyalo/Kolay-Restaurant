@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { AuthService } from '../services/api';
 import { setRole } from '../hooks/useRole';
+import { awardPoints, EARN_RATES } from '../utils/loyaltyUtils';
 import LanguageSelector from '../components/LanguageSelector';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -122,6 +123,9 @@ const Register = () => {
 
             const updatedMembers = [newMemberRecord, ...membersList.filter(m => m.email !== form.email.trim() && m.username !== form.username.trim())];
             localStorage.setItem('kolay_members', JSON.stringify(updatedMembers));
+
+            // Award welcome bonus points
+            awardPoints(form.username.trim(), EARN_RATES.SIGNUP_BONUS, 'Welcome bonus – Deliciously Earned!');
 
             // Step 2: Register the account with backend API (fallback to local if server slow)
             try {
