@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, ArrowRight, CreditCard, Check, Clock, Lock, UserPlus, LogIn } from 'lucide-react';
+import { ShoppingCart, Utensils, X, Plus, Minus, ArrowLeft, ArrowRight, CreditCard, Check, Clock, Lock, UserPlus, LogIn, Zap } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MenuService, OrderService } from '../services/api';
-import { awardPoints, ptsForOrder, getLoyaltyRecord } from '../utils/loyaltyUtils';
+import { awardPoints, ptsForOrder, getLoyaltyRecord, ptsToKES } from '../utils/loyaltyUtils';
 import Footer from '../components/Footer';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -76,6 +76,7 @@ const GuestMenu = () => {
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [orderSuccess, setOrderSuccess] = useState(false);
+    const [earnedPts, setEarnedPts] = useState(0); // pts earned on last order
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const orderType = queryParams.get('type');
@@ -255,7 +256,12 @@ const GuestMenu = () => {
             const authUser = JSON.parse(localStorage.getItem('kolay_auth_user'));
             if (authUser?.username) {
                 const earned = ptsForOrder(total);
-                if (earned > 0) awardPoints(authUser.username, earned, `Order placed – KES ${total.toLocaleString()}`, String(newOrder.id));
+                if (earned > 0) {
+                    awardPoints(authUser.username, earned, `Order placed – KES ${total.toLocaleString()}`, String(newOrder.id));
+                    setEarnedPts(earned);
+                } else {
+                    setEarnedPts(0);
+                }
             }
         } catch { /* silent */ }
 
@@ -595,17 +601,36 @@ const GuestMenu = () => {
             {orderSuccess && (
                 <div className="fixed inset-0 z-[400] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-[#0D0A07]/90 backdrop-blur-md" onClick={() => setOrderSuccess(false)} />
-                    <div className="relative bg-[#1A1008] border border-white/5 rounded-[3rem] p-12 max-w-sm w-full text-center shadow-2xl animate-in zoom-in duration-300">
+                    <div className="relative bg-[#1A1008] border border-white/5 rounded-[3rem] p-10 max-w-sm w-full text-center shadow-2xl animate-in zoom-in duration-300">
                         <div className="w-20 h-20 bg-[#E67E22] rounded-3xl mx-auto flex items-center justify-center mb-6 shadow-[0_0_40px_#E67E2250]">
                             <Check className="w-10 h-10 text-white" />
                         </div>
                         <h2 className="text-3xl font-display font-black text-white mb-3">{t('Chef is ready!')}</h2>
-                        <p className="text-white/40 text-sm leading-relaxed mb-8">
+                        <p className="text-white/40 text-sm leading-relaxed mb-6">
                             {t('Your order has been sent straight to the kitchen.')} {guestInfo.mode === 'Takeaway' ? t('We will prepare it right away.') : t('A server will attend to you matching your name.')}
                         </p>
+
+                        {/* Points earned notification */}
+                        {isLoggedIn && earnedPts > 0 && (
+                            <div className="bg-[#E67E22]/10 border border-[#E67E22]/25 rounded-2xl px-5 py-4 mb-6 text-left">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="w-8 h-8 bg-[#E67E22]/20 rounded-xl flex items-center justify-center shrink-0">
+                                        <Zap className="w-4 h-4 text-[#E67E22] fill-[#E67E22]" />
+                                    </div>
+                                    <p className="text-[#E67E22] font-black text-sm">+{earnedPts} Points Earned!</p>
+                                </div>
+                                <p className="text-white/40 text-xs leading-relaxed">
+                                    This order earned you <strong className="text-[#E67E22]">{earnedPts} pts</strong> worth{' '}
+                                    <strong className="text-green-400">KES {ptsToKES(earnedPts)}</strong> in future discounts.
+                                </p>
+                                <p className="text-white/20 text-[10px] italic mt-1.5">Deliciously Earned</p>
+                            </div>
+                        )}
+
                         <button
                             onClick={() => {
                                 setOrderSuccess(false);
+                                setEarnedPts(0);
                                 setGuestInfo({ name: '', phone: '', mode: 'Takeaway' });
                             }}
                             className="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-black w-full py-4 rounded-xl text-[10px] uppercase tracking-widest transition-colors"

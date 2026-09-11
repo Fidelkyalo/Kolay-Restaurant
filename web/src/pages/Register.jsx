@@ -196,13 +196,39 @@ const Register = () => {
     if (success) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-bg-cream p-4 font-body">
-                <div className="w-full max-w-md bg-white rounded-[2rem] shadow-2xl p-12 text-center border border-cream/50">
-                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="absolute top-10 left-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-10 right-10 w-48 h-48 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="w-full max-w-md bg-white rounded-[2rem] shadow-2xl p-10 text-center border border-cream/50 relative z-10">
+                    {/* Tick */}
+                    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-5">
                         <CheckCircle2 className="w-10 h-10 text-green-500" />
                     </div>
-                    <h2 className="text-2xl font-display font-bold text-primary mb-2">{t('Account Created!')}</h2>
-                    <p className="text-charcoal/50 text-sm mb-2">Welcome, <strong>{form.username}</strong>.</p>
-                    <p className="text-charcoal/40 text-xs">{t('Redirecting you to the menu')}</p>
+                    <h2 className="text-2xl font-display font-bold text-primary mb-1">{t('Account Created!')}</h2>
+                    <p className="text-charcoal/50 text-sm mb-6">Welcome, <strong>{form.username}</strong>.</p>
+
+                    {/* 100 pts welcome banner */}
+                    <div className="bg-[#E67E22]/8 border border-[#E67E22]/25 rounded-2xl px-6 py-5 mb-6 text-left">
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="w-10 h-10 bg-[#E67E22] rounded-xl flex items-center justify-center shrink-0 shadow-md">
+                                <Sparkles className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                                <p className="text-[#E67E22] font-black text-base">🎉 You've received 100 Points!</p>
+                                <p className="text-charcoal/40 text-xs font-semibold italic">Deliciously Earned</p>
+                            </div>
+                        </div>
+                        <p className="text-charcoal/60 text-xs leading-relaxed">
+                            Your <strong className="text-[#E67E22]">100 welcome points</strong> are worth <strong className="text-green-600">KES 50</strong> in discounts.
+                            Keep earning by placing orders — <strong>1 pt per KES 10 spent</strong>.
+                        </p>
+                        <div className="mt-3 flex items-center gap-2 flex-wrap">
+                            <span className="bg-[#E67E22]/15 border border-[#E67E22]/30 text-[#E67E22] text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">⚡ 100 pts</span>
+                            <span className="text-charcoal/30 text-[10px]">=</span>
+                            <span className="bg-green-500/10 border border-green-500/25 text-green-600 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">KES 50 discount</span>
+                        </div>
+                    </div>
+
+                    <p className="text-charcoal/30 text-xs">{t('Redirecting you to the menu')}…</p>
                 </div>
             </div>
         );
