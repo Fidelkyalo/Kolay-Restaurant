@@ -326,6 +326,17 @@ export default function Profile() {
                             </div>
                         </div>
 
+                        {/* Loyalty barcode — visible directly below points on Overview */}
+                        <div className="bg-white/3 border border-white/8 rounded-2xl p-5 flex flex-col items-center gap-3">
+                            <p className="text-[10px] font-black uppercase text-white/30 tracking-widest self-start flex items-center gap-2">
+                                <QrCode className="w-3.5 h-3.5 text-[#E67E22]" /> Your Loyalty Barcode
+                            </p>
+                            <LoyaltyBarcode username={customer.username} points={loyalty.balance} tier={tier} />
+                            <p className="text-white/25 text-[10px] text-center">
+                                Show this to staff at the restaurant to redeem your points at checkout.
+                            </p>
+                        </div>
+
                         {myRating && (
                             <div className="bg-[#E67E22]/8 border border-[#E67E22]/20 rounded-2xl p-5">
                                 <p className="text-[10px] font-black uppercase text-[#E67E22]/60 tracking-widest mb-3">Your Review</p>
