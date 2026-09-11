@@ -88,7 +88,9 @@ const Home = () => {
     const getLoggedInCustomer = () => {
         try {
             const u = JSON.parse(localStorage.getItem('kolay_auth_user'));
-            if (u && u.accessToken && u.username) return u;
+            // Accept both JWT-authenticated users (have accessToken) and locally-registered
+            // users (no accessToken but have a username) so offline/fallback accounts can rate too.
+            if (u && u.username) return u;
             return null;
         } catch { return null; }
     };
